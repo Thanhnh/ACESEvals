@@ -59,8 +59,5 @@ RUN pip install --no-cache-dir \
     urllib3 \
     pycryptodome
 
-# Switch back to non-root user
-USER saber
-
 # Set environment variables for cybersecurity tools
 ENV PATH="/usr/bin:/bin:/usr/local/bin:${PATH}"
