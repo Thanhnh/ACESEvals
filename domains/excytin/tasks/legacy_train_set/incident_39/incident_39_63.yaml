@@ -17,7 +17,7 @@ tasks:
     #       - '5924__2024-06-27t14:33:14.4981439z__"psexec.exe" \vnevado-win10b -accepteula cmd /c "c:\temp\rubeus.exe dump /service:xfbzkp /user:lucasb > c:\temp\adminticket.txt"'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md

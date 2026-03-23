@@ -20,7 +20,7 @@ tasks:
     #       - 'powershell.exe'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md
@@ -85,7 +85,7 @@ tasks:
     #       - 'ntdsutil.exe'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md
@@ -140,7 +140,7 @@ tasks:
     #       - '253.1.244.215'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md
@@ -196,7 +196,7 @@ tasks:
     #       - '231.60.52.209'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md
@@ -261,7 +261,7 @@ tasks:
     #       - 'login.micro.demo.antoinetest.ovh'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md
@@ -322,7 +322,7 @@ tasks:
     #       - '172.33.118.200'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md
@@ -370,7 +370,7 @@ tasks:
     #       - 'alyssat@vnevado.alpineskihouse.co'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md
@@ -426,7 +426,7 @@ tasks:
     #       - '7e838342-601f-4552-9baf-0dfb300cf555'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md
@@ -483,7 +483,7 @@ tasks:
     #       - '''Process ID: 2556, Timestamp: 2024-08-01T12:37:29.6522416Z, Command: "powershell.exe"'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md
@@ -539,7 +539,7 @@ tasks:
     #       - '172.33.118.200'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md

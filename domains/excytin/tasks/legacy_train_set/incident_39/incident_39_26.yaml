@@ -14,7 +14,7 @@ tasks:
     #       - 'https://ac27145722.livelygrass-8d4c4013.eastus2.azurecontainerapps.io/'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md

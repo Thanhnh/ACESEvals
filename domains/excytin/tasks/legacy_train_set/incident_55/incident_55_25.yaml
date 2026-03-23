@@ -19,7 +19,7 @@ tasks:
     #       - 'Executable file: whoami.exe, Execution time: 2024-07-02t09:47:29.6970346'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md

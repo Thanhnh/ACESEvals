@@ -18,7 +18,7 @@ tasks:
     #       - 'S-1-5-21-1740051960-3534030288-108486866-1602'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md
@@ -66,7 +66,7 @@ tasks:
     #       - '107.253.5.27'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md
@@ -114,7 +114,7 @@ tasks:
     #       - '100'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md
@@ -156,7 +156,7 @@ tasks:
     #       - '89e933b9-5b2e-4bd6-bcdf-033db707ef82'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md
@@ -207,7 +207,7 @@ tasks:
     #       - 'Jordan P@vnevado.alpineskihouse.co'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md
@@ -256,7 +256,7 @@ tasks:
     #       - '255.246.85.58'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md
@@ -304,7 +304,7 @@ tasks:
     #       - '100'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md
@@ -354,7 +354,7 @@ tasks:
     #       - '192.238.237.190'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md
@@ -400,7 +400,7 @@ tasks:
     #       - '20893'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md
@@ -441,7 +441,7 @@ tasks:
     #       - 'S-1-5-21-1740051960-3534030288-108486866-1602'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md

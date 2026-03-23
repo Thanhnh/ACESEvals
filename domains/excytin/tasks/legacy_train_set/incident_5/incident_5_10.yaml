@@ -20,7 +20,7 @@ tasks:
     #       - '5572__2024-06-20t09:32:04.8002759z__curl http://vectorsandarrows.com'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md

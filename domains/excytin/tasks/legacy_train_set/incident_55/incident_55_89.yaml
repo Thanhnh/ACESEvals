@@ -17,7 +17,7 @@ tasks:
     #       - '6892__2024-07-02t09:48:23.6453903z__"schtasks.exe" /run /tn run-exportadfstokensignincert.2024-07-02_09_48_23'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md

@@ -15,7 +15,7 @@ tasks:
     #       - '7661dfd4-218f-4016-8a87-66d68a7f098e'
   scoring:
     llm_judge:
-      model: openai/azure/gpt-4.1
+      model: "{judge_llm}"
       steps_per_message: 50
       judge_system_template: judge/checkpoint_judge_system.md
       judge_user_template: judge/checkpoint_judge_user.md
