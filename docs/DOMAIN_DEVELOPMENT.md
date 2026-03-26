@@ -53,9 +53,14 @@ A SABER domain is a self-contained security evaluation environment consisting of
 ### SABER Installation
 
 ```bash
-# Clone oss_saber repository
-git clone https://dev.azure.com/MSECAIModels/Benchmarking/_git/oss_saber
-cd oss_saber
+# Clone the repository
+# GitHub (external):
+git clone https://github.com/microsoft/ACESEvals.git
+cd ACESEvals
+
+# Azure DevOps (Microsoft internal):
+# git clone https://dev.azure.com/MSECAIModels/Benchmarking/_git/oss_saber
+# cd oss_saber
 
 # Install dependencies
 uv sync --all-extras
@@ -137,7 +142,7 @@ Let's create a minimal working domain step by step.
 ### Step 1: Create Directory Structure
 
 ```bash
-cd /path/to/oss_saber/domains
+cd /path/to/ACESEvals/domains
 
 # Create domain directories
 mkdir -p my_domain/{server/config/{tasks,prompts/{instructions,assistants,submits}},client,docker}
@@ -211,8 +216,8 @@ resources:
 
 metadata:
   maintainer: "your-name@example.com"
-  documentation: "https://github.com/your-org/oss_saber/tree/main/domains/my_domain"
-  repository: "https://github.com/your-org/oss_saber"
+  documentation: "https://github.com/microsoft/ACESEvals/tree/main/domains/my_domain"
+  repository: "https://github.com/microsoft/ACESEvals"
   tags:
     - "security"
     - "custom"
@@ -620,7 +625,7 @@ Optional but recommended metadata:
 metadata:
   maintainer: "security-team@example.com"
   documentation: "https://docs.example.com/domains/my_domain"
-  repository: "https://github.com/org/oss_saber"
+  repository: "https://github.com/microsoft/ACESEvals"
   tags:
     - "web-security"
     - "penetration-testing"
