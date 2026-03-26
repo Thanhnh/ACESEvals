@@ -2632,7 +2632,7 @@ wheels = [
 [[package]]
 name = "saber"
 version = "0.2.0"
-source = { git = "https://github.com/microsoft/ACES.git?branch=saber_2_aces_refactor#39cd2a88535cb598c090c2dec6e638608d0ca149" }
+source = { git = "https://github.com/microsoft/ACES.git?branch=saber_2_aces_refactor#f83671c39b8d02144e3a0163decdb79c75d5b151" }
 dependencies = [
     { name = "aiohttp" },
     { name = "anthropic" },
