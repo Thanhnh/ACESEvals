@@ -65,10 +65,10 @@ Issues = "https://dev.azure.com/MSECAIModels/Benchmarking/_git/oss_saber"
 package = false
 
 [tool.uv.sources]
-# Default: install saber from the ADO git repo.
-# To develop against a local checkout, comment the git line and uncomment the path line:
+# Default: install saber from the ADO git repo at a pinned commit.
+# To develop against a local checkout, comment the rev line and uncomment the path line:
 # saber = { path = "./external/saber", editable = true }
-saber = { git = "https://MSECAIModels@dev.azure.com/MSECAIModels/Benchmarking/_git/SABER", branch = "main" }
+saber = { git = "https://MSECAIModels@dev.azure.com/MSECAIModels/Benchmarking/_git/SABER", rev = "59d9aa2a1ed355e8ea072bc2ce8e713b9d5d00ae" }
 
 # inspect_ai = { path = "./external/inspect_ai", editable = true }
 inspect-ai = { git = "https://MSECAIModels@dev.azure.com/MSECAIModels/Benchmarking/_git/inspect_ai", branch = "dev/aces_integration" }
