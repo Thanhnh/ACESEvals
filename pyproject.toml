@@ -73,11 +73,20 @@ package = false
 # Choose ONE saber source based on your repository:
 #
 # GitHub (external — default for ACESEvals repo):
-saber = { git = "https://github.com/microsoft/ACES.git", branch = "saber_2_aces_refactor" }
+saber = { git = "https://github.com/microsoft/ACES.git", branch = "main" }
 # Azure DevOps (Microsoft internal — default for oss_saber repo):
-# saber = { git = "https://MSECAIModels@dev.azure.com/MSECAIModels/Benchmarking/_git/SABER", rev = "59d9aa2a1ed355e8ea072bc2ce8e713b9d5d00ae" }
+# saber = { git = "https://MSECAIModels@dev.azure.com/MSECAIModels/Benchmarking/_git/SABER", branch = "main" }
 # Local editable (for development against a local checkout):
 # saber = { path = "./external/saber", editable = true }
+#
+# NOTE: The saber dependency uses branch = "main" for convenience, but uv.lock
+# pins the exact commit hash for reproducibility. After pushing changes to the
+# ACES/SABER library repo, you MUST update the lock in this repo:
+#
+#   uv lock --upgrade-package saber && uv sync --all-extras
+#
+# Then commit the updated uv.lock. Without this step, evals will continue
+# using the old saber version even though the branch has moved forward.
 
 # inspect-ai: resolves from PyPI by default (no source override needed).
 # Uncomment ONE below for ADO fork or local development:

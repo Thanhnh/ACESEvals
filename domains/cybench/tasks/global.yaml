@@ -1,9 +1,6 @@
 domain: cybench
 
 global_defaults:
-  prompts:
-    assistant: "assistants/inspect_assistant.j2"
-
   max_steps: 30
 
   aggregation: max

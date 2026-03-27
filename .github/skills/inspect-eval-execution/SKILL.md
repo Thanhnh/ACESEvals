@@ -155,3 +155,8 @@ stderr         0.000  stderr          0.000  stderr          0.000
 - **"No tasks found"**: Check `task_filter` matches task YAML filenames (without `.yaml` extension)
 - **Docker build failures**: Run `uv run saber build <domain>` separately to see full build output
 - **Model API errors**: Verify environment variables (`AZURE_OPENAI_API_KEY`, `OPENAI_API_KEY`, etc.)
+- **Stale saber version**: `uv.lock` pins an exact saber commit. If the ACES/SABER library repo has been updated but evals show missing features or unexpected errors, update the lock:
+  ```bash
+  uv lock --upgrade-package saber && uv sync --all-extras
+  ```
+  Then commit the updated `uv.lock`. Use `uv pip show saber` to verify the installed commit.

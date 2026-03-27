@@ -52,6 +52,23 @@ Inspect AI → SABERSandboxEnvironment → ClientSessionManager → REST/MCP Ser
 - **Do NOT** use system Python or create new virtual environments
 - Python 3.11-3.12 required (managed by `.python-version`)
 
+## Dependency Management — saber Library
+
+The `saber` library (from the ACES/SABER repo) is installed via git in `pyproject.toml`
+using `branch = "main"`, but `uv.lock` pins the **exact commit hash**. This means:
+
+- `uv sync` installs whatever commit is locked, **not** the latest on `main`.
+- After changes are pushed to the ACES/SABER library repo, the lock here must be
+  explicitly updated:
+  ```bash
+  uv lock --upgrade-package saber   # resolves latest commit on main
+  uv sync --all-extras               # installs it
+  ```
+  Then commit the updated `uv.lock`.
+- **If evals produce unexpected errors** (missing features, broken scoring), the first
+  thing to check is whether `uv.lock` is pointing at a stale saber commit.
+- Use `uv pip show saber` to see the currently installed commit hash.
+
 ## Code Quality
 
 - **Pre-commit**: Ruff linting/formatting (see `.pre-commit-config.yaml`)
