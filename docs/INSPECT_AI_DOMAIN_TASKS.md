@@ -1,6 +1,8 @@
-# SABER Domain Tasks for Inspect AI
+# ACES Domain Tasks for Inspect AI
 
-SABER provides a **domain task factory pattern** that enables SABER domains to be evaluated as standalone Inspect AI tasks. This integration provides clean task discovery, server lifecycle management, and seamless dataset loading from the running SABER server.
+> **Naming:** This project is externally known as **ACES** (Agent Capability Evaluation Suite). **SABER** is the internal Microsoft codename. The Python package name is `saber`. See the [main README](../README.md) for details.
+
+ACES provides a **domain task factory pattern** that enables ACES domains to be evaluated as standalone Inspect AI tasks. This integration provides clean task discovery, server lifecycle management, and seamless dataset loading from the running SABER server.
 
 ## Overview
 
@@ -372,6 +374,6 @@ This hybrid approach ensures:
 
 ## Related Documentation
 
-- [SABER Client README](../external/saber/src/saber/client/README.md): Client architecture and CLI tools
-- [Domain Development Guide](../docs/DOMAIN_DEVELOPMENT.md): Creating new SABER domains
-- [SABER Architecture](../external/saber/docs/README.md): Overall system architecture
+- [ACES Client README](../external/saber/src/saber/client/README.md): Client architecture and CLI tools
+- [Domain Development Guide](../docs/DOMAIN_DEVELOPMENT.md): Creating new ACES domains
+- [ACES Architecture](../external/saber/docs/README.md): Overall system architecture

@@ -1,8 +1,10 @@
-# SABER Domain Development Guide
+# ACES Domain Development Guide
 
-**A comprehensive guide to building custom security evaluation domains for SABER.**
+> **Naming:** This project is externally known as **ACES** (Agent Capability Evaluation Suite). **SABER** is the internal Microsoft codename. The Python package name is `saber`. See the [main README](../README.md) for details.
 
-This guide walks you through creating production-ready security domains from scratch, following SABER's fail-fast design principles and modern architecture patterns.
+**A comprehensive guide to building custom security evaluation domains for ACES.**
+
+This guide walks you through creating production-ready security domains from scratch, following ACES's fail-fast design principles and modern architecture patterns.
 
 ---
 
@@ -25,7 +27,7 @@ This guide walks you through creating production-ready security domains from scr
 
 ## Overview
 
-A SABER domain is a self-contained security evaluation environment consisting of:
+An ACES domain is a self-contained security evaluation environment consisting of:
 
 1. **Domain Manifest** (`domain.yaml`) - Infrastructure and capability definitions
 2. **Server Configuration** - Task definitions, prompts, and execution logic
@@ -50,7 +52,7 @@ A SABER domain is a self-contained security evaluation environment consisting of
 - Python for custom executors (optional)
 - Security domain expertise for your use case
 
-### SABER Installation
+### ACES Installation
 
 ```bash
 # Clone the repository
