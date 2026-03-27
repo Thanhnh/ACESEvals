@@ -526,6 +526,12 @@ To switch **back** to the git-installed version, reverse step 3 (uncomment the g
 
 > **Tip:** Run `git submodule status external/saber` to verify your submodule points at the expected commit. If it shows a `-` prefix, the submodule is not initialized — run `git submodule update --init external/saber`.
 
+> **ADO users:** The `.gitmodules` file points to the GitHub URL by default. If you're working from the oss_saber ADO repo and don't have GitHub access, override the submodule URL locally (this does not modify tracked files):
+> ```bash
+> git config submodule.external/saber.url https://MSECAIModels@dev.azure.com/MSECAIModels/Benchmarking/_git/SABER
+> git submodule update --init external/saber
+> ```
+
 ### Running Tests
 
 ```bash
