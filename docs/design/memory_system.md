@@ -1,8 +1,8 @@
-# SABER Memory System Design
+# ACES Memory System Design
 
 ## 1. Overview
 
-The SABER Memory System provides agents with persistent, queryable memory 
+The ACES Memory System provides agents with persistent, queryable memory 
 capabilities that span individual episodes, domain runs, and cross-domain 
 evaluations. This enables agents to leverage historical context, learned 
 patterns, and accumulated knowledge.

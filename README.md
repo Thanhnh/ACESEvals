@@ -1,4 +1,6 @@
-# SABER — Security Agent Benchmarking and Evaluation Research
+# ACES — Agent Capability Evaluation Suite
+
+> **Naming:** The external name for this project is **ACES** (Agent Capability Evaluation Suite). **SABER** (Security Agent Benchmarking and Evaluation Research) is the internal Microsoft codename. Both names refer to the same system. You may see "SABER" in code, package names (`saber`), CLI commands (`uv run saber build`), and logs — this is expected.
 
 A thin Python library for benchmarking AI security agents using YAML-driven task definitions and the [inspect_ai](https://inspect.ai-safety-institute.org.uk/) evaluation framework. No server, no client — just `inspect eval`.
 
@@ -40,6 +42,19 @@ SABER loads YAML task definitions, renders Jinja2 prompts, and produces native i
 
 ---
 
+## Dual Repository Setup
+
+This project is maintained in two repositories. Use whichever you have access to — the content is the same:
+
+| | GitHub (external) | Azure DevOps (Microsoft internal) |
+|---|---|---|
+| **Benchmarks** (this repo) | [ACESEvals](https://github.com/microsoft/ACESEvals) | [oss_saber](https://dev.azure.com/MSECAIModels/Benchmarking/_git/oss_saber) |
+| **Library** (saber package) | [ACES](https://github.com/microsoft/ACES) | [SABER](https://dev.azure.com/MSECAIModels/Benchmarking/_git/SABER) |
+
+The `pyproject.toml` has labeled source blocks for each — uncomment the matching block for your repo. The GitHub sources are active by default.
+
+---
+
 ## Quick Start
 
 ### Prerequisites
@@ -53,14 +68,20 @@ SABER loads YAML task definitions, renders Jinja2 prompts, and produces native i
 
 ```bash
 # Clone the repository
-git clone https://dev.azure.com/MSECAIModels/Benchmarking/_git/oss_saber
-cd oss_saber
+# GitHub (external):
+git clone https://github.com/microsoft/ACESEvals.git
+cd ACESEvals
+
+# Azure DevOps (Microsoft internal):
+# git clone https://dev.azure.com/MSECAIModels/Benchmarking/_git/oss_saber
+# cd oss_saber
 
 # Install uv (if not already installed)
 curl -LsSf https://astral.sh/uv/install.sh | sh
 source $HOME/.local/bin/env
 
-# Install all dependencies (saber is fetched from ADO git by default)
+# Install all dependencies
+# (saber library is fetched from GitHub by default; see pyproject.toml to switch to ADO)
 uv sync --all-extras
 
 # Configure LLM credentials
@@ -475,9 +496,9 @@ uv run inspect view logs/<timestamp>_<domain>_<id>.eval
 
 ## Development
 
-### Developing Against a Local SABER Checkout
+### Developing Against a Local SABER/ACES Checkout
 
-By default, `saber` is installed from the ADO git repository. If you need to iterate on SABER code locally (e.g., to test changes before pushing), you can switch to an editable local install using the git submodule:
+By default, the `saber` library is installed from a git repository (GitHub for ACESEvals, ADO for oss_saber). If you need to iterate on the library code locally, switch to an editable local install using the git submodule:
 
 ```bash
 # 1. Initialize the saber submodule (one-time)
@@ -486,15 +507,15 @@ git submodule update --init external/saber
 # 2. Make sure your submodule is up to date with the remote
 cd external/saber
 git fetch origin
-git checkout aces            # or whichever branch you need
-git pull origin aces
+git checkout main            # or whichever branch you need
+git pull origin main
 cd ../..
 
 # 3. Flip pyproject.toml to the local source
-#    In [tool.uv.sources], comment the git line and uncomment the path line:
+#    In [tool.uv.sources], comment the active git line and uncomment the path line:
 #
 #    [tool.uv.sources]
-#    # saber = { git = "...", branch = "aces" }
+#    # saber = { git = "...", branch = "main" }
 #    saber = { path = "./external/saber", editable = true }
 
 # 4. Re-sync dependencies
