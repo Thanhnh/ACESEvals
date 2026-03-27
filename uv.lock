@@ -45,7 +45,7 @@ requires-dist = [
     { name = "openai", specifier = ">=2.26.0" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.0.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
-    { name = "saber", git = "https://github.com/microsoft/ACES.git?branch=saber_2_aces_refactor" },
+    { name = "saber", git = "https://github.com/microsoft/ACES.git?branch=main" },
 ]
 provides-extras = ["copilot", "claude-code", "dev"]
 
@@ -2632,7 +2632,7 @@ wheels = [
 [[package]]
 name = "saber"
 version = "0.2.0"
-source = { git = "https://github.com/microsoft/ACES.git?branch=saber_2_aces_refactor#f83671c39b8d02144e3a0163decdb79c75d5b151" }
+source = { git = "https://github.com/microsoft/ACES.git?branch=main#194f02937403f1e1d715b5326a4d9d05bb9b950e" }
 dependencies = [
     { name = "aiohttp" },
     { name = "anthropic" },
