@@ -127,7 +127,7 @@ class TrajectoryAnalysisStrategy:
 
         sigma_quality = 0.0
         if self._sigma_system:
-            model_name = _extra_str(ctx, "model", "openai/azure/gpt-4.1")
+            model_name = _extra_str(ctx, "model", "openai/azure/gpt-5-mini")
             sigma_quality = await score_sigma_rule(
                 predicted,
                 detection_objective,
@@ -439,7 +439,7 @@ class F1SigmaStrategy:
             predicted = parse_model_output(ctx.submission)
             if "sigma_rule" not in predicted:
                 predicted["sigma_rule"] = sigma_rule
-            model_name = _extra_str(ctx, "model", "openai/azure/gpt-4.1")
+            model_name = _extra_str(ctx, "model", "openai/azure/gpt-5-mini")
             sigma_quality = await score_sigma_rule(
                 predicted,
                 detection_objective,
