@@ -1,7 +1,13 @@
 ```instructions
-# SABER Repository – Copilot Instructions
+# ACES / SABER Repository – Copilot Instructions
 
-**SABER** (Security Agent Benchmarking and Evaluation Research) is a distributed system for benchmarking agentic workflows in cybersecurity domains using **inspect_ai** integration with **Model Context Protocol (MCP)**.
+> **Naming:** The external name for this project is **ACES** (Agent Capability Evaluation Suite). **SABER** (Security Agent Benchmarking and Evaluation Research) is the internal Microsoft codename. The Python package, CLI commands, and code all use the name `saber`. Both names refer to the same system.
+>
+> **Dual repositories:**
+> - **GitHub (external):** [ACESEvals](https://github.com/microsoft/ACESEvals) + [ACES](https://github.com/microsoft/ACES)
+> - **Azure DevOps (internal):** [oss_saber](https://dev.azure.com/MSECAIModels/Benchmarking/_git/oss_saber) + [SABER](https://dev.azure.com/MSECAIModels/Benchmarking/_git/SABER)
+
+**SABER** is a distributed system for benchmarking agentic workflows in cybersecurity domains using **inspect_ai** integration with **Model Context Protocol (MCP)**.
 
 ## Repository Structure
 
@@ -45,6 +51,23 @@ Inspect AI → SABERSandboxEnvironment → ClientSessionManager → REST/MCP Ser
 - Install deps: `uv sync --all-extras` (workspace root)
 - **Do NOT** use system Python or create new virtual environments
 - Python 3.11-3.12 required (managed by `.python-version`)
+
+## Dependency Management — saber Library
+
+The `saber` library (from the ACES/SABER repo) is installed via git in `pyproject.toml`
+using `branch = "main"`, but `uv.lock` pins the **exact commit hash**. This means:
+
+- `uv sync` installs whatever commit is locked, **not** the latest on `main`.
+- After changes are pushed to the ACES/SABER library repo, the lock here must be
+  explicitly updated:
+  ```bash
+  uv lock --upgrade-package saber   # resolves latest commit on main
+  uv sync --all-extras               # installs it
+  ```
+  Then commit the updated `uv.lock`.
+- **If evals produce unexpected errors** (missing features, broken scoring), the first
+  thing to check is whether `uv.lock` is pointing at a stale saber commit.
+- Use `uv pip show saber` to see the currently installed commit hash.
 
 ## Code Quality
 
