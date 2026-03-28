@@ -210,6 +210,10 @@ external/inspect_ai/
 # AI Assistant directories
 **/.github
 **/.claude
+
+# Hugging Face cache
+**/.hf_cache/
+
 # Local experiment outputs
 latest_experiments/
 

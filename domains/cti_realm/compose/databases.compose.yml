@@ -10,8 +10,8 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:8080/v1/rest/mgmt", "-d", '{"db":"NetDefaultDB","csl":".show version"}', "-H", "Content-Type: application/json"]
       interval: 30s
       timeout: 10s
-      retries: 5
-      start_period: 60s
+      retries: 10
+      start_period: 120s
     restart: "no"
     networks:
       - cti-realm-database
@@ -30,7 +30,13 @@ services:
     volumes:
       - ./docker/kusto_init:/app
     working_dir: /app
-    command: bash -c "python init_kusto.py && python load_data.py"
+    command: bash -c "python init_kusto.py && python load_data.py; touch /tmp/init_done && tail -f /dev/null"
+    healthcheck:
+      test: ["CMD", "test", "-f", "/tmp/init_done"]
+      interval: 10s
+      timeout: 5s
+      retries: 60
+      start_period: 30s
     networks:
       - cti-realm-database
     restart: "no"

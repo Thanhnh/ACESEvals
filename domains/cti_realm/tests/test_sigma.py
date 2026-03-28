@@ -108,18 +108,19 @@ class TestScoreSigmaRule:
         assert result == pytest.approx(0.425)
 
     @pytest.mark.asyncio
-    async def test_generate_raises_exception_propagates(self) -> None:
-        """LLM generate() raises exception → propagates to caller."""
+    async def test_generate_raises_exception_returns_zero(self) -> None:
+        """LLM generate() raises exception → returns 0.0 gracefully."""
         mock_model = AsyncMock()
         mock_model.generate = AsyncMock(side_effect=RuntimeError("API down"))
 
         with patch("cti_realm.scoring._sigma.get_model", return_value=mock_model):
-            with pytest.raises(RuntimeError, match="API down"):
-                await score_sigma_rule(
-                    {"sigma_rule": "title: Test"},
-                    "Detect X",
-                    **_SIGMA_KWARGS,  # type: ignore[arg-type]
-                )
+            result = await score_sigma_rule(
+                {"sigma_rule": "title: Test"},
+                "Detect X",
+                **_SIGMA_KWARGS,  # type: ignore[arg-type]
+            )
+
+        assert result == 0.0
 
     @pytest.mark.asyncio
     async def test_custom_weights_respected(self) -> None:

@@ -111,6 +111,56 @@ def parse_model_output(output: str) -> dict[str, object]:
         return extract_fields_with_regex(output)
 
 
+def extract_score_and_reasoning_from_text(text: str) -> tuple[float, str]:
+    """Extract a score and reasoning from text when JSON parsing fails.
+
+    Tries multiple regex patterns to find a score value and optional reasoning.
+
+    Args:
+        text: Raw text response from LLM judge.
+
+    Returns:
+        Tuple of (score, reasoning). Score is 0.0–1.0, or 0.05 if not found.
+    """
+    score = 0.05
+    reasoning = "No reasoning extracted"
+
+    for pat in [
+        r'"score"\s*:\s*([0-9]*\.?[0-9]+)',
+        r"score\s*:\s*([0-9]*\.?[0-9]+)",
+        r"(?:^|\s)([0-1]\.[0-9]+)(?:\s|$)",
+        r"(?:^|\s)(0\.[0-9]+)(?:\s|$)",
+        r"(?:^|\s)(1\.0+)(?:\s|$)",
+    ]:
+        m = re.search(pat, text, re.IGNORECASE)
+        if m:
+            try:
+                val = float(m.group(1))
+                if 0.0 <= val <= 1.0:
+                    score = val
+                    break
+            except (ValueError, IndexError):
+                continue
+
+    for pat in [
+        r'"reasoning"\s*:\s*"([^"]+)"',
+        r'reasoning\s*:\s*"([^"]+)"',
+        r"reasoning\s*:\s*([^\n]+)",
+        r"(?:critique|explanation|rationale)\s*:\s*([^\n]+)",
+    ]:
+        m = re.search(pat, text, re.IGNORECASE)
+        if m:
+            extracted = m.group(1).strip()
+            if extracted and len(extracted) > 5:
+                reasoning = extracted
+                break
+
+    if score == 0.05:
+        logger.warning("Could not extract score from text, defaulting to 0.05")
+
+    return score, reasoning
+
+
 def extract_sigma_scores_from_text(text: str) -> tuple[float, float]:
     """Extract syntax and specificity scores from text.
 
@@ -127,6 +177,7 @@ def extract_sigma_scores_from_text(text: str) -> tuple[float, float]:
         r'"syntax_score"\s*:\s*([0-9]*\.?[0-9]+)',
         r"syntax_score\s*:\s*([0-9]*\.?[0-9]+)",
         r"syntax\s*:\s*([0-9]*\.?[0-9]+)",
+        r"syntax_score\s+(?:is\s+)?([0-9]*\.?[0-9]+)",
     ]:
         m = re.search(pat, text, re.IGNORECASE)
         if m:
@@ -139,6 +190,7 @@ def extract_sigma_scores_from_text(text: str) -> tuple[float, float]:
         r'"specificity"\s*:\s*([0-9]*\.?[0-9]+)',
         r"specificity\s*:\s*([0-9]*\.?[0-9]+)",
         r"specificity_score\s*:\s*([0-9]*\.?[0-9]+)",
+        r"specificity\s+(?:is\s+)?([0-9]*\.?[0-9]+)",
     ]:
         m = re.search(pat, text, re.IGNORECASE)
         if m:

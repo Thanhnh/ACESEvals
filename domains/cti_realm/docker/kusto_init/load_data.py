@@ -58,7 +58,6 @@ def insert_batch(table_name: str, batch: List[Dict], batch_num: int) -> bool:
     if not batch:
         return True
 
-    # Format data for Kusto - format_for_kusto_ingest returns the complete command
     csl = format_for_kusto_ingest(table_name, batch)
 
     print(f"  Batch {batch_num}: Inserting {len(batch)} records...")
