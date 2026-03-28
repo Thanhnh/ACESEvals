@@ -492,6 +492,27 @@ uv run inspect view
 uv run inspect view logs/<timestamp>_<domain>_<id>.eval
 ```
 
+### Analysis Notebooks
+
+For in-depth comparative analysis across models, use the Jupyter notebooks in `notebooks/`:
+
+| Notebook | Description |
+|----------|-------------|
+| [`eval_analysis.ipynb`](notebooks/eval_analysis.ipynb) | **Domain-agnostic** — works with any SABER domain. Standard analyses (scores, cost, tokens, sub-tasks) plus a per-group breakdown that requires a domain-specific `GROUP_FN`. Start here to analyze a new domain. |
+| [`excytin_analysis.ipynb`](notebooks/excytin_analysis.ipynb) | **Excytin-specific** — self-contained notebook pre-configured for incident response. Includes all generic analyses plus Excytin-specific experiments (per-incident breakdown, submission vs. checkpoint gap heatmap). |
+| [`cybench_analysis.ipynb`](notebooks/cybench_analysis.ipynb) | **CyBench-specific** — self-contained notebook pre-configured for CTF challenges. Includes all generic analyses plus CyBench-specific experiments (per-challenge breakdown, submission vs. checkpoint gap heatmap). |
+
+All notebooks use the shared `notebooks/saber_analysis/` module for data loading and plotting utilities.
+
+To run:
+```bash
+# Open in VS Code (recommended — use the Jupyter extension)
+code notebooks/eval_analysis.ipynb
+
+# Or launch JupyterLab
+uv run jupyter lab notebooks/
+```
+
 ---
 
 ## Development
