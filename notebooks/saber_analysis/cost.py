@@ -1,20 +1,23 @@
-"""Cost computation utilities for SABER eval analysis."""
+"""Cost computation utilities for SABER eval analysis.
+
+Uses inspect_ai's typed log API (``read_eval_log``) for header-only reads.
+"""
 
 from __future__ import annotations
 
-import json
 import os
-import zipfile
 
 import pandas as pd
+from inspect_ai.log import read_eval_log
+from inspect_ai.model._model_output import ModelUsage
 
 
-def calc_cost(usage: dict, pricing: dict) -> float:
-    """Compute dollar cost from a token-usage dict and per-million-token pricing."""
-    inp = usage.get("input_tokens", 0)
-    out = usage.get("output_tokens", 0)
-    cr = usage.get("input_tokens_cache_read", 0)
-    cw = usage.get("input_tokens_cache_write", 0)
+def calc_cost(usage: ModelUsage, pricing: dict) -> float:
+    """Compute dollar cost from a ModelUsage object and per-million-token pricing."""
+    inp = usage.input_tokens or 0
+    out = usage.output_tokens or 0
+    cr = usage.input_tokens_cache_read or 0
+    cw = usage.input_tokens_cache_write or 0
     return (
         (inp / 1e6) * pricing["input"]
         + (out / 1e6) * pricing["output"]
@@ -47,31 +50,37 @@ def extract_cost_rows(
         log_path = os.path.join(log_dir, log_file)
         if not os.path.exists(log_path):
             continue
-        with zipfile.ZipFile(log_path) as z:
-            header = json.loads(z.read("header.json"))
-        mu = header.get("stats", {}).get("model_usage", {})
+
+        log = read_eval_log(log_path, header_only=True)
+
+        # Extract saber_overall score from header
         score = None
-        for s in header.get("results", {}).get("scores", []):
-            if s.get("name") == "saber_overall":
-                score = s["metrics"]["mean"]["value"]
+        if log.results and log.results.scores:
+            for sc in log.results.scores:
+                if sc.name == "saber_overall":
+                    score = sc.metrics["mean"].value
+
+        # Extract model usage from stats
         agent_cost = 0.0
-        agent_tokens: dict = {}
-        for api_model, usage in mu.items():
-            p = pricing.get(api_model)
-            if p is None:
-                continue
-            agent_cost = calc_cost(usage, p)
-            agent_tokens = usage
+        agent_usage: ModelUsage | None = None
+        if log.stats and log.stats.model_usage:
+            for api_model, usage in log.stats.model_usage.items():
+                p = pricing.get(api_model)
+                if p is None:
+                    continue
+                agent_cost = calc_cost(usage, p)
+                agent_usage = usage
+
         rows.append(
             {
                 "model": model_name,
                 "score": score,
-                "input_tokens": agent_tokens.get("input_tokens", 0),
-                "output_tokens": agent_tokens.get("output_tokens", 0),
-                "cache_read": agent_tokens.get("input_tokens_cache_read", 0),
-                "cache_write": agent_tokens.get("input_tokens_cache_write", 0),
-                "reasoning_tokens": agent_tokens.get("reasoning_tokens", 0),
-                "total_tokens": agent_tokens.get("total_tokens", 0),
+                "input_tokens": agent_usage.input_tokens if agent_usage else 0,
+                "output_tokens": agent_usage.output_tokens if agent_usage else 0,
+                "cache_read": (agent_usage.input_tokens_cache_read or 0) if agent_usage else 0,
+                "cache_write": (agent_usage.input_tokens_cache_write or 0) if agent_usage else 0,
+                "reasoning_tokens": (agent_usage.reasoning_tokens or 0) if agent_usage else 0,
+                "total_tokens": agent_usage.total_tokens if agent_usage else 0,
                 "total_cost": agent_cost,
                 "cost_per_sample": agent_cost / n_samples if n_samples > 0 else 0,
             }

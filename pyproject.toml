@@ -47,6 +47,10 @@ claude-code = [
     # Claude Code agent support (requires Anthropic API key)
     "claude-code-sdk>=0.0.25",
 ]
+analysis = [
+    "scipy>=1.11.0",
+    "seaborn>=0.13.0",
+]
 dev = [
     "pytest>=7.0.0",
     "black>=23.0.0",
@@ -88,9 +92,14 @@ saber = { git = "https://github.com/microsoft/ACES.git", branch = "main" }
 # Then commit the updated uv.lock. Without this step, evals will continue
 # using the old saber version even though the branch has moved forward.
 
-# inspect-ai: resolves from PyPI by default (no source override needed).
-# Uncomment ONE below for ADO fork or local development:
-# inspect-ai = { git = "https://MSECAIModels@dev.azure.com/MSECAIModels/Benchmarking/_git/inspect_ai", branch = "dev/aces_integration" }
+# inspect-ai: Use ADO fork with tool_call_limit support required by saber agents.
+# PyPI inspect-ai never had tool_call_limit; saber's copilot/claude_code solvers depend on it.
+# TODO: Once saber is updated to remove the tool_call_limit dependency, switch back to PyPI:
+#   - Comment out the ADO line below
+#   - copilot/claude_code agents will then work for external GitHub users too
+# WARNING: This ADO source requires Microsoft internal credentials. Do NOT push this
+# to the GitHub ACESEvals repo — external users should use PyPI inspect-ai.
+inspect-ai = { git = "https://MSECAIModels@dev.azure.com/MSECAIModels/Benchmarking/_git/inspect_ai", branch = "dev/aces_integration" }
 # inspect-ai = { path = "./external/inspect_ai", editable = true }
 
 [dependency-groups]
