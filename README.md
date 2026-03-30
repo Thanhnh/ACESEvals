@@ -513,24 +513,63 @@ uv run inspect view logs/<timestamp>_<domain>_<id>.eval
 
 ### Analysis Notebooks
 
-For in-depth comparative analysis across models, use the Jupyter notebooks in `notebooks/`:
+For in-depth comparative analysis across models and agent architectures, use the Jupyter notebooks in `notebooks/`. Pre-run sample eval files are included in `eval_samples/` — no need to run evaluations first.
+
+#### Domain-Specific Analysis (Model Comparison)
 
 | Notebook | Description |
 |----------|-------------|
-| [`eval_analysis.ipynb`](notebooks/eval_analysis.ipynb) | **Domain-agnostic** — works with any SABER domain. Includes 12 analyses: scores, cost, tokens, sub-tasks, agent trajectory (tool-call budgets, effort distributions, time efficiency, effort quartile segmentation, cross-model difficulty correlation), plus a per-group breakdown requiring a domain-specific `GROUP_FN`. Start here to analyze a new domain. |
-| [`excytin_analysis.ipynb`](notebooks/excytin_analysis.ipynb) | **Excytin-specific** — self-contained notebook pre-configured for incident response (599 tasks, 5 models). All generic analyses plus Excytin-specific experiments: per-incident breakdown, submission vs. checkpoint gap heatmap, and **SQL query analysis** (extracts all SQL queries from agent tool calls, classifies outcomes as success/empty/error/large-result, and correlates query quality with scores). |
-| [`cybench_analysis.ipynb`](notebooks/cybench_analysis.ipynb) | **CyBench-specific** — self-contained notebook pre-configured for CTF challenges. All generic analyses plus CyBench-specific experiments: per-challenge breakdown and submission vs. checkpoint gap heatmap. Includes small-sample guards for N=1 scenarios. |
+| [`eval_analysis.ipynb`](notebooks/eval_analysis.ipynb) | **Domain-agnostic template** — 14 standard experiments (scores, cost, tokens, sub-tasks, agent trajectory, tool usage, effort segmentation, difficulty agreement). Configure `GROUP_FN` for any domain. Start here for new domains. |
+| [`excytin_analysis.ipynb`](notebooks/excytin_analysis.ipynb) | **Excytin** — self-contained, 599 tasks × 5 models. All generic analyses plus per-incident gap heatmap and **SQL query analysis** (classifies query outcomes as success/empty/error/large-result). |
+| [`cybench_analysis.ipynb`](notebooks/cybench_analysis.ipynb) | **CyBench** — self-contained, CTF challenges × 5 models. All generic analyses plus per-challenge gap heatmap. Small-sample guards for N=1 scenarios. |
+| [`cti_realm_analysis.ipynb`](notebooks/cti_realm_analysis.ipynb) | **CTI Realm** — self-contained, 25 tasks × 5 models. All generic analyses plus **per-checkpoint heatmap** (C0–C4), **KQL query quality analysis**, **CTI tool usage patterns**, and **checkpoint correlation analysis**. |
 
-All notebooks use the shared `notebooks/saber_analysis/` module for data loading and plotting utilities.
+#### Agent Architecture Comparison
+
+| Notebook | Description |
+|----------|-------------|
+| [`agent_architecture_analysis.ipynb`](notebooks/agent_architecture_analysis.ipynb) | **Domain-agnostic template** — compares React, GH Copilot, and Claude Code agents using the same 14 experiments. |
+| [`excytin_agent_architecture_analysis.ipynb`](notebooks/excytin_agent_architecture_analysis.ipynb) | **Excytin** — agent comparison plus safety refusal analysis and SQL query analysis per agent. |
+| [`cybench_agent_architecture_analysis.ipynb`](notebooks/cybench_agent_architecture_analysis.ipynb) | **CyBench** — agent comparison for CTF challenges. |
+| [`cti_realm_agent_architecture_analysis.ipynb`](notebooks/cti_realm_agent_architecture_analysis.ipynb) | **CTI Realm** — agent comparison for threat intelligence tasks. |
+
+#### Cross-Domain Aggregate Analysis
+
+| Notebook | Description |
+|----------|-------------|
+| [`aggregate_model_analysis.ipynb`](notebooks/aggregate_model_analysis.ipynb) | **Model comparison across all domains** — domain-normalized scoring (equal weight per domain), ranking consistency, cross-domain radar charts, reasoning impact analysis. |
+| [`aggregate_agent_architecture_analysis.ipynb`](notebooks/aggregate_agent_architecture_analysis.ipynb) | **Agent comparison across all domains** — domain-normalized agent ranking, consistency analysis, efficiency comparison. |
+
+#### Sample Eval Data
+
+The `eval_samples/` directory contains pre-run `.eval` files for immediate analysis — no evaluations needed:
+
+- **Models**: Claude Haiku 4.5, Sonnet 4.6, Opus 4.6, GPT-5.4, GPT-5.4-mini
+- **Agent architectures**: React, GH Copilot, Claude Code (Sonnet 4.6)
+- **Baselines**: No-reasoning/no-thinking variants for extended thinking comparison
+- **Auto-download**: Missing files are automatically fetched from [HuggingFace](https://huggingface.co/datasets/anandmudgerikar/AcesEvals) via `ensure_eval_files()`
+
+All notebooks use the shared `notebooks/saber_analysis/` module for data loading and plotting. Generated visualizations are saved to `notebooks/artifacts/`.
 
 To run:
 ```bash
 # Open in VS Code (recommended — use the Jupyter extension)
-code notebooks/eval_analysis.ipynb
+code notebooks/excytin_analysis.ipynb
 
 # Or launch JupyterLab
 uv run jupyter lab notebooks/
 ```
+
+For the full analysis methodology (14 experiments, interpretation guides, domain-specific analysis details), see the [eval-analysis skill](.github/skills/eval-analysis/SKILL.md).
+
+### Copilot Agent & Skill for Analysis
+
+If you're using GitHub Copilot in VS Code, the repo includes an **analysis agent** and **skill** that make all the notebook analysis knowledge available conversationally:
+
+| File | Purpose |
+|------|---------|
+| [`.github/agents/analysis.agent.md`](.github/agents/analysis.agent.md) | Analysis agent — routes questions to the right notebook, interprets results, helps run missing evals |
+| [`.github/skills/eval-analysis/SKILL.md`](.github/skills/eval-analysis/SKILL.md) | Eval analysis skill — complete methodology reference for all 14+ experiments, domain-specific analyses, and configuration guides |
 
 ---
 
