@@ -1,0 +1,1527 @@
+tasks:
+- task_id: aks_001
+  title: Write a detection rule to identify Kubernetes certificate-ba...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to identify Kubernetes certificate-based credential access by monitoring for POST requests to the
+    certificates.k8s.io/v1/certificatesigningrequests API endpoint, indicating creation of certificate signing requests for
+    client authentication'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to identify Kubernetes certificate-based credential access by monitoring for
+      POST requests to the certificates.k8s.io/v1/certificatesigningrequests API endpoint, indicating creation of certificate
+      signing requests for client authentication
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: AKS
+    mitre_techniques: &id001
+    - T1552
+    data_sources: &id002
+    - AKSAudit
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to identify Kubernetes certificate-based credential access by monitoring
+          for POST requests to the certificates.k8s.io/v1/certificatesigningrequests API endpoint, indicating creation of
+          certificate signing requests for client authentication
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id001
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id002
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to identify Kubernetes certificate-based credential access by monitoring
+          for POST requests to the certificates.k8s.io/v1/certificatesigningrequests API endpoint, indicating creation of
+          certificate signing requests for client authentication
+        regex_patterns:
+          verb: (?i)^(create)$
+          requesturi: ^/apis/certificates\.k8s\.io/v1/certificatesigningrequests$
+          useragent: .*a7b8c9d0-1e2f-4a3b-9c8d-0e1f2a3b4c5d-CSR1-create-csr.*
+        max_score: 6.5
+        weight: 1.0
+- task_id: aks_003
+  title: Write a detection rule to identify privilege escalation thro...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to identify privilege escalation through RBAC by monitoring for POST requests creating ClusterRoles
+    in the rbac.authorization.k8s.io API with potentially excessive permissions, indicating creation of highly privileged
+    roles'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to identify privilege escalation through RBAC by monitoring for POST requests
+      creating ClusterRoles in the rbac.authorization.k8s.io API with potentially excessive permissions, indicating creation
+      of highly privileged roles
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: AKS
+    mitre_techniques: &id003
+    - T1548
+    data_sources: &id004
+    - AKSAudit
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to identify privilege escalation through RBAC by monitoring for POST requests
+          creating ClusterRoles in the rbac.authorization.k8s.io API with potentially excessive permissions, indicating creation
+          of highly privileged roles
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id003
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id004
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to identify privilege escalation through RBAC by monitoring for POST requests
+          creating ClusterRoles in the rbac.authorization.k8s.io API with potentially excessive permissions, indicating creation
+          of highly privileged roles
+        regex_patterns:
+          verb: (?i)^(create)$
+          requesturi: ^/apis/rbac\.authorization\.k8s\.io/v1/clusterroles$
+          useragent: .*e1f2a3b4-5c6d-47e8-9f0a-1b2c3d4e5f6a-CRADMIN.*
+        max_score: 6.5
+        weight: 1.0
+- task_id: aks_004
+  title: Write a detection rule to detect privilege escalation comple...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to detect privilege escalation completion by monitoring for POST requests creating ClusterRoleBindings
+    that grant ClusterRole permissions to ServiceAccounts or users, indicating assignment of elevated privileges'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to detect privilege escalation completion by monitoring for POST requests
+      creating ClusterRoleBindings that grant ClusterRole permissions to ServiceAccounts or users, indicating assignment of
+      elevated privileges
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: AKS
+    mitre_techniques: &id005
+    - T1548
+    data_sources: &id006
+    - AKSAudit
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to detect privilege escalation completion by monitoring for POST requests
+          creating ClusterRoleBindings that grant ClusterRole permissions to ServiceAccounts or users, indicating assignment
+          of elevated privileges
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id005
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id006
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to detect privilege escalation completion by monitoring for POST requests
+          creating ClusterRoleBindings that grant ClusterRole permissions to ServiceAccounts or users, indicating assignment
+          of elevated privileges
+        regex_patterns:
+          verb: (?i)^(create)$
+          requesturi: ^/apis/rbac\.authorization\.k8s\.io/v1/clusterrolebindings$
+          useragent: .*e1f2a3b4-5c6d-47e8-9f0a-1b2c3d4e5f6a-CRADMIN.*
+        max_score: 6.5
+        weight: 1.0
+- task_id: aks_008
+  title: Write a detection rule to detect cross-namespace secret acce...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to detect cross-namespace secret access by monitoring for GET or LIST requests to namespace-specific
+    secrets endpoints (/api/v1/namespaces/*/secrets), indicating systematic enumeration of secrets across multiple namespaces'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to detect cross-namespace secret access by monitoring for GET or LIST requests
+      to namespace-specific secrets endpoints (/api/v1/namespaces/*/secrets), indicating systematic enumeration of secrets
+      across multiple namespaces
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: AKS
+    mitre_techniques: &id007
+    - T1552
+    data_sources: &id008
+    - AKSAudit
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to detect cross-namespace secret access by monitoring for GET or LIST
+          requests to namespace-specific secrets endpoints (/api/v1/namespaces/*/secrets), indicating systematic enumeration
+          of secrets across multiple namespaces
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id007
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id008
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to detect cross-namespace secret access by monitoring for GET or LIST
+          requests to namespace-specific secrets endpoints (/api/v1/namespaces/*/secrets), indicating systematic enumeration
+          of secrets across multiple namespaces
+        regex_patterns:
+          verb: (?i)^(get|list)$
+          requesturi: ^/api/v1/namespaces$
+          useragent: .*a3b2c9e4-5d7f-4a9b-9d2e-7f8a1c6b3e5f-SIM2.*
+        max_score: 6.5
+        weight: 1.0
+- task_id: aks_009
+  title: Write a detection rule to identify bulk Kubernetes secret ex...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to identify bulk Kubernetes secret exfiltration by monitoring for high-volume GET or LIST operations
+    to /api/v1/secrets with query parameters, indicating mass secret dumping operations that may precede data exfiltration'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to identify bulk Kubernetes secret exfiltration by monitoring for high-volume
+      GET or LIST operations to /api/v1/secrets with query parameters, indicating mass secret dumping operations that may
+      precede data exfiltration
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: AKS
+    mitre_techniques: &id009
+    - T1552
+    data_sources: &id010
+    - AKSAudit
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to identify bulk Kubernetes secret exfiltration by monitoring for high-volume
+          GET or LIST operations to /api/v1/secrets with query parameters, indicating mass secret dumping operations that
+          may precede data exfiltration
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id009
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id010
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to identify bulk Kubernetes secret exfiltration by monitoring for high-volume
+          GET or LIST operations to /api/v1/secrets with query parameters, indicating mass secret dumping operations that
+          may precede data exfiltration
+        regex_patterns:
+          verb: (?i)^(get|list)$
+          requesturi: ^/api/v1/secrets(\?.*)?$
+          useragent: .*a3b2c9e4-5d7f-4a9b-9d2e-7f8a1c6b3e5f-SIM3.*
+        max_score: 6.5
+        weight: 1.0
+- task_id: aks_017
+  title: Write a detection rule to identify ServiceAccount manipulati...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to identify ServiceAccount manipulation by monitoring for patch operations on serviceaccounts resources,
+    indicating modification of ServiceAccount metadata such as annotations or labels that may alter behavior or permissions'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to identify ServiceAccount manipulation by monitoring for patch operations
+      on serviceaccounts resources, indicating modification of ServiceAccount metadata such as annotations or labels that
+      may alter behavior or permissions
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: AKS
+    mitre_techniques: &id011
+    - T1098
+    data_sources: &id012
+    - AKSAudit
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to identify ServiceAccount manipulation by monitoring for patch operations
+          on serviceaccounts resources, indicating modification of ServiceAccount metadata such as annotations or labels that
+          may alter behavior or permissions
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id011
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id012
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to identify ServiceAccount manipulation by monitoring for patch operations
+          on serviceaccounts resources, indicating modification of ServiceAccount metadata such as annotations or labels that
+          may alter behavior or permissions
+        regex_patterns:
+          verb: (?i)^(patch)$
+          objectref_resource: (?i)^(serviceaccounts)$
+          objectref_name: ^sim-serviceaccount-sa-moddel-44556677.*
+        max_score: 6.5
+        weight: 1.0
+- task_id: cloud_002
+  title: Write a detection rule to detect privilege escalation throug...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to detect privilege escalation through hidden membership Administrative Units by monitoring for
+    AU creation with concealed visibility settings, followed by addition of users as members and assignment of privileged
+    directory roles scoped to these hidden organizational containers. This attack enables covert password reset and MFA control
+    capabilities over target users while keeping the administrative relationships invisible to most security tools and investigators.
+    Focus on correlating AU management operations with role assignment activities.'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to detect privilege escalation through hidden membership Administrative Units
+      by monitoring for AU creation with concealed visibility settings, followed by addition of users as members and assignment
+      of privileged directory roles scoped to these hidden organizational containers. This attack enables covert password
+      reset and MFA control capabilities over target users while keeping the administrative relationships invisible to most
+      security tools and investigators. Focus on correlating AU management operations with role assignment activities.
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: Cloud
+    mitre_techniques: &id013
+    - T1078
+    - T1098
+    - T1484
+    - T1136
+    data_sources: &id014
+    - SigninLogs
+    - AuditLogs
+    - MicrosoftGraphActivityLogs
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to detect privilege escalation through hidden membership Administrative
+          Units by monitoring for AU creation with concealed visibility settings, followed by addition of users as members
+          and assignment of privileged directory roles scoped to these hidden organizational containers. This attack enables
+          covert password reset and MFA control capabilities over target users while keeping the administrative relationships
+          invisible to most security tools and investigators. Focus on correlating AU management operations with role assignment
+          activities.
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id013
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id014
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to detect privilege escalation through hidden membership Administrative
+          Units by monitoring for AU creation with concealed visibility settings, followed by addition of users as members
+          and assignment of privileged directory roles scoped to these hidden organizational containers. This attack enables
+          covert password reset and MFA control capabilities over target users while keeping the administrative relationships
+          invisible to most security tools and investigators. Focus on correlating AU management operations with role assignment
+          activities.
+        regex_patterns:
+          Identity: ^(Dale Robinson|kevin\.armstrong@testcorp\.onmicrosoft\.com)$
+          ClientAppUsed: ^Mobile Apps and Desktop clients$
+          AppDisplayName: ^Microsoft Office$
+          ResultType: '0'
+          OperationName: ^Add administrative unit$
+          ActivityDisplayName: ^(Add administrative unit|Add user)$
+          RequestUri: .*/roleManagement/directory/roleAssignments.*
+          RequestMethod: ^POST$
+          UserId: ^e2b7b1e8-9bc3-f94e-b237-8773def21777$
+          ResponseStatusCode: '201'
+        max_score: 6.5
+        weight: 1.0
+- task_id: cloud_009
+  title: Write a detection rule to identify privilege escalation thro...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to identify privilege escalation through VM creation with privileged identities by monitoring for
+    virtual machine creation operations that include administrative managed identities during provisioning, followed by command
+    execution on the newly created infrastructure. This technique allows establishing elevated access paths by embedding privileged
+    identities into attacker-controlled resources. Detection should correlate VM creation showing successful provisioning
+    with subsequent command execution operations and privileged resource management activities that don''t match the original
+    caller''s permission level.'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to identify privilege escalation through VM creation with privileged identities
+      by monitoring for virtual machine creation operations that include administrative managed identities during provisioning,
+      followed by command execution on the newly created infrastructure. This technique allows establishing elevated access
+      paths by embedding privileged identities into attacker-controlled resources. Detection should correlate VM creation
+      showing successful provisioning with subsequent command execution operations and privileged resource management activities
+      that don't match the original caller's permission level.
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: Cloud
+    mitre_techniques: &id015
+    - T1078
+    - T1583
+    - T1578
+    - T1609
+    - T1098
+    - T1552
+    - T1550
+    data_sources: &id016
+    - SigninLogs
+    - AzureActivity
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to identify privilege escalation through VM creation with privileged identities
+          by monitoring for virtual machine creation operations that include administrative managed identities during provisioning,
+          followed by command execution on the newly created infrastructure. This technique allows establishing elevated access
+          paths by embedding privileged identities into attacker-controlled resources. Detection should correlate VM creation
+          showing successful provisioning with subsequent command execution operations and privileged resource management
+          activities that don't match the original caller's permission level.
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id015
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id016
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to identify privilege escalation through VM creation with privileged identities
+          by monitoring for virtual machine creation operations that include administrative managed identities during provisioning,
+          followed by command execution on the newly created infrastructure. This technique allows establishing elevated access
+          paths by embedding privileged identities into attacker-controlled resources. Detection should correlate VM creation
+          showing successful provisioning with subsequent command execution operations and privileged resource management
+          activities that don't match the original caller's permission level.
+        regex_patterns:
+          Caller: ^(kendra\.harris|jesus\.erickson)@testcorp\.onmicrosoft\.com$
+          ResourceGroup: ^PROD-COMPUTE-RG-04$
+          OperationNameValue: ^(MICROSOFT\.COMPUTE/VIRTUALMACHINES/WRITE|.*WRITE.*|MICROSOFT\.COMPUTE/VIRTUALMACHINES/RUNCOMMAND/ACTION)$
+          ActivitySubstatusValue: ^(Created|OK)$
+          ResourceProviderValue: ^MICROSOFT\.COMPUTE$
+          Identity: ^(Kendra Harris|Jesus Erickson)$
+          IPAddress: ^203\.0\.113\.25$
+        max_score: 6.5
+        weight: 1.0
+- task_id: cloud_011
+  title: Write a detection rule to identify chained credential access...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to identify chained credential access from Key Vault to storage by monitoring for vault secret
+    retrieval operations followed within a short timeframe by storage account access and data operations. This multi-stage
+    attack involves exfiltrating secrets from vaults that contain storage access credentials, then immediately weaponizing
+    those credentials to access storage and exfiltrate data. Detection must correlate vault operations showing secret access
+    with subsequent storage operations, analyzing the temporal relationship and identity patterns to link credential theft
+    to credential usage across multiple log sources.'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to identify chained credential access from Key Vault to storage by monitoring
+      for vault secret retrieval operations followed within a short timeframe by storage account access and data operations.
+      This multi-stage attack involves exfiltrating secrets from vaults that contain storage access credentials, then immediately
+      weaponizing those credentials to access storage and exfiltrate data. Detection must correlate vault operations showing
+      secret access with subsequent storage operations, analyzing the temporal relationship and identity patterns to link
+      credential theft to credential usage across multiple log sources.
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: Cloud
+    mitre_techniques: &id017
+    - T1078
+    - T1087
+    - T1526
+    - T1555
+    - T1530
+    - T1619
+    - T1567
+    data_sources: &id018
+    - SigninLogs
+    - StorageBlobLogs
+    - AzureDiagnostics
+    - AzureActivity
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to identify chained credential access from Key Vault to storage by monitoring
+          for vault secret retrieval operations followed within a short timeframe by storage account access and data operations.
+          This multi-stage attack involves exfiltrating secrets from vaults that contain storage access credentials, then
+          immediately weaponizing those credentials to access storage and exfiltrate data. Detection must correlate vault
+          operations showing secret access with subsequent storage operations, analyzing the temporal relationship and identity
+          patterns to link credential theft to credential usage across multiple log sources.
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id017
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id018
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to identify chained credential access from Key Vault to storage by monitoring
+          for vault secret retrieval operations followed within a short timeframe by storage account access and data operations.
+          This multi-stage attack involves exfiltrating secrets from vaults that contain storage access credentials, then
+          immediately weaponizing those credentials to access storage and exfiltrate data. Detection must correlate vault
+          operations showing secret access with subsequent storage operations, analyzing the temporal relationship and identity
+          patterns to link credential theft to credential usage across multiple log sources.
+        regex_patterns:
+          Caller: ^kendra\.harris@testcorp\.onmicrosoft\.com$
+          AccountName: ^device-ybf$
+          OperationName: ^(ListContainers|ListBlobs|GetBlob|SecretGet)$
+          ResourceProvider: ^MICROSOFT\.KEYVAULT$
+          ResourceGroup: ^(PROD-STORAGE-RG|PROD-KEYVAULT-RG)$
+        max_score: 6.5
+        weight: 1.0
+- task_id: cloud_012
+  title: Write a detection rule to detect service principal privilege...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to detect service principal privilege escalation through application administrator abuse by monitoring
+    for a multi-stage attack: directory resource enumeration through API calls to identify targets, role definition queries
+    to identify service principals with elevated permissions, credential addition to target applications, authentication as
+    the compromised service principal using newly added credentials, and directory role assignments to the original account.
+    The attack exploits the trust relationship between application administrators and their managed service principals, using
+    the service principal as a privilege escalation proxy. Detection requires correlation across enumeration patterns, credential
+    management, service principal authentication, and role assignment operations.'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: 'Write a detection rule to detect service principal privilege escalation through application administrator
+      abuse by monitoring for a multi-stage attack: directory resource enumeration through API calls to identify targets,
+      role definition queries to identify service principals with elevated permissions, credential addition to target applications,
+      authentication as the compromised service principal using newly added credentials, and directory role assignments to
+      the original account. The attack exploits the trust relationship between application administrators and their managed
+      service principals, using the service principal as a privilege escalation proxy. Detection requires correlation across
+      enumeration patterns, credential management, service principal authentication, and role assignment operations.'
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: Cloud
+    mitre_techniques: &id019
+    - T1078
+    - T1592
+    - T1087
+    - T1069
+    - T1098
+    - T1552
+    - T1550
+    - T1210
+    - T1548
+    data_sources: &id020
+    - SigninLogs
+    - MicrosoftGraphActivityLogs
+    - AuditLogs
+    - AADServicePrincipalSignInLogs
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: 'Write a detection rule to detect service principal privilege escalation through application
+          administrator abuse by monitoring for a multi-stage attack: directory resource enumeration through API calls to
+          identify targets, role definition queries to identify service principals with elevated permissions, credential addition
+          to target applications, authentication as the compromised service principal using newly added credentials, and directory
+          role assignments to the original account. The attack exploits the trust relationship between application administrators
+          and their managed service principals, using the service principal as a privilege escalation proxy. Detection requires
+          correlation across enumeration patterns, credential management, service principal authentication, and role assignment
+          operations.'
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id019
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id020
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: 'Write a detection rule to detect service principal privilege escalation through application
+          administrator abuse by monitoring for a multi-stage attack: directory resource enumeration through API calls to
+          identify targets, role definition queries to identify service principals with elevated permissions, credential addition
+          to target applications, authentication as the compromised service principal using newly added credentials, and directory
+          role assignments to the original account. The attack exploits the trust relationship between application administrators
+          and their managed service principals, using the service principal as a privilege escalation proxy. Detection requires
+          correlation across enumeration patterns, credential management, service principal authentication, and role assignment
+          operations.'
+        regex_patterns:
+          Identity: ^(Dale Robinson|privileged-service-sp)$
+          ResultType: '0'
+          IPAddress: ^203\.0\.113\.241$
+          ResponseStatusCode: '200'
+          RequestUri: .*(https://graph\.microsoft\.com/v1\.0/users|https://graph\.microsoft\.com/v1\.0/groups|https://graph\.microsoft\.com/v1\.0/servicePrincipals|https://graph\.microsoft\.com/v1\.0/roleManagement/directory/roleDefinitions/e8611ab8-c189-46e8-94e1-60213ab1f814).*
+          OperationName: ^(.*Certificates and secrets management.*|Add member to role.*)$
+          ServicePrincipalName: ^privileged-service-sp$
+        max_score: 6.5
+        weight: 1.0
+- task_id: linux_001
+  title: Write a detection rule to identify when APT or apt-get packa...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to identify when APT or apt-get package managers spawn shell interpreters (sh, dash) as child processes,
+    monitoring for Pre-Invoke or Post-Invoke patterns in the parent command line that indicate configuration hook abuse for
+    arbitrary command execution'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to identify when APT or apt-get package managers spawn shell interpreters
+      (sh, dash) as child processes, monitoring for Pre-Invoke or Post-Invoke patterns in the parent command line that indicate
+      configuration hook abuse for arbitrary command execution
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: Linux
+    mitre_techniques: &id021
+    - T1059
+    - T1546
+    data_sources: &id022
+    - DeviceProcessEvents
+    - DeviceFileEvents
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to identify when APT or apt-get package managers spawn shell interpreters
+          (sh, dash) as child processes, monitoring for Pre-Invoke or Post-Invoke patterns in the parent command line that
+          indicate configuration hook abuse for arbitrary command execution
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id021
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id022
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to identify when APT or apt-get package managers spawn shell interpreters
+          (sh, dash) as child processes, monitoring for Pre-Invoke or Post-Invoke patterns in the parent command line that
+          indicate configuration hook abuse for arbitrary command execution
+        regex_patterns:
+          initiatingprocessfilename: ^(apt|apt-get|bash)$
+          initiatingprocesscommandline: .*Pre-Invoke.*
+          filename: ^(sh|dash)$
+          processcommandline: .*f8e2a4c6-7d9b-4f3e-8a1c-5e7f9d2b4c8a-T1.*
+        max_score: 6.5
+        weight: 1.0
+- task_id: linux_006
+  title: Write a detection rule to identify when awk or gawk processe...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to identify when awk or gawk processes with system() function calls in the command line spawn shell
+    interpreters (sh, bash, dash), indicating exploitation of awk''s system execution capabilities for arbitrary commands'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to identify when awk or gawk processes with system() function calls in the
+      command line spawn shell interpreters (sh, bash, dash), indicating exploitation of awk's system execution capabilities
+      for arbitrary commands
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: Linux
+    mitre_techniques: &id023
+    - T1059
+    data_sources: &id024
+    - DeviceProcessEvents
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to identify when awk or gawk processes with system() function calls in
+          the command line spawn shell interpreters (sh, bash, dash), indicating exploitation of awk's system execution capabilities
+          for arbitrary commands
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id023
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id024
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to identify when awk or gawk processes with system() function calls in
+          the command line spawn shell interpreters (sh, bash, dash), indicating exploitation of awk's system execution capabilities
+          for arbitrary commands
+        regex_patterns:
+          initiatingprocessfilename: ^(awk|gawk)$
+          initiatingprocesscommandline: .*BEGIN.*system\(
+          filename: ^(sh|dash|bash)$
+          processcommandline: .*sh -c .*b3c7e5f1-2a8d-4e6b-9f4c-8d1e3a7b5f9c-T1.*
+        max_score: 6.5
+        weight: 1.0
+- task_id: linux_012
+  title: Write a detection rule to identify clipboard data collection...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to identify clipboard data collection by monitoring for processes executing wl-paste or similar
+    clipboard utilities, which may indicate attempts to capture sensitive data from user clipboard contents'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to identify clipboard data collection by monitoring for processes executing
+      wl-paste or similar clipboard utilities, which may indicate attempts to capture sensitive data from user clipboard contents
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: Linux
+    mitre_techniques: &id025
+    - T1115
+    data_sources: &id026
+    - DeviceProcessEvents
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to identify clipboard data collection by monitoring for processes executing
+          wl-paste or similar clipboard utilities, which may indicate attempts to capture sensitive data from user clipboard
+          contents
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id025
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id026
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to identify clipboard data collection by monitoring for processes executing
+          wl-paste or similar clipboard utilities, which may indicate attempts to capture sensitive data from user clipboard
+          contents
+        regex_patterns:
+          initiatingprocessfilename: ^(bash|sh)$
+          filename: ^(bash|wl-paste)$
+          processcommandline: .*(wl-paste|c9e3f7a2-5d8b-4f6e-9a1c-8e4f7d2a3b6c-T3).*
+        max_score: 6.5
+        weight: 1.0
+- task_id: linux_013
+  title: Write a detection rule to detect crontab reconnaissance by m...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to detect crontab reconnaissance by monitoring for grep commands searching for ''cron'' patterns
+    across system directories, indicating attempts to discover scheduled tasks and persistence mechanisms'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to detect crontab reconnaissance by monitoring for grep commands searching
+      for 'cron' patterns across system directories, indicating attempts to discover scheduled tasks and persistence mechanisms
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: Linux
+    mitre_techniques: &id027
+    - T1053
+    data_sources: &id028
+    - DeviceProcessEvents
+    - DeviceFileEvents
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to detect crontab reconnaissance by monitoring for grep commands searching
+          for 'cron' patterns across system directories, indicating attempts to discover scheduled tasks and persistence mechanisms
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id027
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id028
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to detect crontab reconnaissance by monitoring for grep commands searching
+          for 'cron' patterns across system directories, indicating attempts to discover scheduled tasks and persistence mechanisms
+        regex_patterns:
+          initiatingprocessfilename: ^(grep)$
+          filename: ^(grep)$
+          processcommandline: .*(grep.*cron|f7b4c2a9-8d5f-4e1b-b3a9-9f72bde6c4aa-T1).*
+        max_score: 6.5
+        weight: 1.0
+- task_id: linux_015
+  title: Write a detection rule to identify file exfiltration attempt...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to identify file exfiltration attempts using curl with the --data-binary flag, monitoring for HTTP
+    POST operations that may indicate sensitive data being uploaded to external or suspicious remote endpoints'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to identify file exfiltration attempts using curl with the --data-binary flag,
+      monitoring for HTTP POST operations that may indicate sensitive data being uploaded to external or suspicious remote
+      endpoints
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: Linux
+    mitre_techniques: &id029
+    - T1105
+    - T1567
+    data_sources: &id030
+    - DeviceProcessEvents
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to identify file exfiltration attempts using curl with the --data-binary
+          flag, monitoring for HTTP POST operations that may indicate sensitive data being uploaded to external or suspicious
+          remote endpoints
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id029
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id030
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to identify file exfiltration attempts using curl with the --data-binary
+          flag, monitoring for HTTP POST operations that may indicate sensitive data being uploaded to external or suspicious
+          remote endpoints
+        regex_patterns:
+          initiatingprocessfilename: ^(bash|sh|sudo)?$
+          filename: ^(curl)$
+          processcommandline: .*(--data-binary|a6d3f8e1-4b7c-4e9a-8f2d-5c9e7a3f6b8d-T1).*
+        max_score: 6.5
+        weight: 1.0
+- task_id: linux_016
+  title: Write a detection rule to detect malicious file download and...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to detect malicious file download and execution by monitoring for curl processes downloading bash
+    scripts to /tmp followed by bash execution, indicating classic download-and-execute malware delivery patterns'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to detect malicious file download and execution by monitoring for curl processes
+      downloading bash scripts to /tmp followed by bash execution, indicating classic download-and-execute malware delivery
+      patterns
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: Linux
+    mitre_techniques: &id031
+    - T1105
+    - T1059
+    data_sources: &id032
+    - DeviceProcessEvents
+    - DeviceFileEvents
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to detect malicious file download and execution by monitoring for curl
+          processes downloading bash scripts to /tmp followed by bash execution, indicating classic download-and-execute malware
+          delivery patterns
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id031
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id032
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to detect malicious file download and execution by monitoring for curl
+          processes downloading bash scripts to /tmp followed by bash execution, indicating classic download-and-execute malware
+          delivery patterns
+        regex_patterns:
+          initiatingprocessfilename: ^(curl|bash|sh)$
+          filename: ^(bash|curl)$
+          processcommandline: .*(file:///tmp/.*\.sh|/tmp/.*e7f1a5c9-8d4b-4e6f-9a2c-7d3e8f5a1c6b-T1.*\.sh).*
+        max_score: 6.5
+        weight: 1.0
+- task_id: linux_021
+  title: Write a detection rule to identify suspicious data archiving...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to identify suspicious data archiving by monitoring for tar commands with gzip compression (-czf)
+    creating archives in temporary directories like /dev/shm, indicating preparation for data exfiltration'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to identify suspicious data archiving by monitoring for tar commands with
+      gzip compression (-czf) creating archives in temporary directories like /dev/shm, indicating preparation for data exfiltration
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: Linux
+    mitre_techniques: &id033
+    - T1560
+    data_sources: &id034
+    - DeviceProcessEvents
+    - DeviceFileEvents
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to identify suspicious data archiving by monitoring for tar commands with
+          gzip compression (-czf) creating archives in temporary directories like /dev/shm, indicating preparation for data
+          exfiltration
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id033
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id034
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to identify suspicious data archiving by monitoring for tar commands with
+          gzip compression (-czf) creating archives in temporary directories like /dev/shm, indicating preparation for data
+          exfiltration
+        regex_patterns:
+          initiatingprocessfilename: ^(tar)$
+          filename: ^(tar)$
+          processcommandline: .*(-czf|a8c5e2f7-6d9b-4f4e-8a1c-5e2f8d6a3c7b-T3).*
+        max_score: 6.5
+        weight: 1.0
+- task_id: linux_023
+  title: Write a detection rule to identify secure file deletion for ...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to identify secure file deletion for anti-forensics by monitoring for dd commands overwriting files
+    with random data from /dev/urandom, especially targeting sensitive files like certificates or keys'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to identify secure file deletion for anti-forensics by monitoring for dd commands
+      overwriting files with random data from /dev/urandom, especially targeting sensitive files like certificates or keys
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: Linux
+    mitre_techniques: &id035
+    - T1485
+    - T1070
+    data_sources: &id036
+    - DeviceProcessEvents
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to identify secure file deletion for anti-forensics by monitoring for
+          dd commands overwriting files with random data from /dev/urandom, especially targeting sensitive files like certificates
+          or keys
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id035
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id036
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to identify secure file deletion for anti-forensics by monitoring for
+          dd commands overwriting files with random data from /dev/urandom, especially targeting sensitive files like certificates
+          or keys
+        regex_patterns:
+          initiatingprocessfilename: ^(bash)$
+          filename: ^(dd)$
+          processcommandline: .*(secret_.*\.pem|f3d7a9e4-2c8b-4f6e-8a1d-7e4f9c2a6b3d-T2).*
+        max_score: 6.5
+        weight: 1.0
+- task_id: linux_027
+  title: Write a detection rule to identify history file deletion for...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to identify history file deletion for anti-forensics by monitoring for rm commands targeting bash_history
+    files, indicating attempts to remove command history evidence'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to identify history file deletion for anti-forensics by monitoring for rm
+      commands targeting bash_history files, indicating attempts to remove command history evidence
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: Linux
+    mitre_techniques: &id037
+    - T1070
+    data_sources: &id038
+    - DeviceProcessEvents
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to identify history file deletion for anti-forensics by monitoring for
+          rm commands targeting bash_history files, indicating attempts to remove command history evidence
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id037
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id038
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to identify history file deletion for anti-forensics by monitoring for
+          rm commands targeting bash_history files, indicating attempts to remove command history evidence
+        regex_patterns:
+          initiatingprocessfilename: ^(bash|sh)$
+          filename: ^rm$
+          processcommandline: .*(bash_history|f9d4b7e3-6a8c-4f2e-9b1d-5e7c8a3f6d2b-T1).*
+        max_score: 6.5
+        weight: 1.0
+- task_id: linux_031
+  title: Write a detection rule to identify suspicious package instal...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to identify suspicious package installation by monitoring for yum or dnf commands installing security
+    tools like wireshark, indicating potential setup of network monitoring or analysis capabilities'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to identify suspicious package installation by monitoring for yum or dnf commands
+      installing security tools like wireshark, indicating potential setup of network monitoring or analysis capabilities
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: Linux
+    mitre_techniques: &id039
+    - T1588
+    data_sources: &id040
+    - DeviceProcessEvents
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to identify suspicious package installation by monitoring for yum or dnf
+          commands installing security tools like wireshark, indicating potential setup of network monitoring or analysis
+          capabilities
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id039
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id040
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to identify suspicious package installation by monitoring for yum or dnf
+          commands installing security tools like wireshark, indicating potential setup of network monitoring or analysis
+          capabilities
+        regex_patterns:
+          initiatingprocessfilename: ^(bash|sh)$
+          filename: ^(yum|dnf)$
+          processcommandline: .*(wireshark|700fb7e8-2981-401c-8430-be58e189e741-T2).*
+        max_score: 6.5
+        weight: 1.0
+- task_id: linux_044
+  title: Write a detection rule to detect crontab-based persistence b...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to detect crontab-based persistence by monitoring for crontab commands loading job definitions
+    from /tmp files, indicating establishment of scheduled malicious task execution'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to detect crontab-based persistence by monitoring for crontab commands loading
+      job definitions from /tmp files, indicating establishment of scheduled malicious task execution
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: Linux
+    mitre_techniques: &id041
+    - T1053
+    data_sources: &id042
+    - DeviceProcessEvents
+    - DeviceFileEvents
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to detect crontab-based persistence by monitoring for crontab commands
+          loading job definitions from /tmp files, indicating establishment of scheduled malicious task execution
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id041
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id042
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to detect crontab-based persistence by monitoring for crontab commands
+          loading job definitions from /tmp files, indicating establishment of scheduled malicious task execution
+        regex_patterns:
+          initiatingprocessfilename: ^(bash|sh|sudo)$
+          filename: ^(crontab)$
+          processcommandline: .*(crontab.*/tmp/cron_t1_|e8c5f2a9-7d4b-4f6e-9a2c-5f8d9e3a1c7b-T1).*
+        max_score: 6.5
+        weight: 1.0
+- task_id: linux_046
+  title: Write a detection rule to detect credential harvesting from ...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to detect credential harvesting from command history by monitoring for cat or grep commands reading
+    .bash_history files, indicating attempts to discover passwords or sensitive commands from user history'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to detect credential harvesting from command history by monitoring for cat
+      or grep commands reading .bash_history files, indicating attempts to discover passwords or sensitive commands from user
+      history
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: Linux
+    mitre_techniques: &id043
+    - T1552
+    data_sources: &id044
+    - DeviceProcessEvents
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to detect credential harvesting from command history by monitoring for
+          cat or grep commands reading .bash_history files, indicating attempts to discover passwords or sensitive commands
+          from user history
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id043
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id044
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to detect credential harvesting from command history by monitoring for
+          cat or grep commands reading .bash_history files, indicating attempts to discover passwords or sensitive commands
+          from user history
+        regex_patterns:
+          initiatingprocessfilename: ^(cat|grep|bash|sh|sudo)$
+          filename: ^(cat|grep)$
+          processcommandline: .*(\.bash_history|a7f3d9e2-4b8c-4f5e-8a1d-7e3f9c5a2b6d-T1).*
+        max_score: 6.5
+        weight: 1.0
+- task_id: linux_053
+  title: Write a detection rule to identify security tool discovery b...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to identify security tool discovery by monitoring for find commands searching /opt, /usr, or /var
+    directories, indicating attempts to locate security software installations through filesystem enumeration'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to identify security tool discovery by monitoring for find commands searching
+      /opt, /usr, or /var directories, indicating attempts to locate security software installations through filesystem enumeration
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: Linux
+    mitre_techniques: &id045
+    - T1518
+    data_sources: &id046
+    - DeviceProcessEvents
+    - DeviceFileEvents
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to identify security tool discovery by monitoring for find commands searching
+          /opt, /usr, or /var directories, indicating attempts to locate security software installations through filesystem
+          enumeration
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id045
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id046
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to identify security tool discovery by monitoring for find commands searching
+          /opt, /usr, or /var directories, indicating attempts to locate security software installations through filesystem
+          enumeration
+        regex_patterns:
+          initiatingprocessfilename: ^(bash|find)$
+          filename: ^(find)$
+          processcommandline: .*((/opt|/usr|/var)|d6c9f4e8-2a5b-4f7e-8a3d-5e7f9d2c4a6b-T3).*
+        max_score: 6.5
+        weight: 1.0
+- task_id: linux_062
+  title: Write a detection rule to detect system information reconnai...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to detect system information reconnaissance by monitoring for cat commands reading /proc/version,
+    indicating attempts to gather kernel and OS version information for exploit targeting'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to detect system information reconnaissance by monitoring for cat commands
+      reading /proc/version, indicating attempts to gather kernel and OS version information for exploit targeting
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: Linux
+    mitre_techniques: &id047
+    - T1082
+    data_sources: &id048
+    - DeviceProcessEvents
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to detect system information reconnaissance by monitoring for cat commands
+          reading /proc/version, indicating attempts to gather kernel and OS version information for exploit targeting
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id047
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id048
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to detect system information reconnaissance by monitoring for cat commands
+          reading /proc/version, indicating attempts to gather kernel and OS version information for exploit targeting
+        regex_patterns:
+          initiatingprocessfilename: ^(bash|sh)$
+          filename: ^cat$
+          processcommandline: .*(/proc/version|e5d9f3a7-2c8b-4f4e-8a6d-3f7e9c1a5b2d-T2).*
+        max_score: 6.5
+        weight: 1.0
+- task_id: linux_064
+  title: Write a detection rule to detect user enumeration by monitor...
+  description: 'DETECTION OBJECTIVE:
+
+    Write a detection rule to detect user enumeration by monitoring for w command with -h flag or processes creating user
+    lists in /tmp, indicating reconnaissance of currently logged-in users and their activities'
+  inherit_shared: true
+  timeout: 1800
+  initial_context:
+    detection_objective: Write a detection rule to detect user enumeration by monitoring for w command with -h flag or processes
+      creating user lists in /tmp, indicating reconnaissance of currently logged-in users and their activities
+    question: Develop both Sigma rule and KQL query with actual query results demonstrating detection effectiveness
+    platform: Linux
+    mitre_techniques: &id049
+    - T1033
+    data_sources: &id050
+    - DeviceProcessEvents
+    - DeviceFileEvents
+  scoring:
+    cti_alignment:
+      c0_cti_analysis:
+        target: trajectory
+        detection_objective: Write a detection rule to detect user enumeration by monitoring for w command with -h flag or
+          processes creating user lists in /tmp, indicating reconnaissance of currently logged-in users and their activities
+        model: openai/azure/gpt-5-mini
+        max_score: 1.25
+        weight: 1.0
+    mitre_jaccard:
+      c1_mitre_techniques:
+        target: trajectory
+        expected_techniques: *id049
+        max_score: 0.75
+        weight: 1.0
+    data_exploration:
+      c2_data_exploration:
+        target: trajectory
+        expected_data_sources: *id050
+        max_score: 1.0
+        weight: 1.0
+    query_iteration:
+      c3_query_iteration:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+    detection_quality:
+      c4_detection_quality:
+        target: trajectory
+        detection_objective: Write a detection rule to detect user enumeration by monitoring for w command with -h flag or
+          processes creating user lists in /tmp, indicating reconnaissance of currently logged-in users and their activities
+        regex_patterns:
+          initiatingprocessfilename: ^(bash|sh)$
+          filename: ^(w|bash|cat|head)$
+          processcommandline: .*(w -h|/tmp/wlist_|a4f8c2e6-7d9b-4f3e-8a1c-6e2f8d5a9c3b-T2).*
+        max_score: 6.5
+        weight: 1.0

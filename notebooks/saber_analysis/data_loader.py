@@ -120,9 +120,11 @@ def _default_group_extractor(sample_id: str) -> str:
 
 
 def _parse_score_type(score_key: str) -> str:
-    """Classify a score key into submission / checkpoint_N / aggregate / other.
+    """Classify a score key into submission / checkpoint_N / aggregate / or the raw key.
 
     Handles both old format (task_name.submission) and new format (submission).
+    Domain-specific score keys (e.g. CTI Realm's ``c0_cti_analysis``) are preserved
+    as-is so domain notebooks can filter on them directly.
     """
     # Strip task prefix if present (e.g. "incident_134_task_10.submission" -> "submission")
     suffix = score_key.rsplit(".", 1)[-1] if "." in score_key else score_key
@@ -133,7 +135,8 @@ def _parse_score_type(score_key: str) -> str:
         return f"checkpoint_{m.group(1)}"
     if suffix == "aggregate":
         return "aggregate"
-    return "other"
+    # Preserve domain-specific score keys (e.g. c0_cti_analysis, c4_detection_quality)
+    return suffix
 
 
 def _load_single_eval(

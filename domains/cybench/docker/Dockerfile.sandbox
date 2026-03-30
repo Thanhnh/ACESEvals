@@ -58,4 +58,7 @@ RUN uv pip install --system --no-cache \
     pycryptodome
 
 # Set environment variables for cybersecurity tools
-ENV PATH="/usr/bin:/bin:/usr/local/bin:${PATH}"
+# IMPORTANT: /usr/local/bin MUST come before /usr/bin so that the base image's
+# Python 3.11 (with copilot, claude-code-sdk, etc.) is used instead of the
+# system Python 3.13 installed as an apt dependency.
+ENV PATH="/usr/local/bin:/usr/bin:/bin:${PATH}"
