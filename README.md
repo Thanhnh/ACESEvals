@@ -498,9 +498,9 @@ For in-depth comparative analysis across models, use the Jupyter notebooks in `n
 
 | Notebook | Description |
 |----------|-------------|
-| [`eval_analysis.ipynb`](notebooks/eval_analysis.ipynb) | **Domain-agnostic** — works with any SABER domain. Standard analyses (scores, cost, tokens, sub-tasks) plus a per-group breakdown that requires a domain-specific `GROUP_FN`. Start here to analyze a new domain. |
-| [`excytin_analysis.ipynb`](notebooks/excytin_analysis.ipynb) | **Excytin-specific** — self-contained notebook pre-configured for incident response. Includes all generic analyses plus Excytin-specific experiments (per-incident breakdown, submission vs. checkpoint gap heatmap). |
-| [`cybench_analysis.ipynb`](notebooks/cybench_analysis.ipynb) | **CyBench-specific** — self-contained notebook pre-configured for CTF challenges. Includes all generic analyses plus CyBench-specific experiments (per-challenge breakdown, submission vs. checkpoint gap heatmap). |
+| [`eval_analysis.ipynb`](notebooks/eval_analysis.ipynb) | **Domain-agnostic** — works with any SABER domain. Includes 12 analyses: scores, cost, tokens, sub-tasks, agent trajectory (tool-call budgets, effort distributions, time efficiency, effort quartile segmentation, cross-model difficulty correlation), plus a per-group breakdown requiring a domain-specific `GROUP_FN`. Start here to analyze a new domain. |
+| [`excytin_analysis.ipynb`](notebooks/excytin_analysis.ipynb) | **Excytin-specific** — self-contained notebook pre-configured for incident response (599 tasks, 5 models). All generic analyses plus Excytin-specific experiments: per-incident breakdown, submission vs. checkpoint gap heatmap, and **SQL query analysis** (extracts all SQL queries from agent tool calls, classifies outcomes as success/empty/error/large-result, and correlates query quality with scores). |
+| [`cybench_analysis.ipynb`](notebooks/cybench_analysis.ipynb) | **CyBench-specific** — self-contained notebook pre-configured for CTF challenges. All generic analyses plus CyBench-specific experiments: per-challenge breakdown and submission vs. checkpoint gap heatmap. Includes small-sample guards for N=1 scenarios. |
 
 All notebooks use the shared `notebooks/saber_analysis/` module for data loading and plotting utilities.
 

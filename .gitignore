@@ -208,8 +208,22 @@ pip-delete-this-directory.txt
 external/inspect_ai/
 
 # AI Assistant directories
+# TODO: Configure what .github files (CI/CD workflows, AI assistant files) should
+# be included and tracked by git, vs personal git workflows, tokens, etc. that
+# should be excluded. Exclusion by default is the strategy for now. Add what
+# should be tracked using negation rules as follows:
 **/.github
+!.github/
+!.github/copilot-instructions.md
+!.github/agents/
+!.github/agents/**
+!.github/skills/
+!.github/skills/**
 **/.claude
+
+# Hugging Face cache
+**/.hf_cache/
+
 # Local experiment outputs
 latest_experiments/
 
@@ -221,3 +235,4 @@ notebooks/artifacts/
 
 # Local-only notebook (not part of the repo)
 notebooks/excytin_basic_analysis.ipynb
+nohup.out

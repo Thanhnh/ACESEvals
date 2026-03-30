@@ -66,10 +66,14 @@ async def score_sigma_rule(
     judge = get_model(model_name)
     prompt = f"{system_prompt}\n\n{user_msg}"
 
-    response = await judge.generate(
-        input=prompt,
-        config=GenerateConfig(temperature=temperature, max_tokens=max_tokens),
-    )
+    try:
+        response = await judge.generate(
+            input=prompt,
+            config=GenerateConfig(temperature=temperature, max_tokens=max_tokens),
+        )
+    except Exception as e:
+        logger.error("LLM judge failed for sigma rule scoring: %s", e)
+        return 0.0
 
     match = re.search(r"\{[\s\S]*\}", response.completion)
     if not match:

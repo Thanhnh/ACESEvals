@@ -20,6 +20,7 @@ Run SABER inspect_ai evaluations, analyze the resulting `.eval` log files, and r
 | **Eval Execution** | `.github/skills/inspect-eval-execution/SKILL.md` | ALWAYS — before running any eval |
 | **Log Analysis** | `.github/skills/inspect-eval-log-analysis/SKILL.md` | ALWAYS — before analyzing any `.eval` file |
 | **Eval Debugging** | `.github/skills/inspect-eval-debugging/SKILL.md` | When scores are unexpected or evals fail |
+| **Eval Monitoring** | `.github/skills/eval-monitoring/SKILL.md` | When monitoring batch runs or checking progress |
 
 **Read ALL THREE skill files at the start of every task.** They contain critical knowledge about:
 - The `.eval` ZIP file format and how to parse it
@@ -35,7 +36,7 @@ Run SABER inspect_ai evaluations, analyze the resulting `.eval` log files, and r
 | **Skills First** | Read all three skill files before starting. They are your primary reference. |
 | **Plain Display** | Always use `--display plain` on eval commands. Rich output corrupts agent context. |
 | **Structured Results** | Report scores, tool call counts, and failure reasons in tables, not prose. |
-| **Evidence-Based** | Parse the `.eval` ZIP to back up every claim. Never guess at scores or behavior. |
+| **Evidence-Based** | Parse the `.eval` ZIP to back up every claim. Never guess at scores or behavior. Note: `.eval` ZIPs are flushed in batches and lag **2–3 min** behind the live `inspect view` UI. |
 | **Minimal Runs** | Use `--limit 1` and `task_filter` to isolate. Don't run full suites unless asked. |
 | **Clean Logs** | Capture eval output with `2>&1 \| tee /tmp/eval_output.log` for review. |
 

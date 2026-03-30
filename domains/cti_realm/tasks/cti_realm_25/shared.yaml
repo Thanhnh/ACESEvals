@@ -5,16 +5,6 @@ dataset: cti_realm_25
 
 sandbox_environment: "default"
 
-scoring_aggregation:
-  average:
-    scores:
-    - submission
-    - - c0_cti_analysis
-      - c1_threat_context
-      - c2_data_exploration
-      - c3_query_execution
-      - c4_detection_quality
-
 initial_context:
   kusto_connection:
     cluster_url: "http://saber-cti-kusto-emulator:8080"

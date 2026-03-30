@@ -53,7 +53,6 @@ def format_for_kusto_ingest(table_name: str, data: List[Dict[str, Any]]) -> str:
     if not data:
         return ""
 
-    # Convert each record to a JSON string for Kusto JSON ingestion
     json_lines = []
     for record in data:
         json_lines.append(json.dumps(record))

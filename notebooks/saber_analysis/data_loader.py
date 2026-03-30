@@ -1,4 +1,13 @@
-"""Generic eval log parsing — works for any SABER domain."""
+"""Generic eval log parsing — works for any SABER domain.
+
+Uses inspect_ai's typed log API where possible:
+- ``read_eval_log(header_only=True)`` for run-level results/stats
+- ``read_eval_log_sample_summaries`` for per-sample scores and timing
+- ``read_eval_log_sample`` for per-sample message/tool-call detail
+
+Falls back to raw ZIP/JSON for individual samples that fail typed
+deserialization (event schema drift across inspect_ai versions).
+"""
 
 from __future__ import annotations
 
@@ -10,6 +19,12 @@ import zipfile
 from typing import Any, Callable
 
 import pandas as pd
+from inspect_ai.log import (
+    read_eval_log,
+    read_eval_log_sample,
+    read_eval_log_sample_summaries,
+)
+from inspect_ai.model._chat_message import ChatMessageAssistant
 
 # HuggingFace dataset coordinates
 HF_REPO_ID = "anandmudgerikar/AcesEvals"
@@ -105,15 +120,23 @@ def _default_group_extractor(sample_id: str) -> str:
 
 
 def _parse_score_type(score_key: str) -> str:
-    """Classify a score key into submission / checkpoint_N / aggregate / other."""
-    if ".submission" in score_key:
+    """Classify a score key into submission / checkpoint_N / aggregate / or the raw key.
+
+    Handles both old format (task_name.submission) and new format (submission).
+    Domain-specific score keys (e.g. CTI Realm's ``c0_cti_analysis``) are preserved
+    as-is so domain notebooks can filter on them directly.
+    """
+    # Strip task prefix if present (e.g. "incident_134_task_10.submission" -> "submission")
+    suffix = score_key.rsplit(".", 1)[-1] if "." in score_key else score_key
+    if suffix == "submission":
         return "submission"
-    if ".checkpoint_" in score_key:
-        m = re.search(r"\.checkpoint_(\d+)$", score_key)
-        return f"checkpoint_{m.group(1)}" if m else "checkpoint"
-    if ".aggregate" in score_key:
+    m = re.match(r"^checkpoint_(\d+)$", suffix)
+    if m:
+        return f"checkpoint_{m.group(1)}"
+    if suffix == "aggregate":
         return "aggregate"
-    return "other"
+    # Preserve domain-specific score keys (e.g. c0_cti_analysis, c4_detection_quality)
+    return suffix
 
 
 def _load_single_eval(
@@ -121,49 +144,53 @@ def _load_single_eval(
     model_name: str,
     group_fn: Callable[[str], str],
 ) -> tuple[dict[str, Any] | None, list[dict], list[dict]]:
-    """Parse one .eval ZIP file. Returns (overall_dict, sample_rows, subtask_rows)."""
+    """Parse one .eval file using inspect_ai's typed API.
+
+    Uses ``read_eval_log`` (header only) for overall scores, and
+    ``read_eval_log_sample_summaries`` for per-sample scores — avoids
+    full event deserialization which can fail across inspect_ai versions.
+
+    Returns (overall_dict, sample_rows, subtask_rows).
+    """
     overall = None
     samples: list[dict] = []
     subtasks: list[dict] = []
 
-    with zipfile.ZipFile(path) as z:
-        header = json.loads(z.read("header.json"))
-        status = header.get("status")
-        if status != "success":
-            print(f"⚠ {os.path.basename(path)}: status={status} — skipping")
-            return None, [], []
+    log = read_eval_log(path, header_only=True)
+    if log.status != "success":
+        print(f"⚠ {os.path.basename(path)}: status={log.status} — skipping")
+        return None, [], []
 
-        for sc in header.get("results", {}).get("scores", []):
-            if sc.get("name") == "saber_overall":
+    # Extract saber_overall from header results
+    if log.results and log.results.scores:
+        for sc in log.results.scores:
+            if sc.name == "saber_overall":
                 overall = {
-                    "mean": sc["metrics"]["mean"]["value"],
-                    "stderr": sc["metrics"]["stderr"]["value"],
+                    "mean": sc.metrics["mean"].value,
+                    "stderr": sc.metrics["stderr"].value,
                 }
 
-        for name in z.namelist():
-            if not (name.startswith("samples/") and name.endswith(".json")):
-                continue
-            sample = json.loads(z.read(name))
-            sample_id = sample.get("id", "")
-            group = group_fn(sample_id)
-            scores = sample.get("scores", {})
+    # Use sample summaries — lightweight, no event parsing
+    for summary in read_eval_log_sample_summaries(path):
+        sample_id = str(summary.id)
+        group = group_fn(sample_id)
 
-            overall_val = scores.get("saber_overall", {}).get("value")
-            if overall_val is not None:
+        if summary.scores:
+            overall_score = summary.scores.get("saber_overall")
+            if overall_score is not None:
                 samples.append(
                     {
                         "model": model_name,
                         "sample_id": sample_id,
                         "group": group,
-                        "score": float(overall_val),
+                        "score": float(overall_score.value),
                     }
                 )
 
-            for score_key, score_obj in scores.items():
+            for score_key, score_obj in summary.scores.items():
                 if score_key == "saber_overall":
                     continue
-                val = score_obj.get("value")
-                if val is None:
+                if score_obj.value is None:
                     continue
                 subtasks.append(
                     {
@@ -171,7 +198,7 @@ def _load_single_eval(
                         "sample_id": sample_id,
                         "group": group,
                         "score_type": _parse_score_type(score_key),
-                        "score": float(val),
+                        "score": float(score_obj.value),
                     }
                 )
 
@@ -264,3 +291,117 @@ def load_baseline_logs(
         all_subtasks.extend(subtasks)
 
     return pd.DataFrame(all_samples), pd.DataFrame(all_subtasks), no_thinking_overall
+
+
+def _extract_tool_calls(
+    path: str,
+    sample_id: str,
+) -> tuple[int, int, dict[str, int]]:
+    """Load a single sample and extract step/tool call counts.
+
+    Tries inspect_ai's typed API first, falls back to raw ZIP/JSON
+    for samples whose events don't deserialize cleanly.
+
+    Returns (n_steps, n_tool_calls, tool_counts).
+    """
+    # Try typed API first
+    try:
+        sample = read_eval_log_sample(path, id=sample_id)
+        n_steps = 0
+        tool_counts: dict[str, int] = {}
+        total_tool_calls = 0
+        for msg in sample.messages:
+            if isinstance(msg, ChatMessageAssistant):
+                n_steps += 1
+                if msg.tool_calls:
+                    for tc in msg.tool_calls:
+                        tool_counts[tc.function] = tool_counts.get(tc.function, 0) + 1
+                        total_tool_calls += 1
+        return n_steps, total_tool_calls, tool_counts
+    except Exception:
+        pass
+
+    # Fallback: raw JSON for samples with event schema drift
+    try:
+        with zipfile.ZipFile(path) as z:
+            for name in z.namelist():
+                if not (name.startswith("samples/") and name.endswith(".json")):
+                    continue
+                raw = json.loads(z.read(name))
+                if str(raw.get("id", "")) != sample_id:
+                    continue
+                n_steps = 0
+                tool_counts = {}
+                total_tool_calls = 0
+                for m in raw.get("messages", []):
+                    if m.get("role") == "assistant":
+                        n_steps += 1
+                        for tc in m.get("tool_calls", []):
+                            fn = tc.get("function", "unknown")
+                            tool_counts[fn] = tool_counts.get(fn, 0) + 1
+                            total_tool_calls += 1
+                return n_steps, total_tool_calls, tool_counts
+    except Exception:
+        pass
+
+    return 0, 0, {}
+
+
+def load_trajectory_data(
+    eval_logs: dict[str, str],
+    log_dir: str,
+    model_order: list[str],
+    group_fn: Callable[[str], str] | None = None,
+) -> pd.DataFrame:
+    """Extract per-sample trajectory metadata from eval logs.
+
+    Uses ``read_eval_log_sample_summaries`` for scores and timing, then
+    ``read_eval_log_sample`` per sample for tool call detail. This avoids
+    the full-stream deserialization issues across inspect_ai versions.
+
+    Returns a DataFrame with columns:
+    ``[model, sample_id, group, score, n_steps, n_tool_calls, tool_counts,
+    total_time, working_time, message_count]``
+    """
+    if group_fn is None:
+        group_fn = _default_group_extractor
+
+    rows: list[dict] = []
+    for model_name, log_file in eval_logs.items():
+        path = os.path.join(log_dir, log_file)
+        if not os.path.exists(path):
+            continue
+
+        log = read_eval_log(path, header_only=True)
+        if log.status != "success":
+            continue
+
+        # Summaries are lightweight and always parse successfully
+        summaries = read_eval_log_sample_summaries(path)
+        for summary in summaries:
+            sample_id = str(summary.id)
+            score_obj = summary.scores.get("saber_overall") if summary.scores else None
+            score = float(score_obj.value) if score_obj is not None else None
+
+            # Load full sample for tool call detail
+            n_steps, n_tool_calls, tool_counts = _extract_tool_calls(path, sample_id)
+
+            rows.append(
+                {
+                    "model": model_name,
+                    "sample_id": sample_id,
+                    "group": group_fn(sample_id),
+                    "score": score,
+                    "n_steps": n_steps,
+                    "n_tool_calls": n_tool_calls,
+                    "tool_counts": tool_counts,
+                    "total_time": summary.total_time,
+                    "working_time": summary.working_time,
+                    "message_count": summary.message_count,
+                }
+            )
+
+    df = pd.DataFrame(rows)
+    # Enforce model ordering for consistent plotting
+    df["model"] = pd.Categorical(df["model"], categories=model_order, ordered=True)
+    return df

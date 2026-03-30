@@ -16,10 +16,15 @@ services:
     networks:
       - cti-realm-database
     healthcheck:
-      test: ["CMD", "test", "-d", "/workspace"]
+      test:
+        [
+          "CMD-SHELL",
+          "curl -sf http://saber-cti-kusto-emulator:8080/v1/rest/mgmt -H 'Content-Type: application/json' -d '{\"db\":\"NetDefaultDB\",\"csl\":\".show version\"}' > /dev/null && curl -sf http://saber-cti-mitre-service:8081/health > /dev/null && test -f /opt/cti_realm/data/cti_reports/reports.jsonl && test -f /opt/cti_realm/data/sigma_rules.json",
+        ]
       interval: 10s
-      timeout: 5s
-      retries: 3
+      timeout: 15s
+      retries: 12
+      start_period: 10s
     deploy:
       resources:
         limits:

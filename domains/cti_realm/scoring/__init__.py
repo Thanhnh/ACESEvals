@@ -1,7 +1,8 @@
 """CTI Realm scoring strategies for the SABER thin library.
 
-Exports five :class:`SaberScoringStrategy` implementations and a factory
-function that returns them keyed by strategy name.
+Five checkpoint strategies, one per scoring checkpoint (C0–C4).
+``saber_overall`` aggregates them via the default weighted-average
+path: Σ(score) / Σ(max_score) = total / 10.
 """
 
 from pathlib import Path
@@ -9,19 +10,19 @@ from pathlib import Path
 from saber.scoring.strategies import SaberScoringStrategy
 
 from .strategies import (
-    CTIToolLLMStrategy,
-    F1SigmaStrategy,
-    ToolCallJaccardStrategy,
-    TrajectoryAnalysisStrategy,
-    TrajectoryJaccardStrategy,
+    CTIAlignmentStrategy,
+    DataExplorationStrategy,
+    DetectionQualityStrategy,
+    MITREJaccardStrategy,
+    QueryIterationStrategy,
 )
 
 __all__ = [
-    "CTIToolLLMStrategy",
-    "F1SigmaStrategy",
-    "ToolCallJaccardStrategy",
-    "TrajectoryAnalysisStrategy",
-    "TrajectoryJaccardStrategy",
+    "CTIAlignmentStrategy",
+    "DataExplorationStrategy",
+    "DetectionQualityStrategy",
+    "MITREJaccardStrategy",
+    "QueryIterationStrategy",
     "get_strategies",
 ]
 
@@ -29,7 +30,7 @@ __all__ = [
 def get_strategies(
     domain_root: Path,
 ) -> dict[str, SaberScoringStrategy]:
-    """Create all CTI Realm scoring strategies.
+    """Create the CTI Realm scoring strategies.
 
     Auto-discovered by ``create_task`` when a ``scoring/`` package is
     present in the domain directory.
@@ -42,9 +43,9 @@ def get_strategies(
     """
     prompts_dir = domain_root / "prompts" / "judge"
     return {
-        "trajectory_analysis": TrajectoryAnalysisStrategy(prompts_dir),
-        "cti_tool_llm": CTIToolLLMStrategy(),
-        "trajectory_jaccard": TrajectoryJaccardStrategy(),
-        "tool_call_jaccard": ToolCallJaccardStrategy(),
-        "f1_sigma_scoring": F1SigmaStrategy(prompts_dir),
+        "cti_alignment": CTIAlignmentStrategy(prompts_dir),
+        "mitre_jaccard": MITREJaccardStrategy(),
+        "data_exploration": DataExplorationStrategy(),
+        "query_iteration": QueryIterationStrategy(),
+        "detection_quality": DetectionQualityStrategy(prompts_dir),
     }

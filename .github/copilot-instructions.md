@@ -19,6 +19,7 @@
 | `src/saber/domain/` | Domain orchestration – manifest loading, Docker compose management |
 | `src/saber/models/` | Shared Pydantic models – REST, MCP, evaluation, benchmark task models |
 | `domains/` | Benchmark domains – task configurations, prompts, Docker environments |
+| `notebooks/` | Analysis notebooks – model comparison, agent architecture analysis, cross-domain aggregation |
 | `docs/` | Architecture documentation and diagrams |
 | `tests/` | Test suite organized by component |
 
@@ -153,6 +154,36 @@ uv run inspect eval domains/excytin_demo --model openai/gpt-4 --max-samples 4 --
 | `run_preflight=true` | Run health checks before evaluation |
 | `rest_port` / `mcp_port` | Custom server ports |
 | `agent=<name>` | Specify agent implementation |
+
+## Evaluation Analysis
+
+The `notebooks/` directory contains a comprehensive data science analysis framework for comparing models and agent architectures across all SABER domains.
+
+### Analysis Notebooks
+
+| Notebook | Purpose |
+|----------|---------|
+| `notebooks/eval_analysis.ipynb` | Domain-agnostic analysis template (14 experiments) |
+| `notebooks/{domain}_analysis.ipynb` | Self-contained per-domain analysis (excytin, cybench, cti_realm) |
+| `notebooks/{domain}_agent_architecture_analysis.ipynb` | Agent architecture comparison per domain |
+| `notebooks/aggregate_model_analysis.ipynb` | Cross-domain model comparison (domain-normalized) |
+| `notebooks/aggregate_agent_architecture_analysis.ipynb` | Cross-domain agent architecture comparison |
+
+### Shared Analysis Library
+
+`notebooks/saber_analysis/` provides reusable utilities: `load_eval_logs()`, `load_trajectory_data()`, `extract_cost_rows()`, `setup_plotting()`. Use these for programmatic analysis outside notebooks.
+
+### Analysis Artifacts
+
+Generated visualizations are saved to `notebooks/artifacts/{domain}/` — overall reward, cost analysis, token usage, sub-task breakdowns, effort distributions, tool usage, and more.
+
+### Key Analysis Concepts
+
+- **14 standard experiments**: Overall reward, per-group breakdown, cost, tokens, cost efficiency, sub-task decomposition, checkpoint distributions, gap heatmaps, trajectory analysis, effort budget, tool usage, time efficiency, effort segmentation, difficulty agreement
+- **Domain-normalization**: Cross-domain aggregation uses equal weight per domain (prevents sample-rich domains from dominating)
+- **Agent architectures**: React, GH Copilot, Claude Code compared for fixed model (Sonnet 4.6)
+
+For full analysis methodology, see the `eval-analysis` skill (`.github/skills/eval-analysis/SKILL.md`).
 
 ## Common Patterns
 

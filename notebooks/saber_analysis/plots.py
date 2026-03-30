@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 
@@ -53,4 +55,7 @@ def classify_score_type(st: str) -> str:
         return "Checkpoints"
     if st == "aggregate":
         return "Aggregate"
+    # Domain-specific checkpoints (e.g. c0_cti_analysis, c4_detection_quality)
+    if re.match(r"^c\d+_", st):
+        return "Checkpoints"
     return "Other"
