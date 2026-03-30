@@ -53,6 +53,25 @@ This project is maintained in two repositories. Use whichever you have access to
 
 The `pyproject.toml` has labeled source blocks for each — uncomment the matching block for your repo. The GitHub sources are active by default.
 
+> **⚠️ Azure DevOps (Microsoft internal) users — required setup step:**
+>
+> The `pyproject.toml` defaults to **GitHub** sources for `saber` and `inspect-ai`. If you cloned from Azure DevOps (`oss_saber`), you **must** switch to the ADO sources before running `uv sync`:
+>
+> 1. Open `pyproject.toml` and find the `[tool.uv.sources]` section
+> 2. **For `saber`:** Comment the GitHub line, uncomment the ADO line:
+>    ```toml
+>    # saber = { git = "https://github.com/microsoft/ACES.git", branch = "main" }
+>    saber = { git = "https://MSECAIModels@dev.azure.com/MSECAIModels/Benchmarking/_git/SABER", branch = "main" }
+>    ```
+> 3. **For `inspect-ai`:** Comment the GitHub line, uncomment the ADO line:
+>    ```toml
+>    # inspect-ai = { git = "https://github.com/microsoft/ACESEvals.git", branch = "inspect-ai/dev/aces_integration" }
+>    inspect-ai = { git = "https://MSECAIModels@dev.azure.com/MSECAIModels/Benchmarking/_git/inspect_ai", branch = "dev/aces_integration" }
+>    ```
+> 4. Run `uv sync --all-extras`
+>
+> **Without this step, `uv sync` will fail** because GitHub sources may not be accessible from internal networks.
+
 ---
 
 ## Quick Start
