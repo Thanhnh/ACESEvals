@@ -48,7 +48,7 @@ requires-dist = [
     { name = "claude-code-sdk", marker = "extra == 'claude-code'", specifier = ">=0.0.25" },
     { name = "github-copilot-sdk", marker = "extra == 'copilot'", specifier = ">=0.1.16" },
     { name = "huggingface-hub" },
-    { name = "inspect-ai", git = "https://dev.azure.com/MSECAIModels/Benchmarking/_git/inspect_ai?branch=dev%2Faces_integration" },
+    { name = "inspect-ai", git = "https://github.com/microsoft/ACESEvals.git?branch=inspect-ai%2Fdev%2Faces_integration" },
     { name = "isort", marker = "extra == 'dev'", specifier = ">=5.12.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.0.0" },
     { name = "openai", specifier = ">=2.26.0" },
@@ -1209,8 +1209,8 @@ wheels = [
 
 [[package]]
 name = "inspect-ai"
-version = "0.3.130.dev1341+g4922948c"
-source = { git = "https://dev.azure.com/MSECAIModels/Benchmarking/_git/inspect_ai?branch=dev%2Faces_integration#4922948c6c626ad8fb1724bafaec019c4fbedff8" }
+version = "0.1.dev4754+g4922948c6"
+source = { git = "https://github.com/microsoft/ACESEvals.git?branch=inspect-ai%2Fdev%2Faces_integration#4922948c6c626ad8fb1724bafaec019c4fbedff8" }
 dependencies = [
     { name = "aioboto3" },
     { name = "aiohttp" },
