@@ -95,10 +95,10 @@ saber = { git = "https://github.com/microsoft/ACES.git", branch = "main" }
 # inspect-ai: ADO fork required for tool_call limit functionality not yet merged upstream.
 # Uncomment the GitHub or local lines below if/when upstream merges the feature.
 #
-# Azure DevOps (Microsoft internal — for oss_saber repo):
-inspect-ai = { git = "https://MSECAIModels@dev.azure.com/MSECAIModels/Benchmarking/_git/inspect_ai", branch = "dev/aces_integration" }
 # GitHub (external — default for ACESEvals repo):
-# inspect-ai = { git = "https://github.com/microsoft/ACESEvals.git", branch = "inspect-ai/dev/aces_integration" }
+inspect-ai = { git = "https://github.com/microsoft/ACESEvals.git", branch = "inspect-ai/dev/aces_integration" }
+# Azure DevOps (Microsoft internal — for oss_saber repo):
+# inspect-ai = { git = "https://MSECAIModels@dev.azure.com/MSECAIModels/Benchmarking/_git/inspect_ai", branch = "dev/aces_integration" }
 # Local editable (for development against a local checkout):
 # inspect-ai = { path = "./external/inspect_ai", editable = true }
 
