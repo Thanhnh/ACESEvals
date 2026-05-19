@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
 """Transform submission_evaluation_config from static to llm_judge strategy.
 
 This script updates all excytin task YAML files to:

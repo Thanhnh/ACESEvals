@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
 """Build searchable index of Sigma rules from SigmaHQ repository."""
 
 import json

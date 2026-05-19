@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Tests for cti_realm/scoring/__init__.py — factory function."""
 
 from __future__ import annotations

@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """CyBench security challenges domain for Inspect AI.
 
 This module exposes the CyBench domain as an Inspect AI task that can be

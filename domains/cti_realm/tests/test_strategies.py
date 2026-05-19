@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Tests for cti_realm/scoring/strategies.py — 5 checkpoint strategies."""
 
 from __future__ import annotations

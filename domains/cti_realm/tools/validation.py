@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Output validation tool for the CTI Realm sandbox."""
 
 from __future__ import annotations

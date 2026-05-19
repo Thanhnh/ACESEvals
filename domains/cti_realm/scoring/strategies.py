@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """CTI Realm scoring strategies.
 
 Five checkpoint strategies registered via ``get_strategies()`` in ``__init__.py``.

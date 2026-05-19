@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Data loading utilities for CTI Realm Kusto initialization."""
 
 import json

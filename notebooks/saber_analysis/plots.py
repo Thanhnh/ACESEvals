@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Shared plot configuration and helpers for SABER analysis notebooks."""
 
 from __future__ import annotations

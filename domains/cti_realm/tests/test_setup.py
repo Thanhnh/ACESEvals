@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Tests for cti_realm.setup — domain setup hooks (Hugging Face download)."""
 
 from __future__ import annotations

@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Generate SABER task YAML files from CTI Realm JSONL datasets.
 
 Reads ``dataset_samples_stratified_{N}.jsonl`` and

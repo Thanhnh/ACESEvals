@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Tests for cti_realm/scoring/_parsing.py — pure parsing utilities."""
 
 from __future__ import annotations

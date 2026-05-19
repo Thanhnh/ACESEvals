@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
 """Initialize Kusto Emulator with CTI Realm tables - schema creation only."""
 
 import json

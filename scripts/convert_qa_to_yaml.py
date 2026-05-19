@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
 """Convert Q/A JSON dataset to SABER YAML task format.
 
 This script reads Q/A pairs from the new_dataset JSON files and converts them

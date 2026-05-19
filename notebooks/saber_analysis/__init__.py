@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Shared utilities for SABER evaluation analysis notebooks."""
 
 from saber_analysis.data_loader import load_eval_logs, load_baseline_logs, ensure_eval_files, load_trajectory_data

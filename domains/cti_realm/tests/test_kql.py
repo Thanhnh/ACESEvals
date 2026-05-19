@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Tests for cti_realm/scoring/_kql.py — KQL F1 scoring."""
 
 from __future__ import annotations

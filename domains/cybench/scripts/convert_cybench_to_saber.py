@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
 """
 Convert inspect_eval/cybench benchmark definitions to SABER compliant definitions.
 

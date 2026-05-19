@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """CTI Realm scoring strategies for the SABER thin library.
 
 Five checkpoint strategies, one per scoring checkpoint (C0–C4).

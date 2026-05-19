@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Generic eval log parsing — works for any SABER domain.
 
 Uses inspect_ai's typed log API where possible:

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
 # ══════════════════════════════════════════════════════════════════════════════
 # SABER Eval Monitor — Produces succinct monitoring reports
 # ══════════════════════════════════════════════════════════════════════════════
