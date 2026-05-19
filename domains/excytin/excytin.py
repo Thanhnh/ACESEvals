@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Excytin database forensics and incident response domain for Inspect AI.
 
 This module exposes the Excytin domain as an Inspect AI task that can be

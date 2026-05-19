@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
 """Batch data loader for CTI Realm Kusto initialization."""
 
 import os

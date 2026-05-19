@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Sigma rule quality scoring via LLM-as-judge.
 
 Ported from server/scoring/scorer.py (_score_sigma_rule).

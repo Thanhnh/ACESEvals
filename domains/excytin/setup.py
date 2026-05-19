@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Excytin domain setup hooks.
 
 Provides a ``DownloadExcytinData`` hook that downloads excytin benchmark

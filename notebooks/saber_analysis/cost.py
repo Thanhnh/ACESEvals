@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Cost computation utilities for SABER eval analysis.
 
 Uses inspect_ai's typed log API (``read_eval_log``) for header-only reads.

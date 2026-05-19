@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Trajectory checkpoint detectors for CTI Realm scoring (C0–C3).
 
 Pure functions that analyse ``ToolStep`` tuples and return

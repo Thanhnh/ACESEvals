@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """CTI Realm - Cyber Threat Intelligence domain for Inspect AI.
 
 This module exposes the CTI Realm domain as an Inspect AI task that can be

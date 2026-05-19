@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """CTI Realm domain setup hooks.
 
 Provides two setup hooks that run automatically before evaluation:

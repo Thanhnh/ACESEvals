@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Pure parsing utilities for CTI Realm model outputs.
 
 Ported from server/scoring/parsing_utils.py — no SABER server dependencies.

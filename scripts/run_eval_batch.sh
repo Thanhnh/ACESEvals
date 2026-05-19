@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
 # ══════════════════════════════════════════════════════════════════════════════
 # SABER Eval Batch Runner — Runs evals with concurrency control
 # ══════════════════════════════════════════════════════════════════════════════

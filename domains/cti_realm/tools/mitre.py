@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """MITRE ATT&CK technique search tool for the CTI Realm sandbox."""
 
 from __future__ import annotations

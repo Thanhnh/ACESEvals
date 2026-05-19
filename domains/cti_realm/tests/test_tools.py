@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Tests for cti_realm/tools.py — tool function signatures and structure."""
 
 from __future__ import annotations

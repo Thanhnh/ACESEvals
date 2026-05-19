@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Kusto/KQL query tools for the CTI Realm sandbox."""
 
 from __future__ import annotations

@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """KQL development scoring — F1 with tool verification.
 
 Public API:

@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Shared helpers for CTI Realm scoring strategies.
 
 - Constants: tool-name sets for checkpoint detection.

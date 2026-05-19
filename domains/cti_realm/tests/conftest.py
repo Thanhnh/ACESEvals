@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Shared fixtures and sys.path setup for CTI Realm tests."""
 
 from __future__ import annotations

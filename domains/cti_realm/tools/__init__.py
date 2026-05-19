@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """CTI Realm domain tools for sandbox execution.
 
 Each module provides one or more @tool-decorated functions grouped by concern:

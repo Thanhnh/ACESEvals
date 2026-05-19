@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 """Tests for cti_realm/scoring/_sigma.py — direct score_sigma_rule() unit tests."""
 
 from __future__ import annotations
