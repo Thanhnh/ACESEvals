@@ -718,3 +718,9 @@ See [docs/design/refactor/05-domain-extensibility.md](docs/design/refactor/05-do
 | [Domain Extensibility](docs/design/refactor/05-domain-extensibility.md) | Custom tools and scoring strategies |
 | [Environments](docs/design/refactor/06-environments.md) | Docker Compose conventions |
 | [Approval System](docs/design/refactor/09-approval-system.md) | Security validation via inspect_ai Approver |
+
+---
+
+## Trademarks
+
+This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft trademarks or logos is subject to and must follow [Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general). Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship. Any use of third-party trademarks or logos are subject to those third-party's policies.
