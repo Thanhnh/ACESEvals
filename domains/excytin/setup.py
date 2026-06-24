@@ -17,6 +17,10 @@ logger = get_logger("domains.excytin.setup")
 
 REPO_ID = "anandmudgerikar/excytin-bench"
 DATA_ZIP_FILENAME = "data.zip"
+# Pin to a specific immutable dataset revision so the download cannot be
+# silently swapped for malicious content by a push to the (mutable) HF repo
+# (CWE-494: download of code/data without integrity check).
+DATA_REVISION = "8bc9ce1f97f8a6880c815dfba76d88651ddb761a"
 
 # Subdirectories expected inside data/ after extraction
 _EXPECTED_SUBDIRS = ("csv_files", "sql_files")
@@ -59,15 +63,21 @@ def download_and_extract_data(
         repo_id=REPO_ID,
         repo_type="dataset",
         filename=DATA_ZIP_FILENAME,
+        revision=DATA_REVISION,
     )
 
     logger.info("Download complete: %s — extracting to %s", zip_path, data_dir)
 
+    data_root = data_dir.resolve()
     with zipfile.ZipFile(zip_path, "r") as zf:
         # The zip contains a top-level data/ directory (data/csv_files/,
         # data/sql_files/).  Strip that prefix so files land directly in
         # *data_dir* instead of data_dir/data/.
         prefix = "data/"
+        # Validate every member path up-front so we never extract a partial
+        # tree before failing — a mid-extraction error would otherwise leave
+        # stray files that defeat the next run's "is data present?" check.
+        members_to_extract: list[tuple[zipfile.ZipInfo, Path]] = []
         for member in zf.infolist():
             if not member.filename.startswith(prefix):
                 continue
@@ -75,7 +85,16 @@ def download_and_extract_data(
             rel = member.filename[len(prefix) :]
             if not rel:
                 continue  # skip the prefix directory entry itself
-            target = data_dir / rel
+            target = (data_root / rel).resolve()
+            # Guard against zip-slip: a malicious archive member (e.g.
+            # "data/../../../etc/cron.d/evil") must not escape *data_root*.
+            if target != data_root and data_root not in target.parents:
+                raise ValueError(
+                    f"Unsafe path in archive (zip-slip blocked): {member.filename!r}"
+                )
+            members_to_extract.append((member, target))
+
+        for member, target in members_to_extract:
             if member.is_dir():
                 target.mkdir(parents=True, exist_ok=True)
             else:
