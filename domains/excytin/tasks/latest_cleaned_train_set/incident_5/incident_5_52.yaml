@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_52
+  title: incident_5_latest_cleaned_train_set_task_52
+  description: 'Just moments before the ransomware payload was launched, a related ''Possible lateral movement'' alert was raised on the same affected device, based on a Microsoft Defender for Endpoint detection. Which IP address (other than the one already observed with the ransomware launch) was recorded in that lateral movement alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this human-operated ransomware incident, an alert fired at 2024-07-04 22:35:01 UTC indicating that a ransomware payload was remotely launched on a device, potentially encrypting content and rendering it unusable. The activity was associated with the account `dp5hn` (SID `S-1-5-21-1840191660-8534830288-125585561-1522`, Entra ID `731adb71-b11c-4bbf-850b-57989b350e96`) and the IP address `99.83.111.100`.'
+    question: 'Just moments before the ransomware payload was launched, a related ''Possible lateral movement'' alert was raised on the same affected device, based on a Microsoft Defender for Endpoint detection. Which IP address (other than the one already observed with the ransomware launch) was recorded in that lateral movement alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '38.142.109.10'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '38.142.109.10'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A ransomware payload was remotely launched on the device with HostName `vnevado-win11u`, indicating attackers attempted to encrypt content on this device.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'In close time proximity, possible lateral movement was observed involving the suspicious network address with IP `38.142.109.10`, suggesting the attacker moved laterally across devices.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

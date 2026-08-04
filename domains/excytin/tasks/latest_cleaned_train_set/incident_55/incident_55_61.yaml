@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_61
+  title: incident_55_latest_cleaned_train_set_task_61
+  description: 'For that closely related "Suspicious sequence of exploration activities" alert, what is the Microsoft Entra ID (AAD) user ID of the account associated with the activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a multi-stage intrusion, a "Sensitive credential memory read" alert fired on host `mb-winclient` (AAD device ID `7661dfd4-218f-4016-8a87-66d68a7f098e`), where a process scanned or dumped memory from the Local Security Authority Subsystem Service (`lsass.exe`, PID 760). The activity was tied to the local account `bjenkins` (SID `S-1-5-21-561436748-3867387497-1732241745-3701`) and IP address `72.5.72.208`, and involved a PowerShell command line: `"powershell.exe" -noexit -command set-location -literalpath ''c:\users\bjenkins\downloads\midnight14''`. Roughly one second earlier, a related alert titled "Suspicious sequence of exploration activities" was raised, where a process invoked a set of Windows commands typically used to identify valuable assets and plan lateral movement.'
+    question: 'For that closely related "Suspicious sequence of exploration activities" alert, what is the Microsoft Entra ID (AAD) user ID of the account associated with the activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A process extracted from the file `powershell.exe` scanned or dumped memory from the Local Security Authority Subsystem Service (lsass.exe) to steal credentials such as authentication hashes or passwords, at 2024-07-04 22:35:04 UTC.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the credential theft, a suspicious sequence of exploration activities (a set of windows commands used to identify assets of value and coordinate lateral movement) was performed under the user account with AadUserId `ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5`, at 2024-07-04 22:35:03 UTC.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

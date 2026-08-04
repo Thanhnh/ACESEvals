@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_test_set_task_76
+  title: incident_166_latest_cleaned_test_set_task_76
+  description: 'Following this mailbox compromise activity, a related identity-based attack was detected the next day on 2024-07-23, where an attacker attempted to authenticate against many accounts using common passwords. From which source IP address did that attack originate?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this incident, an alert for a ''Suspicious inbox manipulation rule'' was raised on 2024-07-22, indicating that a user''s inbox rules were manipulated in a suspicious manner — an attacker may have gained access to the mailbox and created rules to delete or move messages in order to exfiltrate data. The affected account was `Jordan P` (`laylaw@vnevado.alpineskihouse.co`, SID `S-1-5-21-1740051960-3534030288-108486866-1602`), with activity observed from IP `255.246.85.58` against cloud application ID `20893`.'
+    question: 'Following this mailbox compromise activity, a related identity-based attack was detected the next day on 2024-07-23, where an attacker attempted to authenticate against many accounts using common passwords. From which source IP address did that attack originate?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '95.202.65.202'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '95.202.65.202'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with AadUserId `89e933b9-5b2e-4bd6-bcdf-033db707ef82` had its inbox rules manipulated in a suspicious manner, indicating the attacker gained access to the user''s mailbox and set rules to delete or move messages for data exfiltration (2024-07-22 10:00:07 UTC).'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the mailbox compromise, a password spray attack was detected originating from the IP address `95.202.65.202`, where the attacker attempted to authenticate against many accounts using common passwords (2024-07-23 14:23:51 UTC).'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

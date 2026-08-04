@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During the investigation of a security incident involving unusual addition of credentials to an OAuth
-      application by Luciano Herrera (`Luciano Herrera@niseko.alpineskihouse.co`), multiple malicious activities were identified.
+      application by Luciano Herrera (`pwilson@niseko.alpineskihouse.co`), multiple malicious activities were identified.
       The user added a credential of type Password to the app SimulandApp. This pattern can indicate credential compromise
       and potential abuse of the OAuth app. Subsequently, a suspicious LDAP query was executed indicating potential reconnaissance
       activity.'

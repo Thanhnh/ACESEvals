@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_30
+  title: incident_5_latest_cleaned_test_set_task_30
+  description: 'For the alert about SMB remote file access being blocked on multiple devices, what is the full email address (UPN) of the contained user account responsible for that lateral movement attempt?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage intrusion, a ''CommandAndControl'' malware detection was raised on a device on 2024-07-04, suggesting an attacker was attempting to move laterally to it from another device on the network. The suspicious activity included a process (PID 88, created 2024-06-20T09:29:42Z) running the command line `curl http://vectorsandarrows.com`. Follow-on activity in the same incident shows that attack disruption automatically blocked a contained user''s attempts to create, delete, or modify files over the SMB protocol on multiple devices on 2024-07-10.'
+    question: 'For the alert about SMB remote file access being blocked on multiple devices, what is the full email address (UPN) of the contained user account responsible for that lateral movement attempt?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'dp5hn@vnevado.alpineskihouse.co'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'dp5hn@vnevado.alpineskihouse.co'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A ''CommandAndControl'' malware was detected during lateral movement on the device with AadDeviceId `e5799261-6720-4297-961e-bd9ca4275033`, indicating an attacker might be moving laterally to this device from another device on the network.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The contained user account with email `dp5hn@vnevado.alpineskihouse.co` attempted lateral movement using SMB remote file access on multiple devices, which was blocked by attack disruption.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

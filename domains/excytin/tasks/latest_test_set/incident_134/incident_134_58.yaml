@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During the investigation of a potentially malicious URL click (https://ms175052280.orangecliff-f53f26fd.eastus.azurecontainerapps.io/)
-      by user Nina Park (Nina Park@vnevado.alpineskihouse.co) from sender alyssat@vnevado.alpineskihouse.co to recipient raphaelt@vnevado.alpineskihouse.co,
+      by user Nina Park (raphaelt@vnevado.alpineskihouse.co) from sender alyssat@vnevado.alpineskihouse.co to recipient raphaelt@vnevado.alpineskihouse.co,
       we traced further activity associated with the same user account. A related alert was raised later in the incident that
       identified the Windows account behind this activity and provided its Security Identifier (SID).'
     question: 'According to the follow-up alert linked to the suspicious URL click, what is the Windows Security Identifier

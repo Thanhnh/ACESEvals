@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_322_latest_cleaned_train_set_task_10
+  title: incident_322_latest_cleaned_train_set_task_10
+  description: 'A follow-up alert in this incident reported suspicious Azure Resource Management activities performed by a user account that signed in from a risky session. What was the source IP address recorded in that follow-up alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this incident, Microsoft Defender for Resource Manager detected a resource management operation coming from an IP address associated with proxy services such as TOR, targeting Azure resources in subscription `7e838342-601f-4552-9baf-0dfb300cf555`, resource group `ctfcat`, including the virtual machine `vnevado-dc` (resource ID `/subscriptions/7e838342-601f-4552-9baf-0dfb300cf555/resourcegroups/ctfcat/providers/microsoft.compute/virtualmachines/vnevado-dc`), its network interface `vnevado-dc-nic`, and the DevTestLab shutdown schedule `shutdown-computevm-vnevado-dc`. Threat actors often use such proxies to hide their true source IP.'
+    question: 'A follow-up alert in this incident reported suspicious Azure Resource Management activities performed by a user account that signed in from a risky session. What was the source IP address recorded in that follow-up alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '253.1.244.215'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '253.1.244.215'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account `Hailey Johnson` performed an Azure Resource Manager operation from a suspicious proxy (e.g., TOR) IP address at 2024-08-01 13:09:13 UTC.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following that, suspicious Azure Resource Management activities were performed by this risky user account from the IP address `253.1.244.215` at 2024-08-01 13:19:20 UTC.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

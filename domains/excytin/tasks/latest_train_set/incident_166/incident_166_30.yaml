@@ -32,7 +32,7 @@ tasks:
         max_score: 0.5
         weight: 1.0
         title: Checkpoint 1
-        description: 'An account associated with business email compromise — Email: `Jordan P@vnevado.alpineskihouse.co` —
+        description: 'An account associated with business email compromise — Email: `laylaw@vnevado.alpineskihouse.co` —
           signed in to SAP in a suspicious manner.'
       checkpoint_2:
         target: trajectory

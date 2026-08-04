@@ -61,7 +61,7 @@ tasks:
     # To use static matching instead, change strategy to "static" and set:
     #   criteria:
     #     expected_answers:
-    #       - 'Nina Park@vnevado.alpineskihouse.co'
+    #       - 'raphaelt@vnevado.alpineskihouse.co'
   scoring:
     llm_judge:
       model: "{judge_llm}"
@@ -72,14 +72,14 @@ tasks:
         target: submission
         judge_system_template: judge/submission_judge_system.md
         judge_user_template: judge/submission_judge_user.md
-        description: 'Nina Park@vnevado.alpineskihouse.co'
+        description: 'raphaelt@vnevado.alpineskihouse.co'
         max_score: 1.0
       checkpoint_1:
         target: trajectory
         max_score: 0.5
         weight: 1.0
         title: Checkpoint 1
-        description: A suspicious inbox rule was created in the email account `Nina Park@vnevado.alpineskihouse.co` 
+        description: A suspicious inbox rule was created in the email account `raphaelt@vnevado.alpineskihouse.co` 
           during a risky Azure Active Directory session, possibly indicating an attempt to conduct business email 
           compromise (BEC) for financial fraud.
   scoring_aggregation:
@@ -179,7 +179,7 @@ tasks:
     incident_context: 'In the context of a recent security incident, we have detected a potentially malicious URL click by
       a user on two URLs: `http://ms175052280.orangecliff-f53f26fd.eastus.azurecontainerapps.io/` and `https://ms175052280.orangecliff-f53f26fd.eastus.azurecontainerapps.io/`.
       The recipient of the mails containing these URLs is `raphaelt@vnevado.alpineskihouse.co` sent from `alyssat@vnevado.alpineskihouse.co`.
-      There are different involved accounts including `Nina Park` with email `Nina Park@vnevado.alpineskihouse.co`.'
+      There are different involved accounts including `Nina Park` with email `raphaelt@vnevado.alpineskihouse.co`.'
     question: What is the IP address associated with the anonymous sign-in attempt detected shortly after the malicious 
       URL click?
     # Main task submission evaluation - uses LLM-as-a-judge by default
@@ -222,7 +222,7 @@ tasks:
   description: Can you identify which cloud application (AppId) was involved in this incident?
   inherit_shared: true
   initial_context:
-    incident_context: 'There was a suspicious manipulation of inbox rules for the account ''Nina Park'' (Email: Nina Park@vnevado.alpineskihouse.co)
+    incident_context: 'There was a suspicious manipulation of inbox rules for the account ''Nina Park'' (Email: raphaelt@vnevado.alpineskihouse.co)
       with IP address 237.7.81.122. An attacker might have gained access to Nina''s inbox and is manipulating rules to delete
       or move messages or folders to exfiltrate data from the organization.'
     question: Can you identify which cloud application (AppId) was involved in this incident?
@@ -289,7 +289,7 @@ tasks:
         max_score: 0.25
         weight: 1.0
         title: Checkpoint 1
-        description: A possibly compromised user account `Nina Park@vnevado.alpineskihouse.co` sent suspicious emails 
+        description: A possibly compromised user account `raphaelt@vnevado.alpineskihouse.co` sent suspicious emails 
           related to a BEC fraud attempt.
       checkpoint_2:
         target: trajectory

@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_test_set_task_17
+  title: incident_39_latest_cleaned_test_set_task_17
+  description: 'Within seconds of this activity on the same endpoint, another alert fired for the execution of a well-known credential theft tool whose command line indicated intent to dump users'' credentials, keys and plain-text passwords. What is the file name of that tool''s process?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation on host `vnevado-win10b` (Azure AD device ID `fafdcd65-46c6-45a6-aa85-ec9b77ca0bcb`), an alert was raised for a file being dropped and launched from a remote location, indicating an attacker or malware may be attempting to move laterally or propagate. Around the same time, on that endpoint, activity was seen from the account `fk8mq` (SID `S-1-5-21-1540151660-3530000288-105586595-1517`) with a remote connection from IP `141.216.110.153`, and a process with ID 2608 running the command line `rubeus.exe dump /service:xfbzkp /user:lucasb`, suggesting Kerberos ticket abuse.'
+    question: 'Within seconds of this activity on the same endpoint, another alert fired for the execution of a well-known credential theft tool whose command line indicated intent to dump users'' credentials, keys and plain-text passwords. What is the file name of that tool''s process?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'mimikatz.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'mimikatz.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A remote session dropped and launched the file `rubeus.exe` from a remote location, indicating possible lateral movement or malware propagation.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The Rubeus kerberoasting tool was used on the host `vnevado-win10v`, attempting to request and abuse Kerberos tickets for credential theft.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The known credential theft tool `mimikatz.exe` was executed on the endpoint to dump users'' credentials, keys, and plain-text passwords.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

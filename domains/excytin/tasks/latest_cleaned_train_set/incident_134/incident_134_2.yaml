@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_134_latest_cleaned_train_set_task_2
+  title: incident_134_latest_cleaned_train_set_task_2
+  description: 'For the emails flagged in this alert, what is the sender''s email address (the mailbox from which the malicious URL messages originated)?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert fired for "Email messages containing malicious URL removed after delivery" — emails containing the malicious URL `https://ms175052280.orangecliff-f53f26fd.eastus.azurecontainerapps.io/` were delivered to the mailbox `raphaelt@vnevado.alpineskihouse.co` (AAD user ID `e036dee7-fa23-42ef-a019-468c8d3401f1`, SID `S-1-5-21-1874151667-3554330288-105586563-1715`) and were later removed. The messages were observed coming from sender IP `254.241.243.229`.'
+    question: 'For the emails flagged in this alert, what is the sender''s email address (the mailbox from which the malicious URL messages originated)?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'alyssat@vnevado.alpineskihouse.co'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'alyssat@vnevado.alpineskihouse.co'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'At 2024-07-17 11:04:19 UTC, the alert "Email messages containing malicious URL removed after delivery" was triggered, indicating that emails containing a malicious URL were delivered to mailboxes and later removed.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The mail message entity associated with this alert shows the sender of the malicious email, Field: Sender, Value: `alyssat@vnevado.alpineskihouse.co`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

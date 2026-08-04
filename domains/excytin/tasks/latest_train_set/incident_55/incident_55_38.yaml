@@ -5,7 +5,7 @@ tasks:
     the AD FS DKM key?'
   inherit_shared: true
   initial_context:
-    incident_context: 'During the investigation, we observed that the user Luciano Herrera (luciano herrera@niseko.alpineskihouse.co)
+    incident_context: 'During the investigation, we observed that the user Luciano Herrera (pwilson@niseko.alpineskihouse.co)
       added a password-type credential to an OAuth application (AppId 11161) from IP 36.193.21.220. This suspicious action
       was correlated with follow-up alerts for system hardware discovery and remote activity on a device. A few days later,
       another alert titled “Suspected AD FS DKM key read” indicated that someone had accessed the Directory Key Material (DKM)

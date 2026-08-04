@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_134_latest_cleaned_test_set_task_14
+  title: incident_134_latest_cleaned_test_set_task_14
+  description: 'For the earlier alert where the user clicked a potentially malicious URL, what is the sender address of the mail message that delivered that link?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During the investigation of this incident, an alert titled ''Malicious IP address'' was raised on 2024-07-18, indicating a sign-in from the IP address `170.54.121.63`, which is known to be malicious during or around the time of the sign-in. Pivoting on the user account involved in that sign-in, an earlier alert from 2024-07-17 shows that the same user clicked on a link that was found to be malicious (''A potentially malicious URL click was detected'').'
+    question: 'For the earlier alert where the user clicked a potentially malicious URL, what is the sender address of the mail message that delivered that link?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'alyssat@vnevado.alpineskihouse.co'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'alyssat@vnevado.alpineskihouse.co'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A sign-in was detected from an IP address known to be malicious for the user account with AadUserId `e036dee7-fa23-42ef-a019-468c8d3401f1`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'From the compromised account, a phishing email containing a malicious URL was sent by the mail message sender `alyssat@vnevado.alpineskihouse.co`, and a potentially malicious URL click was detected.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -6,7 +6,7 @@ tasks:
     the credential theft?'
   inherit_shared: true
   initial_context:
-    incident_context: 'During an investigation, we observed that the IT director Julian Burke (account: Julian Burke@vnevado.alpineskihouse.co)
+    incident_context: 'During an investigation, we observed that the IT director Julian Burke (account: lucasb@vnevado.alpineskihouse.co)
       initiated a suspected DCSync attack from host VNEVADO-Win10V against the domain controller VNEVADO-DC on 2024-07-10.
       This raised concerns about possible follow-up credential-theft activity in the environment.'
     question: 'Analysts later identified a ‘Malicious credential theft tool execution detected’ alert that is linked to this

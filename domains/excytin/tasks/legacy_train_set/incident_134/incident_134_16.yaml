@@ -15,7 +15,7 @@ tasks:
     # To use static matching instead, change strategy to "static" and set:
     #   criteria:
     #     expected_answers:
-    #       - 'Nina Park@vnevado.alpineskihouse.co'
+    #       - 'raphaelt@vnevado.alpineskihouse.co'
   scoring:
     llm_judge:
       model: "{judge_llm}"
@@ -26,7 +26,7 @@ tasks:
         target: submission
         judge_system_template: judge/submission_judge_system.md
         judge_user_template: judge/submission_judge_user.md
-        description: 'Nina Park@vnevado.alpineskihouse.co'
+        description: 'raphaelt@vnevado.alpineskihouse.co'
         max_score: 1.0
       checkpoint_1:
         target: trajectory
@@ -40,7 +40,7 @@ tasks:
         max_score: 0.5
         weight: 1.0
         title: Checkpoint 2
-        description: A suspicious inbox rule was created for the email account `Nina Park@vnevado.alpineskihouse.co`, 
+        description: A suspicious inbox rule was created for the email account `raphaelt@vnevado.alpineskihouse.co`, 
           indicating a potential BEC financial fraud attempt.
   scoring_aggregation:
     max:

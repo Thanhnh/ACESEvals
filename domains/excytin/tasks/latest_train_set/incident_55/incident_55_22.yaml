@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'Security monitoring has flagged an unusual addition of credentials to an OAuth application named “SimulandApp.”
-      The operation was performed by user Luciano Herrera (email: Luciano Herrera@niseko.alpineskihouse.co) from IP address
+      The operation was performed by user Luciano Herrera (email: pwilson@niseko.alpineskihouse.co) from IP address
       2801:e0a:1eb:dea0:642e:5bb6:d315:fbb3 on 2024-07-10. This could indicate that the app was compromised for malicious
       purposes such as phishing or data exfiltration.'
     question: 'A short time later, a separate alert reported that an account accessed the AD FS Delegated Key Management (DKM)

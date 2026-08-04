@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_train_set_task_19
+  title: incident_166_latest_cleaned_train_set_task_19
+  description: 'A follow-up alert on 2024-07-23 flagged possible business email compromise (BEC) financial fraud involving the same compromised identity. What is the display name of the account associated with that BEC alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a SAP financial process manipulation incident, an alert titled ''Suspicious SAP authentication'' was raised on 2024-07-22 after a user account flagged for risky sign-in in Microsoft Entra ID signed in to SAP (cloud application AppId 100) from IP address 107.253.5.27. An attacker might have taken control of this account to search through SAP with the intention of recording or modifying sensitive financial information.'
+    question: 'A follow-up alert on 2024-07-23 flagged possible business email compromise (BEC) financial fraud involving the same compromised identity. What is the display name of the account associated with that BEC alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Jordan P'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Jordan P'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A user account with AadUserId `89e933b9-5b2e-4bd6-bcdf-033db707ef82` had a risky sign-in in Microsoft Entra ID and then signed in to the SAP enterprise application, indicating a possible account takeover used to search for sensitive financial information.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the suspicious SAP authentication, business email compromise (BEC) characteristics were observed for the account named `Jordan P`, indicating a possible BEC financial fraud attempt against the organization.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

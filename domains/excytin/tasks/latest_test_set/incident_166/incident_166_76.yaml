@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'An investigation was initiated after detecting a suspicious inbox manipulation rule on 2024-07-22 that
-      was associated with the user account "Jordan P" (email: Jordan P@vnevado.alpineskihouse.co, SID: S-1-5-21-1740051960-3534030288-108486866-1602).
+      was associated with the user account "Jordan P" (email: laylaw@vnevado.alpineskihouse.co, SID: S-1-5-21-1740051960-3534030288-108486866-1602).
       The activity originated from the IP address 255.246.85.58 and was tied to cloud application ID 20893. On the following
       day, 2024-07-23, the security platform raised an additional alert named "Password Spray," indicating a credential-stuffing
       attempt against the environment.'

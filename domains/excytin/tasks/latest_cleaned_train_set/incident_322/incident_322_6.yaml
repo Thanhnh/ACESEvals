@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_322_latest_cleaned_train_set_task_6
+  title: incident_322_latest_cleaned_train_set_task_6
+  description: 'For the alert about the Azure Resource Manager operation performed from the suspicious proxy IP address, which Azure resource group was the target of that management operation?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, a potentially malicious URL click was detected after an email was delivered to the recipient `alyssat@vnevado.alpineskihouse.co`. Follow-on activity linked to the same compromised user later showed Microsoft Defender for Resource Manager detecting an Azure Resource Manager operation coming from an IP address associated with proxy/anonymization services such as TOR, which threat actors often use to hide their true source IP.'
+    question: 'For the alert about the Azure Resource Manager operation performed from the suspicious proxy IP address, which Azure resource group was the target of that management operation?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'The resource group `ctfcat`'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'The resource group `ctfcat`'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A potentially malicious URL click was detected for the mail recipient `alyssat@vnevado.alpineskihouse.co` at 2024-08-01 12:44:53 UTC.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Emails containing the malicious URL were delivered and later removed for the account with Name `Hailey Johnson` at 2024-08-01 12:44:53 UTC.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'Following the compromise, an Azure Resource Manager operation was performed from a suspicious proxy (TOR) IP address against the Azure resource with ResourceGroup `ctfcat` at 2024-08-01 13:09:13 UTC.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

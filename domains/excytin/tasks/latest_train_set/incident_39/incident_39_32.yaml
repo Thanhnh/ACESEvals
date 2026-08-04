@@ -17,7 +17,7 @@ tasks:
     # To use static matching instead, change strategy to "static" and set:
     #   criteria:
     #     expected_answers:
-    #       - 'Emma Clark@vnevado.alpineskihouse.co'
+    #       - 'fk8mq@vnevado.alpineskihouse.co'
   scoring:
     llm_judge:
       model: "{judge_llm}"
@@ -28,7 +28,7 @@ tasks:
         target: submission
         judge_system_template: judge/submission_judge_system.md
         judge_user_template: judge/submission_judge_user.md
-        description: 'Emma Clark@vnevado.alpineskihouse.co'
+        description: 'fk8mq@vnevado.alpineskihouse.co'
         max_score: 1.0
       checkpoint_1:
         target: trajectory
@@ -42,7 +42,7 @@ tasks:
         max_score: 0.5
         weight: 1.0
         title: Checkpoint 2
-        description: Later, the account with Email `Emma Clark@vnevado.alpineskihouse.co` attempted an overpass-the-hash
+        description: Later, the account with Email `fk8mq@vnevado.alpineskihouse.co` attempted an overpass-the-hash
           Kerberos authentication from host VNEVADO-Win10V to VNEVADO-DC.
   scoring_aggregation:
     max:

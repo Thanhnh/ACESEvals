@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_82
+  title: incident_55_latest_cleaned_train_set_task_82
+  description: 'Following this lateral movement activity, a related alert in the same incident involved an attempt to access the memory of a Windows subsystem process that stores user credentials. What is the file name of that targeted process?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert titled "Ongoing hands-on-keyboard attack via Impacket toolkit" was raised on host `mb-adfs` at 2024-07-04 22:35:01 UTC. The alert flagged a suspicious execution of `powershell.exe` (spawned via `%comspec%`) with the command line `powershell.exe -encodedcommand qwa6afwauwbjahiaaqbwahqacwbcafiazqbuageabqblafaabwb3aguacgbzaggazqbsagwalgbwahmamqa=` and Process ID 6808, associated with accounts `LocalSystem` and `gsmith` (SID S-2-5-21-571436798-3864380397-1837441745-3206). Impacket connects to other hosts to explore network shares and execute commands, and is often seen in hands-on-keyboard attacks preceding credential theft.'
+    question: 'Following this lateral movement activity, a related alert in the same incident involved an attempt to access the memory of a Windows subsystem process that stores user credentials. What is the file name of that targeted process?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'lsass.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'lsass.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'An Impacket-based hands-on-keyboard attack was observed on the device, where the attacker executed commands remotely to move laterally across the network.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'As part of this activity, the process `lsass.exe` was targeted/extracted, indicating an attempt to dump credentials from the Local Security Authority Subsystem Service.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_10
+  title: incident_5_latest_cleaned_train_set_task_10
+  description: 'A related alert in this incident flagged suspicious hands-on-keyboard user behavior on a device. What is the security identifier (SID) of the account associated with that alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage human-operated attack, a known credential theft tool was executed with the command line `"mimikatz.exe" privilege::debug "sekurlsa::pth /user:fk8mq /ntlm: /domain:vnevado.alpineskihouse.co /run:..\notepad.exe //vnevado-jumpv cmd.exe"` (Process ID 4464), spawning notepad.exe and cmd.exe. This activity was part of a chain that later included lateral movement via PSExec to the jump server and a remotely launched ransomware payload.'
+    question: 'A related alert in this incident flagged suspicious hands-on-keyboard user behavior on a device. What is the security identifier (SID) of the account associated with that alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'S-1-5-21-1840191660-8534830288-125585561-1522'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'S-1-5-21-1840191660-8534830288-125585561-1522'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A known credential theft tool was executed under the account `tgs2z`, indicating an intent to dump users'' credentials, keys, and plain-text passwords.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The attacker used PSExec to move laterally to the jump server from IP address `99.83.111.100`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'A ransomware payload was remotely launched on the device with AadDeviceId `e5799261-6720-4297-961e-bd9ca4275033`.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'Suspicious hands-on-keyboard user behavior was observed for the account with SID `S-1-5-21-1840191660-8534830288-125585561-1522`, indicating the user has likely been compromised and involved in a human-operated attack.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

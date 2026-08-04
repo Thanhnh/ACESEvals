@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_test_set_task_3
+  title: incident_34_latest_cleaned_test_set_task_3
+  description: 'A closely related ''Suspicious PowerShell download or encoded command execution'' alert was triggered moments earlier on the same device. What is the Microsoft Entra (Azure AD) user ID of the account associated with that related alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident involving Execution & Discovery on one endpoint, an alert for ''Suspicious PowerShell download or encoded command execution'' was raised. In this alert, the process `winword.exe` (Process ID 9780, created at 2024-06-26T11:57:20.2959493Z) was launched with the command line `"winword.exe" c:\scripts\rs4_winatp-intro-invoice.docm`, indicating a macro-enabled document may have spawned PowerShell to download a payload or run an encoded command.'
+    question: 'A closely related ''Suspicious PowerShell download or encoded command execution'' alert was triggered moments earlier on the same device. What is the Microsoft Entra (Azure AD) user ID of the account associated with that related alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '16320fec-8d90-403b-b7fe-78f715d4728d'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '16320fec-8d90-403b-b7fe-78f715d4728d'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A process on host `vnevado-win10e` executed PowerShell to download a file or run an encoded command, indicating a possible in-memory payload download or command execution.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The suspicious PowerShell download or encoded command execution was performed under the user account with AadUserId `16320fec-8d90-403b-b7fe-78f715d4728d`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_36
+  title: incident_39_latest_cleaned_train_set_task_36
+  description: 'For the ''Suspicious service launched'' alert on that device, what was the process ID, creation time, and command line of the process involved?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an incident investigation, a suspected overpass-the-hash (Kerberos) attack was detected where the account `Emma Clark` (Helpdesk Administrator, email `fk8mq@vnevado.alpineskihouse.co`) on host `VNEVADO-Win10V` attempted to authenticate against `VNEVADO-DC`. Pivoting from the compromised account''s SID leads to a device where active ''Kekeo'' malware was detected, and on that same device an alert was raised for a suspicious service being launched, which attackers may use to maintain persistence or elevate privileges.'
+    question: 'For the ''Suspicious service launched'' alert on that device, what was the process ID, creation time, and command line of the process involved?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID: 684, Created Time (UTC): 2024-06-26T17:11:52.8075185Z, Command Line: services.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID: 684, Created Time (UTC): 2024-06-26T17:11:52.8075185Z, Command Line: services.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with SID `S-1-5-21-1540151660-3530000288-105586595-1517` (Emma Clark, Helpdesk Administrator) was used in a suspected overpass-the-hash (Kerberos) attack, authenticating from VNEVADO-Win10V against VNEVADO-DC at 2024-07-10 11:24:45 UTC.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On the host with HostName `vnevado-win10b`, an active ''Kekeo'' malware (a Kerberos ticket abuse tool used for overpass-the-hash) was detected running at 2024-07-04 22:35:03 UTC.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'On that host, a suspicious service was launched for persistence/privilege escalation: the process `services.exe` with Process ID `684`, created at `2024-06-26t17:11:52.8075185z`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

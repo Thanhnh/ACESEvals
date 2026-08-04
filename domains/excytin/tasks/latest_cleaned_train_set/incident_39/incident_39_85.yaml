@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_85
+  title: incident_39_latest_cleaned_train_set_task_85
+  description: 'A related alert in this incident flagged possible lateral movement based on a Microsoft Defender for Endpoint detection, triggered by a suspicious network event occurring in close time proximity on another device. Which device (host name) was that alert raised on?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, on host `vnevado-dc` the account `lucasb` ran a suspicious PowerShell command (process ID 3780) that stopped the NTDS service using `net.exe stop ntds /y` and attempted to add SID history for an account, which is a technique attackers use to avoid detection and elevate privileges. Related alerts later showed an actor stealing IT director Julian Burke''s Kerberos ticket (pass-the-ticket) and using it to access additional resources.'
+    question: 'A related alert in this incident flagged possible lateral movement based on a Microsoft Defender for Endpoint detection, triggered by a suspicious network event occurring in close time proximity on another device. Which device (host name) was that alert raised on?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'vnevado-win10b'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'vnevado-win10b'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A user account with AadUserId `7fcf9695-68fc-4258-864d-e1e5b166c66f` ran a suspicious process that stopped services on the device, likely to evade detection and prevent recovery.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Suspected identity theft (pass-the-ticket) was detected from IP address `35.202.74.47`, where an actor stole Julian Burke''s (IT director) Kerberos ticket and reused it to access 4 resources.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'Possible lateral movement was observed on host `vnevado-win10b`, the device from which the Kerberos ticket was stolen, indicating the attacker is moving laterally across devices to gather data or elevate privileges.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

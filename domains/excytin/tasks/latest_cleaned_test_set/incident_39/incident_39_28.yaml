@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_39_latest_cleaned_test_set_task_28
+  title: incident_39_latest_cleaned_test_set_task_28
+  description: 'About a second earlier, a related alert titled ''Suspicious process stopping services'' was raised on the same device, where a process suspiciously stopped a running service (a common tactic to avoid detection or prevent recovery). What was the process ID and the full command line of the process that triggered that alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a SID history injection alert was raised on a device — SID history is an attribute that supports migration scenarios, and attackers typically use attack tools to change the SID history of an existing domain user to an SID with elevated privileges, enabling access to sensitive files, persistence, and system setting modifications. The alert involved a suspicious file named `dkwj.mze` and a process with ID 7712 created at 2024-06-27T14:34:10.8729414Z running the command `net1 stop ntds /y`.'
+    question: 'About a second earlier, a related alert titled ''Suspicious process stopping services'' was raised on the same device, where a process suspiciously stopped a running service (a common tactic to avoid detection or prevent recovery). What was the process ID and the full command line of the process that triggered that alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID: 6428, Command line: `"net.exe" stop ntds /y` (created at 2024-06-27T14:34:10.8607851Z)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID: 6428, Command line: `"net.exe" stop ntds /y` (created at 2024-06-27T14:34:10.8607851Z)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A SID history injection was detected involving the account with SID `S-1-5-21-1440151660-4837038288-105596163-1120`, indicating the attacker modified the SID history attribute to gain elevated privileges.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using those elevated privileges, the attacker ran a suspicious process with Process ID `6428` at `2024-06-27t14:34:10.8607851z` with the command line `"net.exe" stop ntds /y` to stop the Active Directory Domain Services (ntds) service, likely to evade detection and hinder recovery.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

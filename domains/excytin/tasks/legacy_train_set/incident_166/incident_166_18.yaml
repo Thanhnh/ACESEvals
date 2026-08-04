@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'As part of a recent suspicious SAP authentication incident, a user account named Jordan P with email
-      `Jordan P@vnevado.alpineskihouse.co` and associated with the risky sign-in alert from Microsoft Entra ID accessed the
+      `laylaw@vnevado.alpineskihouse.co` and associated with the risky sign-in alert from Microsoft Entra ID accessed the
       SAP enterprise application software. The attacker potentially gained control of the user account to search through SAP,
       aiming to record or modify sensitive financial information for future attacks such as phishing or social engineering.'
     question: 'What is the IP address used by the user involved in the business email compromise-related alert when signing

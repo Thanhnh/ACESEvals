@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_47
+  title: incident_55_latest_cleaned_test_set_task_47
+  description: 'Just before the LSASS access alert, another alert on the same machine flagged suspicious activity that was initiated remotely. What is the name of the file/executable associated with that remote activity alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation on host `mb-winclient` (AAD device ID `7661dfd4-218f-4016-8a87-66d68a7f098e`), an alert for suspicious access to the LSASS service was raised. The LSASS process (PID 760, created 2024-07-02T07:28:35.8580921Z) was accessed in a way consistent with credential theft, involving modules such as `cryptdll.dll`, `vaultcli.dll`, `winscard.dll`, and `hid.dll`, under the account `bjenkins` (SID S-1-5-21-561436748-3867387497-1732241745-3701).'
+    question: 'Just before the LSASS access alert, another alert on the same machine flagged suspicious activity that was initiated remotely. What is the name of the file/executable associated with that remote activity alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'powershell.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'powershell.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'An attacker performed suspicious access to the LSASS service, targeting the process `lsass.exe` to dump credentials from memory.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using the stolen credentials, suspicious remote activity was initiated on the machine, executing the file `powershell.exe` remotely.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_65
+  title: incident_5_latest_cleaned_test_set_task_65
+  description: 'In the related ''Active unknown malware was detected'' alert, what is the name of the malicious file that was identified as active on the machine?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a ''Command and Control behavior was blocked'' alert was raised after communication with the malicious URL `http://vectorsandarrows.com/` was observed. Following this activity, the attacker performed suspicious remote activity and used PSExec for lateral movement to a jump server. A related alert, ''Active unknown malware was detected'', was also triggered around the same time on the affected machine.'
+    question: 'In the related ''Active unknown malware was detected'' alert, what is the name of the malicious file that was identified as active on the machine?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'mimikatz.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'mimikatz.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Command and Control behavior was blocked for the compromised account with SID `S-1-5-21-1840191660-8534830288-125585561-1522`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Suspicious remote activity was observed originating from the remote IP address `99.83.111.100`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The attacker used PSExec to move laterally to the jump server, the host with AadDeviceId `4d8d23e9-a77d-4e33-9435-b8c457e57ca1`.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'Active unknown malware was detected on the machine as the file `mimikatz.exe`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

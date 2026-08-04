@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_train_set_task_12
+  title: incident_34_latest_cleaned_train_set_task_12
+  description: 'A closely related alert, ''Suspicious process executed PowerShell command'', was triggered around the same time. What is the Microsoft Entra (Azure AD) user ID of the account associated with that alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident involving execution and discovery on an endpoint, an alert for a ''Suspicious PowerShell command line'' was raised. Investigation showed that `winword.exe` was launched with the macro-enabled document `c:\scripts\rs4_winatp-intro-invoice.docm` (PID 9780), after which `schtasks.exe` was used to create and run a scheduled task named `yrei` (PIDs 1348 and 1616) that executed the file `winatp-intro-backdoor.exe`.'
+    question: 'A closely related alert, ''Suspicious process executed PowerShell command'', was triggered around the same time. What is the Microsoft Entra (Azure AD) user ID of the account associated with that alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'AadUserId: 16320fec-8d90-403b-b7fe-78f715d4728d'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'AadUserId: 16320fec-8d90-403b-b7fe-78f715d4728d'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious PowerShell command line was observed running under the user account with AadUserId `16320fec-8d90-403b-b7fe-78f715d4728d`, potentially used to invoke modules, download external payloads, or gather system information while bypassing security protections.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A suspicious process executed a PowerShell command under the same user account with AadUserId `16320fec-8d90-403b-b7fe-78f715d4728d`, indicating an attacker may be executing in-memory payloads or commands on the system.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -4,7 +4,7 @@ tasks:
   description: 'From which IP address did the suspicious LDAP query originate on 2024-07-04?'
   inherit_shared: true
   initial_context:
-    incident_context: 'During the investigation, it was observed that the user "Luciano Herrera" (Luciano Herrera@niseko.alpineskihouse.co)
+    incident_context: 'During the investigation, it was observed that the user "Luciano Herrera" (pwilson@niseko.alpineskihouse.co)
       unusually added a password-type credential to the OAuth application "SimulandApp" in Microsoft 365 on 2024-07-10. This
       behaviour raised concern that the application may have been compromised. While reviewing related activity, analysts
       also noted that a suspicious LDAP query was executed several days earlier, suggesting possible reconnaissance ahead

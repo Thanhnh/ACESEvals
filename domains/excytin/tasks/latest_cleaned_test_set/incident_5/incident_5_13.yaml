@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_13
+  title: incident_5_latest_cleaned_test_set_task_13
+  description: 'For the alert about the malicious credential theft tool execution, what was the full command line used, including the process ID and creation time?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a ransomware-related incident, system recovery setting tampering was observed on host `vnevado-win10r` involving the account `dp5hn`. The attacker ran `vssblatemp.exe delete shadows /all` (PID 7236) and `bcdedit /set recoveryenabled no` (PID 4312) to remove volume shadow copies and disable Windows recovery features. Tracing this activity further reveals lateral movement, including PSExec to the jump server, and the execution of a known credential theft tool on one of the affected endpoints.'
+    question: 'For the alert about the malicious credential theft tool execution, what was the full command line used, including the process ID and creation time?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID 2020, created at 2024-06-20T09:03:47.538167Z, command line: `"mimikatz.exe" privilege::debug "sekurlsa::pth /user:fk8mq /ntlm:96def1a633fc6790124d5f8fe21cc72b /domain:vnevado.alpineskihouse.co /run:..\notepad.exe //vnevado-jump cmd.exe"`'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID 2020, created at 2024-06-20T09:03:47.538167Z, command line: `"mimikatz.exe" privilege::debug "sekurlsa::pth /user:fk8mq /ntlm:96def1a633fc6790124d5f8fe21cc72b /domain:vnevado.alpineskihouse.co /run:..\notepad.exe //vnevado-jump cmd.exe"`'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account `dp5hn` tampered with system recovery settings on the device, attempting to delete backups and disable recovery options.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Potentially compromised assets associated with IP address `99.83.111.100` exhibited ransomware-like behavior across several devices.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'Lateral movement via PSExec to the jump server was observed originating from host `vnevado-win10v`.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'On that host, a credential theft tool was executed with Process ID `2020` at `2024-06-20t09:03:47.538167z`, using the command line `"mimikatz.exe" privilege::debug "sekurlsa::pth /user:fk8mq /ntlm:96def1a633fc6790124d5f8fe21cc72b /domain:vnevado.alpineskihouse.co /run:..\notepad.exe //vnevado-jump cmd.exe"` to dump credentials and perform a pass-the-hash attack against the jump server.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_test_set_task_20
+  title: incident_34_latest_cleaned_test_set_task_20
+  description: 'Shortly after this, a related alert fired on the same machine for an uncommon file being created and added to a Registry Run Key for persistence. Which IP address was involved in that alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident on an endpoint, an anomalous scheduled task was created for persistence. Investigation showed `powershell.exe` (PID 8604) ran a heavily obfuscated command that rebuilt a Base64-encoded PE file, wrote it to the user''s desktop as `winatp-intro-backdoor.exe`, and then used `schtasks.exe` (PID 1348) to register and run a task named ''yrei'' pointing to that executable in `c:\users\samuelf\onedrive - (new) alpineskihouse\desktop\`.'
+    question: 'Shortly after this, a related alert fired on the same machine for an uncommon file being created and added to a Registry Run Key for persistence. Which IP address was involved in that alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '72.5.72.208'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '72.5.72.208'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'An anomalous scheduled task was created using the process file `winatp-intro-backdoor.exe`, likely for persistence on the device.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'An uncommon file was created and added to a Run Key for persistence, with associated network activity to the IP address `72.5.72.208`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_test_set_task_35
+  title: incident_166_latest_cleaned_test_set_task_35
+  description: 'For the follow-up ''Suspicious SAP authentication'' alert triggered at 13:19 UTC, what is the Microsoft Entra ID (AAD) user identifier of the account involved?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of an SAP financial process manipulation incident, an alert for ''Suspicious SAP authentication'' was raised on 2024-07-22 at 12:59 UTC. The alert involved a user account displayed as `Jordan P` with the email `laylaw@vnevado.alpineskihouse.co` and SID `S-1-5-21-1740051960-3534030288-108486866-1602`, signing in from the IP address `107.253.5.27` to a cloud application with AppId `100`. Roughly 20 minutes later, at 13:19 UTC, a second ''Suspicious SAP authentication'' alert was triggered involving the same cloud application.'
+    question: 'For the follow-up ''Suspicious SAP authentication'' alert triggered at 13:19 UTC, what is the Microsoft Entra ID (AAD) user identifier of the account involved?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '89e933b9-5b2e-4bd6-bcdf-033db707ef82'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '89e933b9-5b2e-4bd6-bcdf-033db707ef82'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A risky sign-in was detected against the SAP enterprise application, identified as the cloud application with AppId `100`, at 2024-07-22 12:59:26 UTC.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The suspicious SAP authentication to that application was performed by the compromised user account with AadUserId `89e933b9-5b2e-4bd6-bcdf-033db707ef82` at 2024-07-22 13:19:46 UTC.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

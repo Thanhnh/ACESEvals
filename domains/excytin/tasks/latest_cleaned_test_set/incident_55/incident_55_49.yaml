@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_49
+  title: incident_55_latest_cleaned_test_set_task_49
+  description: 'Just before this injection alert, a closely related alert reported that a renamed Windows system executable was launched. What is the security identifier (SID) of the account associated with that alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert fired indicating that a process was injected with potentially malicious code on host `mb-winclient` (AAD device ID `7661dfd4-218f-4016-8a87-66d68a7f098e`). Around the same time, PowerShell activity was observed under the account `bjenkins`, including the command `"powershell.exe" c:\script\contosoadfsblatempcreds.ps1` (Process ID 13968) and `"powershell.exe" -noexit -command set-location -literalpath ''c:\users\bjenkins\downloads\midnight14''` (Process ID 12412), with a connection to IP `72.5.72.208`.'
+    question: 'Just before this injection alert, a closely related alert reported that a renamed Windows system executable was launched. What is the security identifier (SID) of the account associated with that alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'S-2-2-78'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'S-2-2-78'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A process `powershell.exe` was injected with potentially malicious code, indicating suspicious code running within a trusted process memory.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A renamed Windows system executable was launched by the account with SID `S-2-2-78`, likely to evade path- and name-based detections.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

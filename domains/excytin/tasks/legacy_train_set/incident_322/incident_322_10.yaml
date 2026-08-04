@@ -30,7 +30,7 @@ tasks:
         max_score: 0.333
         weight: 1.0
         title: Checkpoint 1
-        description: The email account `Hailey Johnson@vnevado.alpineskihouse.co` received and then had an email with a 
+        description: The email account `alyssat@vnevado.alpineskihouse.co` received and then had an email with a 
           malicious URL removed.
       checkpoint_2:
         target: trajectory

@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_322_latest_cleaned_test_set_task_17
+  title: incident_322_latest_cleaned_test_set_task_17
+  description: 'In the related alert about the suspicious credential dump from NTDS.dit, what was the name of the executable file of the process involved in this activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a proxy log alert flagged a connection from 231.60.52.209 (host vnevado-win11h.vnevado.alpineskihouse.co) as well as 228.3.31.94 to the malicious URL `login.micro.demo.antoinetest.ovh`. Pivoting from this host led to a chain of related alerts, including a malicious URL click on a device and an Azure Resource Manager operation from a suspicious proxy IP address, ultimately connecting to an alert where attackers dumped NTDS.dit to obtain domain user credentials from the domain controller.'
+    question: 'In the related alert about the suspicious credential dump from NTDS.dit, what was the name of the executable file of the process involved in this activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'powershell.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'powershell.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A connection to a malicious URL (login.micro.demo.antoinetest.ovh) was detected in proxy logs from the host with HostName `vnevado-win11h` at 2024-08-01 12:47:22 UTC.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The user account with Sid `S-1-5-21-1840151686-3534835288-156286563-1127` clicked on the malicious URL on that device at 2024-08-01 13:49:58 UTC.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'An Azure Resource Manager operation from a suspicious proxy IP address was detected involving the host with HostName `vnevado-dc` at 2024-08-01 13:09:13 UTC.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'On the domain controller, a suspicious credential dump from NTDS.dit was performed by the process with ExtractedFileName `powershell.exe` at 2024-08-01 12:49:26 UTC, allowing the attacker to obtain domain user credentials.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

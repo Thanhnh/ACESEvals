@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_2
+  title: incident_39_latest_cleaned_train_set_task_2
+  description: 'For the suspected identity theft (pass-the-ticket) alert, what is the security identifier (SID) of the compromised user account whose Kerberos ticket was stolen and reused?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a multi-stage identity attack, the ''Kekeo'' malware family was detected and found active in the environment. The activity involved the credential theft tool `rubeus.exe`, executed under the account `fk8mq` with process ID 2608 and the command line `rubeus.exe dump /service:xfbzkp /user:lucasb`. Follow-on alerts showed Kerberos abuse against the domain controller VNEVADO-DC, including a suspected overpass-the-hash attempt and, shortly after, a suspected identity theft (pass-the-ticket) alert in which an actor stole an IT director''s Kerberos ticket from one workstation and replayed it on another to access 4 resources.'
+    question: 'For the suspected identity theft (pass-the-ticket) alert, what is the security identifier (SID) of the compromised user account whose Kerberos ticket was stolen and reused?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'S-1-0-25-1848151668-3534030238-185306563-542 (the SID of Julian Burke, the IT director)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'S-1-0-25-1848151668-3534030238-185306563-542 (the SID of Julian Burke, the IT director)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The ''Kekeo'' malware was detected and was active on the device associated with the user account with AadUserId `97e6a954-b6bd-48a5-808c-bd8464cce677`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using Kekeo, an overpass-the-hash (Kerberos) attack was attempted from the host `VNEVADO-Win10V` against VNEVADO-DC, using Emma Clark''s (Helpdesk Administrator) credentials.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'From the same host, an actor stole and used a Kerberos ticket belonging to the account with SID `S-1-0-25-1848151668-3534030238-185306563-542` (Julian Burke, IT director) taken from VNEVADO-Win10B, to access 4 resources in a pass-the-ticket identity theft attack.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

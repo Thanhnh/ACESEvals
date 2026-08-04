@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_test_set_task_79
+  title: incident_34_latest_cleaned_test_set_task_79
+  description: 'Moments later on the same device, an alert fired for a process executing PowerShell to download a file or run an encoded command. What is the security identifier (SID) of the account associated with that PowerShell activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident involving Execution & Discovery on an endpoint, a ''Suspicious Task Scheduler activity'' alert was raised. A process `schtasks.exe` (PID 1348) was used to create a scheduled task with the command line `"schtasks.exe" /create /sc once /tn yrei /tr "c:\users\samuelf\onedrive - (new) alpineskihouse\desktop\winatp-intro-backdoor.exe" /st 11:58 /f`, and shortly after, another `schtasks.exe` process (PID 1616) ran the task with `"schtasks.exe" /run /tn yrei`, suggesting an attempt to launch malicious code automatically and establish persistence.'
+    question: 'Moments later on the same device, an alert fired for a process executing PowerShell to download a file or run an encoded command. What is the security identifier (SID) of the account associated with that PowerShell activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'S-1-5-21-1870156660-7534030218-135086563-1193'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'S-1-5-21-1870156660-7534030218-135086563-1193'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'On host `vnevado-win10e`, a process previously involved in malicious activity used Task Scheduler to create, modify, or delete a scheduled task in an attempt to establish persistence.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The account with SID `S-1-5-21-1870156660-7534030218-135086563-1193` executed PowerShell to download a file or run an encoded command, likely to fetch external payloads and execute them in memory.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_86
+  title: incident_5_latest_cleaned_train_set_task_86
+  description: 'A closely related alert on the same device reported that all file snapshots and shadow copies were deleted, behavior commonly seen in ransomware infections. What was the exact command line executed to delete the backups, and what was its process ID?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident, ''CommandAndControl'' malware was detected on host `vnevado-win11u` (AAD Device ID `bc00e484-d0e5-4da4-9472-95568cccc07e`), where a process with ID 5572 ran the command `curl http://vectorsandarrows.com` on 2024-06-20, suggesting an attacker may have moved laterally to this device from another device on the network.'
+    question: 'A closely related alert on the same device reported that all file snapshots and shadow copies were deleted, behavior commonly seen in ransomware infections. What was the exact command line executed to delete the backups, and what was its process ID?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Command line: `vssblatemp.exe delete shadows /all`, Process ID: 1900 (created 2024-06-20T09:29:40.8785892Z)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Command line: `vssblatemp.exe delete shadows /all`, Process ID: 1900 (created 2024-06-20T09:29:40.8785892Z)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The ''CommandAndControl'' malware was detected during lateral movement on a device associated with the account SID `S-1-5-21-1840191660-8534830288-125585561-1522`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The attacker then deleted all file backups by running the process `vssblatemp.exe delete shadows /all` with Process ID `1900` at `2024-06-20t09:29:40.8785892z`, a behavior commonly seen during ransomware infections.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_test_set_task_36
+  title: incident_39_latest_cleaned_test_set_task_36
+  description: 'For the ''Suspicious service launched'' alert associated with this device, what was the process name, its process ID, and its creation time?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a multi-stage incident, an alert for ''Suspicious account creation'' was raised on host `vnevado-win10v` (Azure AD device ID `4d8d23e9-a77d-4e33-9435-b8c457e57ca1`). The account `tgs2z` (SID `S-5-7-21-1843151660-3234030288-105586167-1422`) ran `"powershell.exe" -executionpolicy bypass -file c:\users\tgs2z\downloads\domaindominance27\domaindominance27.ps1` (PID 4676), followed by `"net.exe" user /add bdadmin password1! /domain` (PID 3624), creating a new domain account that could be used as backup access. Related alerts on the same device also flagged that a suspicious service was launched, which attackers commonly use to maintain persistence or elevate privileges.'
+    question: 'For the ''Suspicious service launched'' alert associated with this device, what was the process name, its process ID, and its creation time?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process: services.exe, Process ID: 652, Created Time (UTC): 2024-06-19T12:56:00.7201251Z'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process: services.exe, Process ID: 652, Created Time (UTC): 2024-06-19T12:56:00.7201251Z'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A new user account was created using the process `net.exe`, indicating a suspicious account creation likely for backup/persistent access.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A suspicious service was launched on the host `vnevado-dc`, suggesting attackers used services to run malicious commands or elevate privileges.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The suspicious service was started by the process `services.exe` with Process ID `652`, created at `2024-06-19t12:56:00.7201251z`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

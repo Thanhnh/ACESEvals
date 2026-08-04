@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_61
+  title: incident_55_latest_cleaned_test_set_task_61
+  description: 'For the earlier ADFS private key extraction attempt alert on 2024-07-04, what was the process ID and creation time (UTC) of the process that triggered it?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this incident, an alert titled "Attempt to hide use of dual-purpose tool" was raised on 2024-07-06, where a known public tool was observed running under an unexpected filename `iy2orr1e.rrg.exe` with the command line `"iy2orr1e.rrg.exe" -windowstyle hidden -encodedcommand qwa6afwauwbjahiaaqbwahqacwbcaeuaeabwag8acgb0aeearabgafmavabvagsazqbuafmaaqbnag4aaqbuaemazqbyahqalgbwahmamqa=` under process ID 5752. Investigation shows this same renamed tool was also involved earlier, on 2024-07-04, in an alert for an ADFS private key extraction attempt, where a suspicious LDAP query was launched that may indicate attackers trying to steal Active Directory Federation Service private keys or move laterally.'
+    question: 'For the earlier ADFS private key extraction attempt alert on 2024-07-04, what was the process ID and creation time (UTC) of the process that triggered it?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID: 8764, Created Time UTC: 2024-07-04T00:00:01.698205Z (the process was the renamed tool `iy2orr1e.rrg.exe` running with the same hidden window / encoded command line)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID: 8764, Created Time UTC: 2024-07-04T00:00:01.698205Z (the process was the renamed tool `iy2orr1e.rrg.exe` running with the same hidden window / encoded command line)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account `gsmith` was observed running a known public dual-purpose tool under an unexpected filename, an attempt to hide its malicious usage.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'This activity was tied to a suspicious LDAP query used for an ADFS private key extraction attempt, executed by the process with Process ID `8764`, created at `2024-07-04t00:00:01.698205z`, with command line `"iy2orr1e.rrg.exe" -windowstyle hidden -encodedcommand qwa6afwauwbjahiaaqbwahqacwbcaeuaeabwag8acgb0aeearabgafmavabvagsazqbuafmaaqbnag4aaqbuaemazqbyahqalgbwahmamqa=`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

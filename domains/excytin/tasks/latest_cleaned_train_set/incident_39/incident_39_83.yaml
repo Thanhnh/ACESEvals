@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_83
+  title: incident_39_latest_cleaned_train_set_task_83
+  description: 'Pivoting from this compromised user (they share the same Microsoft Entra user ID), an earlier endpoint alert reported a suspicious sequence of exploration activities where a process ran a set of Windows discovery commands. What is the account name (username) associated with that exploration activity alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, an alert fired for "Email messages containing malicious URL removed after delivery" — emails carrying the malicious URL `https://ac27145722.livelygrass-8d4c4013.eastus2.azurecontainerapps.io/` were delivered to the mailbox of user `Ethan Brooks` and later removed. The messages were sent from `k1pt7ez@vnevado.alpineskihouse.co` originating from sender IP `118.254.65.186`.'
+    question: 'Pivoting from this compromised user (they share the same Microsoft Entra user ID), an earlier endpoint alert reported a suspicious sequence of exploration activities where a process ran a set of Windows discovery commands. What is the account name (username) associated with that exploration activity alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'tgs2z'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'tgs2z'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account with AadUserId `1d94aaf6-efe6-4e76-ad56-ffd7d1257bc1` received an email containing a malicious URL, which was later removed after delivery.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the compromise, a suspicious sequence of exploration activities (a process calling a set of Windows discovery commands) was performed under the account named `tgs2z`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

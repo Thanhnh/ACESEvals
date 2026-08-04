@@ -104,7 +104,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: An internal phishing campaign was detected within the organization where a user, Nina Sullivan 
-      (`Nina Sullivan@vnevado.alpineskihouse.co`), sent phishing emails from their account to other recipients inside 
+      (`santiago@vnevado.alpineskihouse.co`), sent phishing emails from their account to other recipients inside 
       the organization. This suggests that Nina Sullivan's account might have been compromised, possibly allowing 
       attackers to move laterally within the organization. The alert was triggered based on a Microsoft Defender for 
       Office 365 alert.
@@ -132,7 +132,7 @@ tasks:
         max_score: 0.25
         weight: 1.0
         title: Checkpoint 1
-        description: The email account `Lucas Grey@niseko.alpineskihouse.co` sent phishing emails within the 
+        description: The email account `bjenkins@niseko.alpineskihouse.co` sent phishing emails within the 
           organization.
       checkpoint_2:
         target: trajectory

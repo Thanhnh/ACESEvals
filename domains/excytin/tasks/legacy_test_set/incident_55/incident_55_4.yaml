@@ -463,7 +463,7 @@ tasks:
       `http://kn017721628.wittytree-b6f239d6.northeurope.azurecontainerapps.io/` were delivered and later removed. The 
       emails were sent by `4qs6v9m@vnevado.alpineskihouse.co` from the IP address `106.214.87.198`, and one of the 
       recipients was Nina Sullivan, who can be identified by the AAD User ID `28058d92-fc24-4869-9231-6546a34b00f2` and 
-      email address `Nina Sullivan@vnevado.alpineskihouse.co`.
+      email address `santiago@vnevado.alpineskihouse.co`.
     question: Which mailbox's primary address was involved in this alert?
     # Main task submission evaluation - uses LLM-as-a-judge by default
     # To use static matching instead, change strategy to "static" and set:
@@ -502,7 +502,7 @@ tasks:
   initial_context:
     incident_context: In a security incident involving unusual addition of credentials to an OAuth app, user Luciano 
       Herrera performed an addition of a credential to the application SimulandApp, indicating possible compromise. The 
-      user added a credential of type Password to the app using the email `Luciano Herrera@niseko.alpineskihouse.co`. 
+      user added a credential of type Password to the app using the email `pwilson@niseko.alpineskihouse.co`. 
       The activity was noted from the IP address `2801:e0a:1eb:dea0:642e:5bb6:d315:fbb3`.
     question: In the context of the same security incident, what is the Security Identifier (SID) of the account 
       involved in the suspicious sequence of exploration activities?

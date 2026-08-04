@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_76
+  title: incident_55_latest_cleaned_test_set_task_76
+  description: 'In the related credential theft alert, which Windows system process had its memory scanned or dumped by the attacker? Provide the process file name.'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert fired showing that the user Luciano Herrera (pwilson@niseko.alpineskihouse.co) performed an unusual addition of a Password credential to the OAuth application SimulandApp (OAuthAppId `4d9476b8-6ae6-459b-a273-5837c15b5981`) in the Office 365 / Microsoft 365 cloud application, from IP address `2801:e0a:1eb:dea0:642e:5bb6:d315:fbb3`. This pattern may indicate that an attacker compromised the app to spread phishing, exfiltrate data, or gain access to other accounts and devices. Pivoting on the related account, other alerts in the same incident include a suspicious sequence of Windows exploration commands and a credential theft alert where a process scanned or dumped memory from a system service in order to extract authentication hashes or passwords.'
+    question: 'In the related credential theft alert, which Windows system process had its memory scanned or dumped by the attacker? Provide the process file name.'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'lsass.exe (the Local Security Authority Subsystem Service process)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'lsass.exe (the Local Security Authority Subsystem Service process)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with SID `S-1-5-21-551436448-9871687716-9837441745-1903` (Luciano Herrera, pwilson@niseko.alpineskihouse.co) performed an unusual addition of a Password credential to the OAuth application SimulandApp, indicating the account/app may be compromised.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using that compromised access, a suspicious sequence of exploration activities was run through the process `powershell.exe`, which invoked a set of Windows discovery commands to identify valuable assets and prepare for lateral movement.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The attacker then targeted the process `lsass.exe`, scanning/dumping its memory (sensitive credential memory read) to extract authentication hashes and passwords for further credential theft.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

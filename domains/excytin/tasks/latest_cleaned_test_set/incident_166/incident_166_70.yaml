@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_test_set_task_70
+  title: incident_166_latest_cleaned_test_set_task_70
+  description: 'For that earlier anonymous sign-in alert tied to the same user account, what was the source IP address recorded?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During the investigation of a multi-stage identity attack, a Password Spray alert was raised at 2024-07-23 14:23:51 UTC, with the attack originating from the IP address `95.202.65.202`. Pivoting on the targeted user account (identified by its Microsoft Entra ID user ID), analysts found an earlier related alert on 2024-07-22 09:11:31 UTC indicating a sign-in from an anonymizing service such as a Tor browser or anonymizer VPN.'
+    question: 'For that earlier anonymous sign-in alert tied to the same user account, what was the source IP address recorded?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '192.238.237.190'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '192.238.237.190'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A password spray attack was detected targeting the account with AadUserId `89e933b9-5b2e-4bd6-bcdf-033db707ef82` at 2024-07-23 14:23:51 UTC.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The same compromised account was involved in a sign-in from an anonymous IP address (e.g., Tor browser or anonymizer VPN) with Address `192.238.237.190` at 2024-07-22 09:11:31 UTC.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

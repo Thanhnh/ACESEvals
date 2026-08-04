@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_60
+  title: incident_55_latest_cleaned_test_set_task_60
+  description: 'For the alert reporting the attempt to hide the use of the dual-purpose tool, what is the security identifier (SID) of the account involved?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a ''Sensitive credential memory read'' alert fired at 2024-07-04 22:35:04 UTC on host `mb-winclient` (Azure AD device ID `7661dfd4-218f-4016-8a87-66d68a7f098e`), where a process scanned or dumped memory from lsass.exe (PID 760, created 2024-07-02T07:28:35Z). The activity was tied to user `bjenkins` (AAD user ID a2d0f7c2-b0a0-43bd-bce0-27d8ae3be4d0), source IP 72.5.72.208, and a PowerShell process (PID 12412) launched with the command line `"powershell.exe" -noexit -command set-location -literalpath ''c:\users\bjenkins\downloads\midnight14''`. Moments earlier, related alerts showed suspicious remote activity and an attempt to hide the use of a known dual-purpose public tool that was observed running under an unexpected filename.'
+    question: 'For the alert reporting the attempt to hide the use of the dual-purpose tool, what is the security identifier (SID) of the account involved?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'S-2-5-21-571436798-3864380397-1837441745-3206'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'S-2-5-21-571436798-3864380397-1837441745-3206'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A process scanned or dumped memory from the Local Security Authority Subsystem Service, with the extracted file name `lsass.exe`, indicating an attempt to steal credentials such as authentication hashes or passwords.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The credential theft activity was initiated remotely, and suspicious remote activity (such as interactive sessions, WMI commands, or scheduled task creation from a remote machine) was observed on the host `mb-adfs`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'On that host, a known public dual-purpose tool was executed under an unexpected filename to hide its malicious use, by the account with SID `S-2-5-21-571436798-3864380397-1837441745-3206`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

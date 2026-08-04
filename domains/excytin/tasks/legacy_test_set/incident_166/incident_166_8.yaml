@@ -7,7 +7,7 @@ tasks:
   initial_context:
     incident_context: 'A business email compromise (BEC)-related user, under the name `Jordan P`, signed in to SAP in a suspicious
       manner. This incident was flagged by Microsoft Defender XDR. The user account also had the following details: SID `S-1-5-21-1740051960-3534030288-108486866-1602`,
-      IP address `107.253.5.27`, and associated email `Jordan P@vnevado.alpineskihouse.co`. The attacker might have taken
+      IP address `107.253.5.27`, and associated email `laylaw@vnevado.alpineskihouse.co`. The attacker might have taken
       control of the account to search through SAP with the intention of recording or modifying sensitive financial information,
       which could be used in future phishing or social engineering attacks.'
     question: Can you identify the Azure Active Directory (AAD) User ID associated with the compromised account that 
@@ -48,7 +48,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: As part of an investigation into a recent security incident, it was found that a user account 
-      under the name `Jordan P` with the email `Jordan P@vnevado.alpineskihouse.co` was flagged for a risky sign-in to 
+      under the name `Jordan P` with the email `laylaw@vnevado.alpineskihouse.co` was flagged for a risky sign-in to 
       SAP via Microsoft Entra ID. This security threat indicates that an attacker might have hijacked this user's 
       account to sift through sensitive financial data in SAP for potential misuse. The alert was triggered by a risky 
       sign-in detected in Microsoft Entra ID, which could be indicative of compromised credentials or an unauthorized 
@@ -141,7 +141,7 @@ tasks:
     incident_context: There was a suspicious incident where a user's inbox rules were manipulated. This typically 
       indicates that an attacker may have gained access to the user's inbox and is manipulating the rules to exfiltrate 
       data from the organization. The suspicious activity was observed from the account `Jordan P` with associated email
-      `Jordan P@vnevado.alpineskihouse.co` and IP address `255.246.85.58`. It has been discovered that this is possibly 
+      `laylaw@vnevado.alpineskihouse.co` and IP address `255.246.85.58`. It has been discovered that this is possibly 
       linked to an anonymous sign-in activity.
     question: During this investigation, it was found that a sign-in occurred from an anonymous IP address. Can you 
       identify the anonymous IP address involved in this suspicious sign-in activity?
@@ -364,7 +364,7 @@ tasks:
         weight: 1.0
         title: Checkpoint 1
         description: A user's inbox rules were manipulated in a suspicious manner. The affected account's email is 
-          `Jordan P@vnevado.alpineskihouse.co`.
+          `laylaw@vnevado.alpineskihouse.co`.
       checkpoint_2:
         target: trajectory
         max_score: 0.25
@@ -385,7 +385,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: There was a suspicious event suggesting a possible BEC financial fraud indicated by traces 
-      involving the account Jordan P with the email `Jordan P@vnevado.alpineskihouse.co`. This event was linked to an 
+      involving the account Jordan P with the email `laylaw@vnevado.alpineskihouse.co`. This event was linked to an 
       ongoing Password Spray attack detected during the same timeframe. This suggests that attackers are actively trying
       to compromise accounts by spraying known passwords across different accounts.
     question: What is the IP address involved in the Password Spray attack?

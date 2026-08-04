@@ -5,7 +5,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'A BEC (Business Email Compromise)-related alert was raised on 2024-07-17 at 11:34 UTC after a suspicious
-      inbox rule was created for the user account Nina Park (email: Nina Park@vnevado.alpineskihouse.co) from the external
+      inbox rule was created for the user account Nina Park (email: raphaelt@vnevado.alpineskihouse.co) from the external
       IP address 237.7.81.122. This activity suggested an attempt at financial fraud and was performed in a risky Azure AD
       session. The following day, the same investigation noted a separate "Password Spray" attack linked to the overall incident.'
     question: 'What was the external IP address identified as the source of the Password Spray attack observed on 2024-07-18?'

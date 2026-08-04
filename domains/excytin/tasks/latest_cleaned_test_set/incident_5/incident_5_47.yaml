@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_47
+  title: incident_5_latest_cleaned_test_set_task_47
+  description: 'Just before the ransomware encryption activity, a related alert flagged suspicious activity that was initiated remotely (such as interactive sessions, file modifications, WMI commands, or scheduled task creation). What is the hostname of the machine where this remotely initiated suspicious activity was observed?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this incident, possible ransomware activity was detected on the device `vnevado-win11t` (AAD Device ID `e5799261-6720-4297-961e-bd9ca4275033`), where files such as `characterical.zip` were renamed to `characterical.zip.lockbit` — a file extension known from past ransomware incidents — and a script named `get-userprttoken.ps1` was also observed on the machine.'
+    question: 'Just before the ransomware encryption activity, a related alert flagged suspicious activity that was initiated remotely (such as interactive sessions, file modifications, WMI commands, or scheduled task creation). What is the hostname of the machine where this remotely initiated suspicious activity was observed?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'vnevado-win10s'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'vnevado-win10s'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Possible ransomware activity based on a known malicious extension was detected, involving mass file system changes associated with the IP address `99.83.111.100`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Suspicious remote activity initiated from a remote machine was observed on the host `vnevado-win10s`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -5,7 +5,7 @@ tasks:
     this endpoint. What is the username of the account for which Kerberos tickets were requested?'
   inherit_shared: true
   initial_context:
-    incident_context: 'A user named Ethan Brooks from the email `Ethan Brooks@vnevado.alpineskihouse.co` accessed a possibly
+    incident_context: 'A user named Ethan Brooks from the email `tgs2z@vnevado.alpineskihouse.co` accessed a possibly
       malicious link `https://ac27145722.livelygrass-8d4c4013.eastus2.azurecontainerapps.io/` in an email that was quarantined
       by zero-hour auto purge (ZAP). This alert was triggered based on a Microsoft Defender for Office 365 alert.'
     question: 'In a related alert, it was observed that the Rubeus tool might have been used to perform kerberoasting on this

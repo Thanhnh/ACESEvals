@@ -5,7 +5,7 @@ tasks:
     process had its memory accessed?'
   inherit_shared: true
   initial_context:
-    incident_context: 'During the investigation, we observed that the user account "Luciano Herrera" (Luciano Herrera@niseko.alpineskihouse.co)
+    incident_context: 'During the investigation, we observed that the user account "Luciano Herrera" (pwilson@niseko.alpineskihouse.co)
       added a password-type credential to an OAuth application (App ID 11161) in Microsoft 365 from the IPv6 address 2801:e0a:1eb:dea0:642e:5bb6:d315:fbb3.
       Shortly afterwards, on the same host, a suspicious sequence of Windows exploration commands was executed, which was
       immediately followed by an alert indicating that a system process’s memory had been read to harvest sensitive credentials.'

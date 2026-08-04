@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_test_set_task_6
+  title: incident_34_latest_cleaned_test_set_task_6
+  description: 'Almost immediately before this detection, an analyst (u141@ash.alpineskihouse.co) manually launched an Automated investigation against the impacted endpoint. What is the Azure AD device ID of the device that this automated investigation was run on?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident involving Execution & Discovery on an endpoint, an alert titled ''Powershell dropped a suspicious file on the machine'' was raised on 2024-07-04. The activity was tied to the account `samuelf` (SID `S-1-5-21-1870156660-7534030218-135086563-1193`), where `powershell.exe` was executed with an encoded/obfuscated command (PID 8604) that reconstructed a base64 blob, wrote it to the desktop as `winatp-intro-backdoor.exe`, and then created and ran a scheduled task named ''yrei'' to execute it.'
+    question: 'Almost immediately before this detection, an analyst (u141@ash.alpineskihouse.co) manually launched an Automated investigation against the impacted endpoint. What is the Azure AD device ID of the device that this automated investigation was run on?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'AadDeviceId: 02b8f519-1123-4228-b32a-ccb78af3449f (device vnevado-win10e.vnevado.alpineskihouse.co)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'AadDeviceId: 02b8f519-1123-4228-b32a-ccb78af3449f (device vnevado-win10e.vnevado.alpineskihouse.co)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'PowerShell dropped a suspicious file on the host `vnevado-win10e` and executed it.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'In response, an Automated investigation was started manually by u141(u141@ash.alpineskihouse.co) on that same device, identified by AadDeviceId `02b8f519-1123-4228-b32a-ccb78af3449f`, to review the threat artifacts for possible remediation.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

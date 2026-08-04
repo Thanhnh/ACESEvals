@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_84
+  title: incident_5_latest_cleaned_test_set_task_84
+  description: 'For the system recovery setting tampering alert, what was the process ID, creation time, and full command line of the process used to delete the volume shadow copies?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a ransomware incident, potentially compromised assets on host `vnevado-win11u` (AAD device ID `bc00e484-d0e5-4da4-9472-95568cccc07e`, IP `99.83.111.100`) were observed exhibiting ransomware-like behavior, with files such as `unstreaming.xlsx`, `syncretic.7z`, and `kiters.7z` being encrypted into `.lockbit` versions, along with a suspicious script `get-userprttoken.ps1`. Shortly before this, an alert was raised for system recovery setting tampering on the same device, where an adversary attempted to remove built-in operating system recovery data to prevent restoring a corrupted system.'
+    question: 'For the system recovery setting tampering alert, what was the process ID, creation time, and full command line of the process used to delete the volume shadow copies?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID: 7236, Created Time (UTC): 2024-06-20T09:10:51.2193152Z, Command Line: `vssblatemp.exe delete shadows /all`'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID: 7236, Created Time (UTC): 2024-06-20T09:10:51.2193152Z, Command Line: `vssblatemp.exe delete shadows /all`'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Potentially compromised assets exhibiting ransomware-like behavior were detected, involving the user account `dp5hn`, which an attacker may be using to move laterally and spread ransomware across devices.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On the affected device, system recovery setting tampering was observed: the process with Process ID `7236`, created at `2024-06-20t09:10:51.2193152z`, ran the command line `vssblatemp.exe delete shadows /all` to delete all volume shadow copies and prevent system recovery.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

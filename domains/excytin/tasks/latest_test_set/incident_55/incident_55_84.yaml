@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During the investigation of an "Internal phishing campaign" detected on 2024-07-07, we observed that
-      the compromised user accounts "Nina Sullivan" (Nina Sullivan@vnevado.alpineskihouse.co) and "Lucas Grey" (Lucas Grey@niseko.alpineskihouse.co)
+      the compromised user accounts "Nina Sullivan" (santiago@vnevado.alpineskihouse.co) and "Lucas Grey" (bjenkins@niseko.alpineskihouse.co)
       reportedly sent phishing emails from an internal device. This activity is tied to a broader incident in which another,
       earlier alert flagged the same device for "Suspicious System Hardware Discovery"—suggesting the attacker may have run
       reconnaissance commands after gaining access.'

@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_322_latest_cleaned_test_set_task_25
+  title: incident_322_latest_cleaned_test_set_task_25
+  description: 'About an hour earlier, another alert in the same incident reported a malicious URL detected in proxy logs, showing the endpoint `vnevado-win11h.vnevado.alpineskihouse.co` reaching out to `login.micro.demo.antoinetest.ovh`. What source IP address was recorded on the proxy for that connection?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage security incident, an alert titled ''Malicious URL was clicked on that device'' was raised on 2024-08-01 13:49:58 UTC. The user account involved was `Hailey Johnson` (`alyssat@vnevado.alpineskihouse.co`, SID `S-1-5-21-1840151686-3534835288-156286563-1127`), who clicked on the malicious URL `https://dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io/` from a device with AAD Device ID `76707c40-3343-490e-9205-88fdb51aefe0` and IP `172.33.118.200`. The browser process was `msedge.exe` (Process ID 4256, created at 2024-08-01T13:42:52.04).'
+    question: 'About an hour earlier, another alert in the same incident reported a malicious URL detected in proxy logs, showing the endpoint `vnevado-win11h.vnevado.alpineskihouse.co` reaching out to `login.micro.demo.antoinetest.ovh`. What source IP address was recorded on the proxy for that connection?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '231.60.52.209'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '231.60.52.209'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A malicious URL was clicked on the device with HostName `vnevado-win11h` at 2024-08-01 13:49:58 UTC.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Proxy logs detected a malicious URL connection from that same device (vnevado-win11h.vnevado.alpineskihouse.co) to `login.micro.demo.antoinetest.ovh`, originating from the IP address `231.60.52.209`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

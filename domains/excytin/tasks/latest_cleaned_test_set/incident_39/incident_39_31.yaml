@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_test_set_task_31
+  title: incident_39_latest_cleaned_test_set_task_31
+  description: 'For the related ''File dropped and launched from remote location'' alert, what is the name of the user account that was involved in dropping and executing the file?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, an alert titled ''Suspicious service launched'' was raised on a device after a service process was started (Process ID 652, created 2024-06-19T12:56:00.7201251Z, command line `services.exe`). Attackers often abuse services to launch malicious commands or programs in order to maintain persistence or elevate privileges. Follow-on activity on the same device included ''Kekeo'' malware detected during lateral movement, and a related alert showing that a remote session dropped a file and executed it.'
+    question: 'For the related ''File dropped and launched from remote location'' alert, what is the name of the user account that was involved in dropping and executing the file?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'fk8mq'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'fk8mq'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious service was launched on the device via the process with extracted file name `psexesvc.exe`, indicating remote execution with PsExec.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A remote session dropped a file and executed it, associated with the account named `fk8mq`, indicating lateral movement or malware propagation.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The ''Kekeo'' malware was detected during lateral movement under the account with SID `S-1-5-21-1540151660-3530000288-105586595-1517`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

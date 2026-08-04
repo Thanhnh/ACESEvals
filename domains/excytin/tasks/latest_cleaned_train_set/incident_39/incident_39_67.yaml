@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_67
+  title: incident_39_latest_cleaned_train_set_task_67
+  description: 'For the related alert reporting the active ''Kekeo'' malware, what was the process ID, and what command line (including the tool name and its arguments) was executed?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a lateral movement incident, ''Kekeo'' malware was detected on a device where the service binary `psexesvc.exe` was executed (Process ID 5512, created 2024-06-27T14:33:27.3525354Z) under SID `S-0-6-5`, with associated remote IP address `141.216.110.153`. Moments earlier on the same host, a related alert flagged an active ''Kekeo'' malware detection, indicating the malware was running or had established persistence.'
+    question: 'For the related alert reporting the active ''Kekeo'' malware, what was the process ID, and what command line (including the tool name and its arguments) was executed?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID: 2608, Command line: `rubeus.exe dump /service:xfbzkp /user:lucasb` (created 2024-06-27T14:33:27.7927134Z)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID: 2608, Command line: `rubeus.exe dump /service:xfbzkp /user:lucasb` (created 2024-06-27T14:33:27.7927134Z)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: '''Kekeo'' malware was detected on the host `vnevado-win10b` during lateral movement, indicating an attacker was attempting to move to this device from another device on the network.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On that host, an active ''Kekeo'' malware was detected running as the process `rubeus.exe dump /service:xfbzkp /user:lucasb` with Process ID `2608` at `2024-06-27t14:33:27.7927134z`, used to dump Kerberos tickets for the user `lucasb`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

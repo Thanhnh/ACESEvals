@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_36
+  title: incident_5_latest_cleaned_test_set_task_36
+  description: 'A related alert shows that a ransomware payload was remotely launched on a device. What is the host name of the device where the ransomware payload was launched?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident, a ''Suspicious remote activity'' alert was raised on host `vnevado-win11u` (AAD device ID `bc00e484-d0e5-4da4-9472-95568cccc07e`), where several suspicious commands were executed, including `bcdedit /set recoveryenabled no`, `bcdedit /set bootstatuspolicy ignoreallfailures`, `vssblatemp.exe delete shadows /all`, `curl http://vectorsandarrows.com`, and `powershell -file c:\scripts\get-userprttoken.ps1`. These actions, initiated remotely, are typical precursors to ransomware deployment.'
+    question: 'A related alert shows that a ransomware payload was remotely launched on a device. What is the host name of the device where the ransomware payload was launched?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'vnevado-win11t'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'vnevado-win11t'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with SID `S-1-5-21-1840191660-8534830288-125585561-1522` performed suspicious remote activity, initiating actions such as remote interactive sessions, file modifications, or WMI commands from a remote machine.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using that compromised account, a ransomware payload was remotely launched on the host `vnevado-win11t`, attempting to encrypt its content.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

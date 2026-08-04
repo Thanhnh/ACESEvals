@@ -41,7 +41,7 @@ tasks:
         max_score: 0.333
         weight: 1.0
         title: Checkpoint 2
-        description: Three days later, the account with Email `Nina Sullivan@vnevado.alpineskihouse.co` launched an 
+        description: Three days later, the account with Email `santiago@vnevado.alpineskihouse.co` launched an 
           internal phishing campaign from the same environment (2024-07-07 10:09:33 UTC).
       checkpoint_3:
         target: trajectory

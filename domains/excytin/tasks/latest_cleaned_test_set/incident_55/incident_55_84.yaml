@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_84
+  title: incident_55_latest_cleaned_test_set_task_84
+  description: 'A few days earlier, on 2024-07-04, a related alert flagged "Suspicious System Hardware Discovery" where a known tool or technique was used to gather information about a device. What is the account name (username) associated with that discovery activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert titled "Internal phishing campaign" was raised on 2024-07-07, indicating that a user sent phishing email from a device to recipients inside the organization, suggesting the account may have been compromised for lateral movement (triggered from a Microsoft Defender for Office 365 alert). The involved account was Nina Sullivan (`santiago@vnevado.alpineskihouse.co`, SID `S-1-5-11-7842151660-4834030208-105586563-1139`, AAD User ID `28058d92-fc24-4869-9231-6546a34b00f2`), and the phishing message referenced the URL `http://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/`.'
+    question: 'A few days earlier, on 2024-07-04, a related alert flagged "Suspicious System Hardware Discovery" where a known tool or technique was used to gather information about a device. What is the account name (username) associated with that discovery activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'bjenkins'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'bjenkins'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A user account with SID `S-1-5-21-561436748-3867387497-1732241745-3701` was observed sending internal phishing emails from this device, indicating the account may have been compromised for lateral movement.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The same compromised account, identified by the user name `bjenkins`, was then used to run known tools or techniques to perform suspicious system hardware discovery on the device, gathering information for later attacks.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -16,7 +16,7 @@ tasks:
     # To use static matching instead, change strategy to "static" and set:
     #   criteria:
     #     expected_answers:
-    #       - 'Jordan P@vnevado.alpineskihouse.co'
+    #       - 'laylaw@vnevado.alpineskihouse.co'
   scoring:
     llm_judge:
       model: "{judge_llm}"
@@ -27,7 +27,7 @@ tasks:
         target: submission
         judge_system_template: judge/submission_judge_system.md
         judge_user_template: judge/submission_judge_user.md
-        description: 'Jordan P@vnevado.alpineskihouse.co'
+        description: 'laylaw@vnevado.alpineskihouse.co'
         max_score: 1.0
       checkpoint_1:
         target: trajectory
@@ -41,7 +41,7 @@ tasks:
         weight: 1.0
         title: Checkpoint 2
         description: A suspicious inbox rule that hides incoming email messages was created in a risky Azure Active 
-          Directory session for the email `Jordan P@vnevado.alpineskihouse.co`.
+          Directory session for the email `laylaw@vnevado.alpineskihouse.co`.
   scoring_aggregation:
     max:
       scores:

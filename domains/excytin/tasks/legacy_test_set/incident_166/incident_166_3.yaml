@@ -57,7 +57,7 @@ tasks:
   initial_context:
     incident_context: An alert was generated indicating that an inbound rule was created to hide incoming emails 
       potentially as part of a business email compromise (BEC) fraud attempt. The account involved was Jordan P 
-      associated with email `Jordan P@vnevado.alpineskihouse.co` and originating from IP `255.246.85.58`. The incident 
+      associated with email `laylaw@vnevado.alpineskihouse.co` and originating from IP `255.246.85.58`. The incident 
       took place during a risky Azure Active Directory session.
     question: Which cloud application (AppId) was involved in the incident where the user Jordan P had a suspicious 
       inbox manipulation rule?
@@ -93,7 +93,7 @@ tasks:
         title: Checkpoint 2
         description: A suspicious inbox rule that hides incoming email messages was created in a risky Azure Active 
           Directory session. It indicates a potential attempt at business email compromise (BEC) targeting the email 
-          account Jordan P@vnevado.alpineskihouse.co.
+          account laylaw@vnevado.alpineskihouse.co.
   scoring_aggregation:
     max:
       scores:
@@ -199,7 +199,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: As part of a security incident involving BEC (business email compromise) fraud attempt, suspicious
-      emails were sent by a user account named Jordan P (Jordan P@vnevado.alpineskihouse.co). The suspicious emails were
+      emails were sent by a user account named Jordan P (laylaw@vnevado.alpineskihouse.co). The suspicious emails were
       detected as part of an ongoing investigation into potential BEC fraud activities.
     question: In relation to this incident, it appears there was also a sign-in attempt from an anonymous IP address. 
       Can you identify the IP address?
@@ -293,7 +293,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: A recent security incident involved a possible business email compromise (BEC) aimed at financial 
-      fraud. The user named `Jordan P` with the email `Jordan P@vnevado.alpineskihouse.co` and AAD User ID 
+      fraud. The user named `Jordan P` with the email `laylaw@vnevado.alpineskihouse.co` and AAD User ID 
       `89e933b9-5b2e-4bd6-bcdf-033db707ef82` was flagged for suspicious activities. An unusual login from this account 
       points towards an attempted fraud against our organization.
     question: Can you identify the IP address from which the suspicious SAP login was made as part of this business 
@@ -321,7 +321,7 @@ tasks:
         weight: 1.0
         title: Checkpoint 1
         description: There was a suspicious event with BEC (Business Email Compromise) characteristics observed for the 
-          email account `Jordan P@vnevado.alpineskihouse.co`.
+          email account `laylaw@vnevado.alpineskihouse.co`.
       checkpoint_2:
         target: trajectory
         max_score: 0.25
@@ -366,7 +366,7 @@ tasks:
         max_score: 0.25
         weight: 1.0
         title: Checkpoint 1
-        description: A user account with the email `Jordan P@vnevado.alpineskihouse.co` had a risky sign-in alert and 
+        description: A user account with the email `laylaw@vnevado.alpineskihouse.co` had a risky sign-in alert and 
           signed in to SAP.
       checkpoint_2:
         target: trajectory
@@ -438,7 +438,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'In a recent incident, a suspicious SAP authentication alert was triggered. A risky sign-in using the
-      account `Jordan P` (email: `Jordan P@vnevado.alpineskihouse.co`) was detected, indicating a potential compromise to
+      account `Jordan P` (email: `laylaw@vnevado.alpineskihouse.co`) was detected, indicating a potential compromise to
       search or modify sensitive financial information in SAP software. The sign-in originated from the IP address `107.253.5.27`.'
     question: What is the IP address from which the anonymous sign-in was detected related to this alert?
     # Main task submission evaluation - uses LLM-as-a-judge by default

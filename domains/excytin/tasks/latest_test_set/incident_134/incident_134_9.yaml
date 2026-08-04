@@ -4,7 +4,7 @@ tasks:
   description: 'From which IP address did the anonymous sign-in associated with the "Nina Park" account originate on 2024-07-17?'
   inherit_shared: true
   initial_context:
-    incident_context: 'Security monitoring detected that user account "Nina Park" (email: Nina Park@vnevado.alpineskihouse.co)
+    incident_context: 'Security monitoring detected that user account "Nina Park" (email: raphaelt@vnevado.alpineskihouse.co)
       was successfully accessed during a suspected password-spray campaign on 2024-07-18. Investigation shows that, shortly
       before this compromise, the same account had logged in from a network identified as an anonymous source (such as a Tor
       exit node or anonymizing VPN).'

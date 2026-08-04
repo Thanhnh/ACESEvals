@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_train_set_task_26
+  title: incident_166_latest_cleaned_train_set_task_26
+  description: 'For the follow-up alert about suspicious emails linked to the BEC fraud attempt, what was the sender email address of those messages?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a high-severity SAP financial process manipulation (attack disruption) incident, Azure Active Directory Identity Protection flagged a sign-in from the anonymous IP address `192.238.237.190` (e.g. Tor browser or anonymizer VPN) at 2024-07-22 09:11:31 UTC. About an hour later, a follow-up alert reported that suspicious emails were sent by a possibly compromised user account tied to an ongoing BEC (business email compromise) fraud attempt.'
+    question: 'For the follow-up alert about suspicious emails linked to the BEC fraud attempt, what was the sender email address of those messages?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'laylaw@vnevado.alpineskihouse.co'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'laylaw@vnevado.alpineskihouse.co'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A sign-in from an anonymous IP address (e.g. Tor browser or anonymizer VPN) was detected for the account with AadUserId `89e933b9-5b2e-4bd6-bcdf-033db707ef82`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The compromised account then sent suspicious emails related to an ongoing BEC (business email compromise) fraud attempt, with the mail message sender `laylaw@vnevado.alpineskihouse.co`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

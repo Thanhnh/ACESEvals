@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_65
+  title: incident_55_latest_cleaned_train_set_task_65
+  description: 'For the suspicious service registration alert, what was the process ID, creation time, and command line of the process involved?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'In this incident, a user named Lucas Grey (`bjenkins@niseko.alpineskihouse.co`) clicked on a potentially malicious URL `http://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/` that was delivered to his mailbox. Tracing the related activity, the same compromised account is linked to a chain of endpoint alerts, including a malicious PowerShell cmdlet invocation, suspicious Task Scheduler activity on the affected machine, and finally an alert for a suspicious service registration, where a system program was registered as a service to establish persistence or gain system privileges.'
+    question: 'For the suspicious service registration alert, what was the process ID, creation time, and command line of the process involved?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process Id: 764, Created Time (UTC): 2024-06-20T08:30:13.7925191Z, Command Line: services.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process Id: 764, Created Time (UTC): 2024-06-20T08:30:13.7925191Z, Command Line: services.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user with SID `S-1-5-21-561436748-3867387497-1732241745-3701` clicked on a potentially malicious URL.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A malicious PowerShell Cmdlet was invoked through the process `powershell.exe`, potentially used for credential theft, reconnaissance, or code injection.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'On the host `mb-adfs`, a process involved in the earlier malicious activity used Task Scheduler to create, modify, or delete a scheduled task to establish persistence.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'A system program was registered as a service via the process `services.exe` with Process ID `764` created at `2024-06-20t08:30:13.7925191z`, indicating an attempt to establish persistence or gain system privileges.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

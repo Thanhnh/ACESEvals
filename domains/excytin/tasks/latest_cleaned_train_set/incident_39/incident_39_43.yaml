@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_43
+  title: incident_39_latest_cleaned_train_set_task_43
+  description: 'For the ''Suspicious service launched'' alert in this same chain, what was the executable name of the service that was started, along with its process ID and creation time?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert for ''Anomalous account lookups'' was triggered when a chain of reconnaissance commands was executed on a device, including `"net.exe" user /domain` (PID 2720), `"net.exe" group /domain` (PID 6264), `"net.exe" group "domain admins" /domain` (PID 6252), `"net.exe" group "enterprise admins" /domain` (PID 1700), and `"net.exe" user fk8mq /domain` (PID 3560), all around 2024-06-27 14:32 UTC. Follow-on alerts on the same device chain showed multiple dual-purpose tools being dropped and ''Kekeo'' malware detected during lateral movement, as well as a ''Suspicious service launched'' alert.'
+    question: 'For the ''Suspicious service launched'' alert in this same chain, what was the executable name of the service that was started, along with its process ID and creation time?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Executable: psexesvc.exe, Process ID: 5912, Created Time (UTC): 2024-06-27T14:32:53.2267179Z'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Executable: psexesvc.exe, Process ID: 5912, Created Time (UTC): 2024-06-27T14:32:53.2267179Z'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with AadUserId `1d94aaf6-efe6-4e76-ad56-ffd7d1257bc1` performed an anomalous chain of user account lookups, indicating reconnaissance on potential targets.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Multiple dual-purpose tools were dropped on the device, including the credential theft tool file `rubeus.exe`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The ''Kekeo'' malware was detected on host `vnevado-win10b`, indicating lateral movement to this device from another device on the network.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'A suspicious service was launched on the device with Process ID `5912` at `2024-06-27t14:32:53.2267179z` using the command line `psexesvc.exe`, showing the attacker used PsExec to execute commands remotely for persistence or privilege escalation.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

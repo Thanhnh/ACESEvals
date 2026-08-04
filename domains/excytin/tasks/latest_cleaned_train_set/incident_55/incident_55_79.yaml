@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_79
+  title: incident_55_latest_cleaned_train_set_task_79
+  description: 'Later in the same incident, a malicious URL was clicked on the same device involved in this PowerShell activity. What was the full URL that was clicked?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, we found that a malicious PowerShell Cmdlet was invoked on a machine by the account `bjenkins` (SID S-1-5-21-561436748-3867387497-1732241745-3701). The process details show `powershell.exe` executing the script `contosoadfsblatempcreds.ps1` (Process ID 13968, created 2024-07-02T09:47:59.8256018Z), preceded by a PowerShell session set to the folder `c:\users\bjenkins\downloads\midnight14`. The Cmdlet may be associated with credential theft, exploitation, network reconnaissance or code injection, and activity was also linked to the IP address 72.5.72.208.'
+    question: 'Later in the same incident, a malicious URL was clicked on the same device involved in this PowerShell activity. What was the full URL that was clicked?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'https://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'https://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A malicious PowerShell Cmdlet, potentially associated with credential theft, exploitation, network reconnaissance or code injection, was invoked on the host with HostName `mb-winclient`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'From that same device, a malicious URL with Url `https://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/` was clicked on.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

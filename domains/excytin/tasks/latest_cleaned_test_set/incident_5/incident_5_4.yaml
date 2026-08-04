@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_4
+  title: incident_5_latest_cleaned_test_set_task_4
+  description: 'In the follow-up alert about assets exhibiting ransomware-like behavior, what is the name of the file that indicates the encryption activity (and hints at the ransomware family involved)?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a security incident, an alert titled "File backups were deleted" fired on host `vnevado-win10s` (AAD device ID `f5b847aa-8712-4bf6-b4f7-ed6cd89e1505`), where the process `vssblatemp.exe` was executed with the command line `vssblatemp.exe delete shadows /all` (Process ID 5512, created 2024-06-20T09:10:50.2899021Z). Deleting all snapshots and shadow copies via WMI or VSSAdmin is a behavior commonly seen during ransomware infections. Roughly a second later, a related alert reported potentially compromised assets exhibiting ransomware-like behavior across several devices.'
+    question: 'In the follow-up alert about assets exhibiting ransomware-like behavior, what is the name of the file that indicates the encryption activity (and hints at the ransomware family involved)?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'ponceau.7z.lockbit'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'ponceau.7z.lockbit'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with AadUserId `731adb71-b11c-4bbf-850b-57989b350e96` deleted all file backups (shadow copies/snapshots) via WMI or VSSAdmin, a common precursor to ransomware encryption.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the backup deletion, the potentially compromised assets exhibited ransomware-like behavior, producing the encrypted file `ponceau.7z.lockbit` (LockBit ransomware extension).'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

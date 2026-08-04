@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_39_latest_cleaned_test_set_task_74
+  title: incident_39_latest_cleaned_test_set_task_74
+  description: 'A related alert on the same device reported that multiple known public dual-purpose tools were dropped. What is the file name of the dropped tool that was executed from c:\temp to harvest the Kerberos ticket written to adminticket.txt?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a lateral movement investigation, an alert fired for `PsExec launched a command on a remote device`. PsExec (process ID 5612) was used against `vnevado-dc` to run `powershell.exe -command "net.exe stop ntds /y; add-addbsidhistory -samaccountname bdadmin -sidhistory \"s-1-5-32-544\" ...; net.exe start ntds"`, and another PsExec instance (process ID 5924) was used against `vnevado-win10b` to run a credential-theft utility from `c:\temp\` whose output was redirected to `c:\temp\adminticket.txt`.'
+    question: 'A related alert on the same device reported that multiple known public dual-purpose tools were dropped. What is the file name of the dropped tool that was executed from c:\temp to harvest the Kerberos ticket written to adminticket.txt?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'rubeus.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'rubeus.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'PsExec was used to launch `powershell.exe` as a command on a remote device, indicating possible lateral movement by an attacker.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Multiple dual-purpose tools were dropped on the device, including the credential theft tool file named `rubeus.exe`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_85
+  title: incident_55_latest_cleaned_train_set_task_85
+  description: 'Roughly one second later, a related alert reported that a renamed Windows system executable was launched on the same device. Which user account context was that renamed executable launched under?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, a "Suspicious System Hardware Discovery" alert fired, indicating a known tool or technique was used to gather information about the device or network for later attacks. The activity involved the accounts `pwilson` (SID S-1-5-21-551436448-9871687716-9837441745-1903) and `bjenkins`, the device with AAD Device ID `7661dfd4-218f-4016-8a87-66d68a7f098e`, the remote address `72.5.72.208`, and processes such as `svchost.exe -k netsvcs -p -s winmgmt` (PID 2880) and `"powershell.exe" c:\script\contosoadfsblatempcreds.ps1` (PID 13968).'
+    question: 'Roughly one second later, a related alert reported that a renamed Windows system executable was launched on the same device. Which user account context was that renamed executable launched under?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'SYSTEM'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'SYSTEM'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The process `powershell.exe` was used to perform suspicious system hardware discovery on the device, gathering information for later attacks.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following this, a renamed Windows system executable was launched under the account `SYSTEM`, indicating an attempt to evade path- and name-based detections.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

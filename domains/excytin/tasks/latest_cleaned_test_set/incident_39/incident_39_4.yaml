@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_test_set_task_4
+  title: incident_39_latest_cleaned_test_set_task_4
+  description: 'Earlier in this same incident, on 2024-07-04, a Microsoft Defender for Endpoint alert titled ''Possible lateral movement'' was raised where a suspicious network event coincided with lateral movement activity on another device. What is the hostname of the device on which that alert was reported (excluding VNEVADO-DC and VNEVADO-Win10V)?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a multi-stage intrusion, a ''Suspected DCSync attack (replication of directory services)'' alert was raised on 2024-07-10, indicating that the account of Julian Burke (IT director), with email `lucasb@vnevado.alpineskihouse.co`, SID `S-1-5-21-1440151660-4837038288-105596163-1120` and AAD user ID `7fcf9695-68fc-4258-864d-e1e5b166c66f`, sent a replication request from `VNEVADO-Win10V` to the domain controller `VNEVADO-DC`.'
+    question: 'Earlier in this same incident, on 2024-07-04, a Microsoft Defender for Endpoint alert titled ''Possible lateral movement'' was raised where a suspicious network event coincided with lateral movement activity on another device. What is the hostname of the device on which that alert was reported (excluding VNEVADO-DC and VNEVADO-Win10V)?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'vnevado-win10b'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'vnevado-win10b'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with SID `S-1-5-21-1440151660-4837038288-105596163-1120` (Julian Burke, IT director) on VNEVADO-Win10V sent a replication request to VNEVADO-DC, indicating a suspected DCSync attack.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The same compromised identity was used from IP address `35.202.74.47`, where an actor stole Julian Burke''s Kerberos ticket and replayed it (pass-the-ticket) to access 4 resources.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The stolen Kerberos ticket originated from the host `vnevado-win10b`, on which possible lateral movement was observed in close time proximity to a suspicious network event.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

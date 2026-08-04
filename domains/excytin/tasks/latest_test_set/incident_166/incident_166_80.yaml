@@ -5,7 +5,7 @@ tasks:
     P’s account. What is that SID?'
   inherit_shared: true
   initial_context:
-    incident_context: 'A user named Jordan P (email: Jordan P@vnevado.alpineskihouse.co) was flagged after signing in to SAP
+    incident_context: 'A user named Jordan P (email: laylaw@vnevado.alpineskihouse.co) was flagged after signing in to SAP
       from IP address 107.253.5.27. This activity was linked to an ongoing Business Email Compromise (BEC) investigation in
       Microsoft Defender XDR, indicating the account might have been taken over to access sensitive financial data in SAP.'
     question: 'From a correlated alert, incident responders identified the Windows Security Identifier (SID) tied to Jordan

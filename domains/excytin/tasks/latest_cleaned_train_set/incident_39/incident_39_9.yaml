@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_9
+  title: incident_39_latest_cleaned_train_set_task_9
+  description: 'Moments later, a related alert flagged the possible use of the Rubeus kerberoasting tool on this endpoint. What is the Microsoft Entra ID (Azure AD) user ID of the account associated with that Rubeus alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'A "Potential human-operated malicious activity" alert was raised on device `vnevado-win10b` (AAD device ID `fafdcd65-46c6-45a6-aa85-ec9b77ca0bcb`), where a sequence of suspicious behaviors was observed, including execution of `psexesvc.exe` (PID 5512, created 2024-06-27T14:33:27Z), the presence of the file `rubeus.exe`, activity from IP `141.216.110.153`, and involvement of accounts such as `kyleg` and `fk8mq` (SID S-1-5-21-1540151660-3530000288-105586595-1517). This type of activity can lead to ransomware or other payloads being deployed.'
+    question: 'Moments later, a related alert flagged the possible use of the Rubeus kerberoasting tool on this endpoint. What is the Microsoft Entra ID (Azure AD) user ID of the account associated with that Rubeus alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '1d94aaf6-efe6-4e76-ad56-ffd7d1257bc1'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '1d94aaf6-efe6-4e76-ad56-ffd7d1257bc1'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A sequence of alerts indicative of human-operated malicious activity was observed on the device, involving the process file `rubeus.exe`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The Rubeus kerberoasting tool was possibly used by the account with AadUserId `1d94aaf6-efe6-4e76-ad56-ffd7d1257bc1`, potentially requesting Kerberos service tickets to extract credentials or perform pass-the-ticket attacks.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

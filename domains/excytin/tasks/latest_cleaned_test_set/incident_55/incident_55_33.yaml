@@ -1,0 +1,36 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_33
+  title: incident_55_latest_cleaned_test_set_task_33
+  description: 'Shortly before this renamed binary ran, a related PowerShell process with a Base64-encoded command was launched as part of the same activity. What was that process''s ID, creation time, and full command line?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident, an alert titled "System executable renamed and launched" fired on host `mb-adfs`. A renamed Windows executable, `iy2orr1e.rrg.exe`, was launched under the `SYSTEM` account (SID `S-2-2-78`) with process ID 3116 at 2024-07-02T09:48:23.94Z, using the arguments `-windowstyle hidden -encodedcommand Qwa6AFwAUwBjAHIAaQBwAHQAcwBcAEUAeABwAG8AcgB0AEQARgBTAFQAbwBrAGUAbgBTAGkAZwBuAGkAbgBDAGUAcgB0AC4AcABzADEA`. Renaming a system binary is a common technique to evade path/name-based detections.'
+    question: 'Shortly before this renamed binary ran, a related PowerShell process with a Base64-encoded command was launched as part of the same activity. What was that process''s ID, creation time, and full command line?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID 6808, created at 2024-07-02T09:48:12.7628138Z, with the command line: `powershell.exe -encodedcommand qwa6afwauwbjahiaaqbwahqacwbcafiazqbuageabqblafaabwb3aguacgbzaggazqbsagwalgbwahmamqa=`'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID 6808, created at 2024-07-02T09:48:12.7628138Z, with the command line: `powershell.exe -encodedcommand qwa6afwauwbjahiaaqbwahqacwbcafiazqbuageabqblafaabwb3aguacgbzaggazqbsagwalgbwahmamqa=`'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 1.0
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A Windows system executable was renamed and launched: the renamed PowerShell binary ran with command line `powershell.exe -encodedcommand qwa6afwauwbjahiaaqbwahqacwbcafiazqbuageabqblafaabwb3aguacgbzaggazqbsagwalgbwahmamqa=` (decoding to the script `C:\Scripts\RenamePowerShell.ps1`) at `2024-07-02t09:48:12.7628138z`, with Process ID `6808`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1

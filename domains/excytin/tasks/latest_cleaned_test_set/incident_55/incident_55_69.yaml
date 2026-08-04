@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_69
+  title: incident_55_latest_cleaned_test_set_task_69
+  description: 'Roughly a second later, a related alert flagged a suspicious LDAP query indicating a possible ADFS private key extraction attempt. What is the security identifier (SID) of the user account associated with that ADFS private key extraction alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, an alert was raised for "System executable renamed and launched" — a renamed Windows executable was launched, a technique attackers use to evade path/filename-based detections. The observed process was `powershell.exe` running under the `SYSTEM` account (SID `S-2-2-78`), with the process details `6808__2024-07-02t09:48:12.7628138z__powershell.exe -encodedcommand qwa6afwauwbjahiaaqbwahqacwbcafiazqbuageabqblafaabwb3aguacgbzaggazqbsagwalgbwahmamqa=`.'
+    question: 'Roughly a second later, a related alert flagged a suspicious LDAP query indicating a possible ADFS private key extraction attempt. What is the security identifier (SID) of the user account associated with that ADFS private key extraction alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'S-2-5-21-571436798-3864380397-1837441745-3206'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'S-2-5-21-571436798-3864380397-1837441745-3206'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A renamed Windows system executable `iy2orr1e.rrg.exe` was launched on the machine, indicating an attempt to evade path/file name based detections.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following that, a suspicious LDAP query attempting to extract ADFS private keys was launched by the account with SID `S-2-5-21-571436798-3864380397-1837441745-3206`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

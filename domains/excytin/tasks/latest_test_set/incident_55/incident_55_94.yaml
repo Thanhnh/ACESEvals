@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During the investigation of recent suspicious activity, we observed that the user account "Luciano
-      Herrera" (email: Luciano Herrera@niseko.alpineskihouse.co) added a password-type credential to an OAuth application
+      Herrera" (email: pwilson@niseko.alpineskihouse.co) added a password-type credential to an OAuth application
       named "SimulandApp" (App ID 11161). Shortly thereafter, a separate alert reported that malicious code had been injected
       into a process on an endpoint, indicating possible lateral movement. A few days later, another alert flagged that a
       malicious URL was clicked on the same device, suggesting potential phishing or command-and-control activity.'

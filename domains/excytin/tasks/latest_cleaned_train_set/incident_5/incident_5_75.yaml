@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_75
+  title: incident_5_latest_cleaned_train_set_task_75
+  description: 'Around the same time, a ''Possible lateral movement'' alert was triggered by Microsoft Defender for Endpoint based on a suspicious network event. What IP address was involved in that lateral movement alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, an alert for ''Suspicious access to LSASS service'' was raised after `mimikatz.exe` was executed on an endpoint (e.g., process 6600 with the command line `"mimikatz.exe" privilege::debug "sekurlsa::pth /user:fk8mq /ntlm:96def1a633fc6790124d5f8fe21cc72b /domain:vnevado.alpineskihouse.co /run:..\notepad.exe \\vnevado-jump cmd.exe"`), touching `lsass.exe` and DLLs such as `samlib.dll`, `cryptdll.dll`, `winscard.dll` and `hid.dll`. This credential theft was followed by PsExec activity to the jump server and a remotely launched ransomware payload.'
+    question: 'Around the same time, a ''Possible lateral movement'' alert was triggered by Microsoft Defender for Endpoint based on a suspicious network event. What IP address was involved in that lateral movement alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '38.142.109.10'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '38.142.109.10'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with SID `S-5-7-21-1843151660-3234030288-105586167-1422` performed suspicious access to the LSASS service to dump credentials in clear text.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using the stolen credentials, the attacker used PSExec for lateral movement to the jump server from the IP address `99.83.111.100`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'A ransomware payload was remotely launched on the host `vnevado-win11u`.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'Possible lateral movement was observed in close time proximity to a suspicious network event involving the IP address `38.142.109.10`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_14
+  title: incident_5_latest_cleaned_test_set_task_14
+  description: 'Around the same time, a related alert flagged a possible attempt to access a Primary Refresh Token (PRT). What is the Azure AD device ID (AadDeviceId) of the host affected by that PRT access attempt?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of Manatee Tempest activity group (a Russia-based cybercriminal group known for the Dridex banking trojan, SocGholish/FakeUpdates infections, BLISTER loader and Cobalt Strike beacons), analysts observed on the device `vnevado-win11t` (Azure AD device ID `e5799261-6720-4297-961e-bd9ca4275033`) a process with ProcessId__CreatedTimeUtc__CommandLine `88__2024-06-20t09:29:42.3927529z__curl http://vectorsandarrows.com`, reaching out to the domain `vectorsandarrows.com` resolving to IP `198.43.121.209`.'
+    question: 'Around the same time, a related alert flagged a possible attempt to access a Primary Refresh Token (PRT). What is the Azure AD device ID (AadDeviceId) of the host affected by that PRT access attempt?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '9d4887ba-0b69-47d6-89bc-9b32787f379e'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '9d4887ba-0b69-47d6-89bc-9b32787f379e'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account with Name `dp5hn` was involved in activity associated with the Manatee Tempest activity group, which uses drive-by downloads and loaders to gain initial access and deploy Cobalt Strike beacons.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On the device with AadDeviceId `9d4887ba-0b69-47d6-89bc-9b32787f379e`, a possible attempt to access the Primary Refresh Token (PRT) was detected, indicating credential theft and lateral movement attempts.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

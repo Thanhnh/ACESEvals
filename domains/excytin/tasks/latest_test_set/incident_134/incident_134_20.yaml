@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During the investigation of a security incident, we observed that the user account “Nina Park” (email:
-      Nina Park@vnevado.alpineskihouse.co, SID S-1-5-21-1874151667-3554330288-105586563-1715) clicked a URL that was later
+      raphaelt@vnevado.alpineskihouse.co, SID S-1-5-21-1874151667-3554330288-105586563-1715) clicked a URL that was later
       determined to be potentially malicious. This action triggered the alert titled “A potentially malicious URL click was
       detected” on 2024-07-17 at 10:59 UTC. Just a couple of minutes later, another alert—“Anonymous IP address”—was raised,
       indicating that the same user attempted to sign in from a network location associated with an anonymity service.'

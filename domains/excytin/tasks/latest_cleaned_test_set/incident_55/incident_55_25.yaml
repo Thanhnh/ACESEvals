@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_25
+  title: incident_55_latest_cleaned_test_set_task_25
+  description: 'Shortly after this activity, a suspicious service named DDLOXJDSQSNGMUKKFUXQ was created on the same host to execute potentially malicious commands. What is the full email address of the user account associated with the creation of this service?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an ongoing hands-on-keyboard attack investigation, suspicious execution of commands via the Impacket toolkit was observed on the device `mb-adfs`. The activity involved `powershell.exe` running under the `LocalSystem` account (e.g., process ID 6808 executing `powershell.exe -encodedcommand qwa6afwauwbjahiaaqbwahqacwbcafiazqbuageabqblafaabwb3aguacgbzaggazqbsagwalgbwahmamqa=`), along with access to `lsass.exe` (process ID 780) and use of `%comspec%`. Impacket is often used by attackers to connect to other hosts, explore network shares, and execute commands for lateral movement, frequently preceding ransomware deployment.'
+    question: 'Shortly after this activity, a suspicious service named DDLOXJDSQSNGMUKKFUXQ was created on the same host to execute potentially malicious commands. What is the full email address of the user account associated with the creation of this service?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'gsmith@niseko.alpineskihouse.co'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'gsmith@niseko.alpineskihouse.co'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'An ongoing hands-on-keyboard attack via the Impacket toolkit was observed, executed under the compromised account with AadUserId `ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5`, which was used to connect to other hosts, explore network shares, and execute commands for lateral movement.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using that lateral movement, the attacker leveraged the account with email `gsmith@niseko.alpineskihouse.co` to create a suspicious service named `DDLOXJDSQSNGMUKKFUXQ` on device `MB-ADFS` in order to execute potentially malicious commands.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

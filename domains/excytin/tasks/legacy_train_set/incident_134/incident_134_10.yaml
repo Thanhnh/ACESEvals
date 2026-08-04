@@ -30,7 +30,7 @@ tasks:
         max_score: 0.5
         weight: 1.0
         title: Checkpoint 1
-        description: The email account `Nina Park@vnevado.alpineskihouse.co` clicked on a link found to be malicious.
+        description: The email account `raphaelt@vnevado.alpineskihouse.co` clicked on a link found to be malicious.
       checkpoint_2:
         target: trajectory
         max_score: 0.5

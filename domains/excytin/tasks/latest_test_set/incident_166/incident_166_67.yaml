@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During the investigation of a suspicious inbox manipulation rule affecting user Jordan P (who uses
-      the email address Jordan P@vnevado.alpineskihouse.co), analysts noted that the mailbox rules were altered in a way that
+      the email address laylaw@vnevado.alpineskihouse.co), analysts noted that the mailbox rules were altered in a way that
       could enable data exfiltration. The same incident also includes a separate alert indicating that the same user account
       signed in from an anonymous network, suggesting use of Tor or an anonymizer VPN.'
     question: 'According to the alert that flagged an anonymous network connection, from which IP address did the risky sign-in

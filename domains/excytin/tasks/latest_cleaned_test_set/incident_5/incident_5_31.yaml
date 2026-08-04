@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_31
+  title: incident_5_latest_cleaned_test_set_task_31
+  description: 'For the alert attributing this activity to the Manatee Tempest activity group, what is the IP address recorded as an entity in that alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage intrusion, an alert titled ''PSExec to Vnevado-jump'' flagged lateral movement to the jump server. The activity involved the account `tgs2z` (SID `S-5-7-21-1843151660-3234030288-105586167-1422`, email `tgs2z@vnevado.alpineskihouse.co`) on host `vnevado-win10v`, where `notepad.exe` was observed. Follow-on activity included a ransomware payload being remotely launched on a device, and further correlation tied the intrusion to the Manatee Tempest activity group — a Russia-based cybercriminal group known for using Mustard Tempest for initial access, BLISTER loader and Cobalt Strike beacons for lateral movement and ransomware deployment.'
+    question: 'For the alert attributing this activity to the Manatee Tempest activity group, what is the IP address recorded as an entity in that alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '198.43.121.209'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '198.43.121.209'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The attacker performed lateral movement using PSExec to the jump server from the source IP address `99.83.111.100`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The compromised account with SID `S-1-5-21-1840191660-8534830288-125585561-1522` was used to remotely launch a ransomware payload on the device.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The activity was attributed to the Manatee Tempest activity group, which communicated with the command-and-control IP address `198.43.121.209`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

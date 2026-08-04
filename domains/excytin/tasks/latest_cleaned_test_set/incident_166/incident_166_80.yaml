@@ -1,0 +1,36 @@
+tasks:
+- task_id: incident_166_latest_cleaned_test_set_task_80
+  title: incident_166_latest_cleaned_test_set_task_80
+  description: 'This same compromised user account also appears in related on-premises/endpoint alerts within the incident. What is the account''s on-premises security identifier (SID)?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a business email compromise (BEC) related incident, an alert titled ''BEC-related user signed in to SAP'' was triggered. The alert indicates that a user account with the email `laylaw@vnevado.alpineskihouse.co` (display name `Jordan P`, Microsoft Entra user ID `89e933b9-5b2e-4bd6-bcdf-033db707ef82`) signed in to SAP (cloud application ID 100) in a suspicious manner from the IP address `107.253.5.27`. An attacker might have taken control of this user account to search through SAP with the intention of recording or modifying sensitive financial information.'
+    question: 'This same compromised user account also appears in related on-premises/endpoint alerts within the incident. What is the account''s on-premises security identifier (SID)?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'S-1-5-21-1740051960-3534030288-108486866-1602'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'S-1-5-21-1740051960-3534030288-108486866-1602'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 1.0
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A user account with SID `S-1-5-21-1740051960-3534030288-108486866-1602`, previously involved in a business email compromise-related alert, signed in to SAP in a suspicious manner at 2024-07-22 14:09:41 UTC, indicating the account may have been taken over to access sensitive financial information.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1

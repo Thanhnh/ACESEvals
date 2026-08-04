@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_80
+  title: incident_5_latest_cleaned_test_set_task_80
+  description: 'Just moments before this ransomware-like behavior alert was raised, a related alert reported that a ransomware payload was remotely launched on a device. Which device (host name) was the payload remotely launched on?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an incident involving potentially compromised assets exhibiting ransomware-like behavior, an attacker used the account with SID `S-0-6-5` on host `vnevado-win11t` (AAD device ID `e5799261-6720-4297-961e-bd9ca4275033`), where files such as `get-userprttoken.ps1`, `characterical.zip`, and the encrypted `characterical.zip.lockbit` were observed. The attacker appeared to be moving laterally to infect as many devices as possible with ransomware.'
+    question: 'Just moments before this ransomware-like behavior alert was raised, a related alert reported that a ransomware payload was remotely launched on a device. Which device (host name) was the payload remotely launched on?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'vnevado-win11u'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'vnevado-win11u'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account with SID `S-1-5-21-1840191660-8534830288-125585561-1522` was potentially compromised and exhibited ransomware-like behavior, moving laterally across the network to infect multiple devices.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using that compromised account, a ransomware payload was remotely launched on the device with HostName `vnevado-win11u`, attempting to encrypt its content.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

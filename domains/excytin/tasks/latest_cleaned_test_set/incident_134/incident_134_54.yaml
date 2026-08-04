@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_134_latest_cleaned_test_set_task_54
+  title: incident_134_latest_cleaned_test_set_task_54
+  description: 'For the alert reporting the sign-in from an anonymous IP address, which user account was involved? Provide the account''s Microsoft Entra (AAD) user ID.'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an identity-focused security incident, a Password Spray attack was detected originating from the IP address `170.54.121.63` on 2024-07-18. Reviewing related alerts, an earlier alert on 2024-07-17 flagged a sign-in coming from an anonymous IP address (such as a Tor browser or anonymizer VPN).'
+    question: 'For the alert reporting the sign-in from an anonymous IP address, which user account was involved? Provide the account''s Microsoft Entra (AAD) user ID.'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'AadUserId: e036dee7-fa23-42ef-a019-468c8d3401f1'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'AadUserId: e036dee7-fa23-42ef-a019-468c8d3401f1'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A password spray attack was detected originating from the IP address `170.54.121.63`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the password spray attempts, a successful sign-in from an anonymous IP address (e.g. Tor browser or anonymizer VPN) was detected for the compromised account with AadUserId `e036dee7-fa23-42ef-a019-468c8d3401f1`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

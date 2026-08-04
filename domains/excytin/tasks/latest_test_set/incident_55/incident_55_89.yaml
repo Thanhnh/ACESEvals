@@ -5,7 +5,7 @@ tasks:
     What is the Azure AD user ID (AadUserId) of the account involved in that hardware discovery activity?'
   inherit_shared: true
   initial_context:
-    incident_context: 'During investigation we observed that on 2024-07-10 a user named Luciano Herrera (email: Luciano Herrera@niseko.alpineskihouse.co)
+    incident_context: 'During investigation we observed that on 2024-07-10 a user named Luciano Herrera (email: pwilson@niseko.alpineskihouse.co)
       added a password-type credential to the OAuth application "SimulandApp" (AppId 11161) from IP address 2801:e0a:1eb:dea0:642e:5bb6:d315:fbb3.
       This activity was flagged as an unusual addition of credentials to an OAuth app and may indicate that the application
       has been compromised.'

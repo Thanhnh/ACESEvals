@@ -310,7 +310,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: During a security incident involving a suspected DCSync attack, user Julian Burke, with the email 
-      `Julian Burke@vnevado.alpineskihouse.co`, sent a replication request from host `VNEVADO-Win10V` to `VNEVADO-DC`. 
+      `lucasb@vnevado.alpineskihouse.co`, sent a replication request from host `VNEVADO-Win10V` to `VNEVADO-DC`. 
       This incident was flagged due to its potential malicious intent, typically used to replicate directory services 
       for unauthorized access.
     question: Can you identify the account name associated with the incident involving the suspicious process stopping 

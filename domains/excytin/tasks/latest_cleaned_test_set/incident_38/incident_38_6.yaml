@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_38_latest_cleaned_test_set_task_6
+  title: incident_38_latest_cleaned_test_set_task_6
+  description: 'For the ''Suspicious Application Window Discovery'' alert on that same device, which process was used for the discovery activity, and what were its process ID and creation time?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this incident, an alert for ''Suspicious process injection observed'' was raised: a process abnormally injected code into another process, which may allow unexpected code to run in the target process memory. The involved process was `notepad.exe` (Process ID 8932, created 2024-06-26T15:49:51.3043595Z), and the activity was associated with the URL `https://wcdstaticfilesprdeus.blob.core.windows.net/wcdstaticfiles/winatp-intro-fileless.txt`. This activity took place on the same device that also triggered a ''Suspicious Application Window Discovery'' alert, where a known tool or technique was used to gather information about the target device or network.'
+    question: 'For the ''Suspicious Application Window Discovery'' alert on that same device, which process was used for the discovery activity, and what were its process ID and creation time?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'The process was `powershell.exe` with Process ID 7472, created at 2024-06-26T15:49:15.7860486Z.'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'The process was `powershell.exe` with Process ID 7472, created at 2024-06-26T15:49:15.7860486Z.'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious process injection was observed on the host with AadDeviceId `39d8c57f-2d08-4888-b0cd-12cd0679337a`, where a process abnormally injected code into another process to hide malicious code execution within a trusted process.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On that same device, a known application window discovery technique was executed via the process `powershell.exe` with Process ID `7472`, created at `2024-06-26t15:49:15.7860486z`, to gather information about the target device or network for later attacks.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

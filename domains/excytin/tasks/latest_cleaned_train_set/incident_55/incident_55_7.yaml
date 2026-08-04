@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_7
+  title: incident_55_latest_cleaned_train_set_task_7
+  description: 'For the alert about the unusual addition of credentials to the OAuth application, what is the OAuth object ID of the targeted application?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a suspicious access to the LSASS service was detected: the process `lsass.exe` (Process ID 760, created 2024-07-02T07:28:35.8580921Z) was accessed, with modules such as `cryptdll.dll`, `hid.dll`, `winscard.dll`, and `vaultcli.dll` involved. Attackers typically do this to decrypt clear-text credentials from LSASS memory and reuse them for lateral movement. Following this activity, a malicious PowerShell cmdlet was invoked on the same machine, and days later the compromised user Luciano Herrera (pwilson@niseko.alpineskihouse.co) performed an unusual addition of a Password-type credential to the OAuth application SimulandApp.'
+    question: 'For the alert about the unusual addition of credentials to the OAuth application, what is the OAuth object ID of the targeted application?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'a66a4b44-d1f7-4563-95bf-a89d1b05b325'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'a66a4b44-d1f7-4563-95bf-a89d1b05b325'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Suspicious access to the LSASS service was detected for credential theft on the device with IP address `72.5.72.208`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A malicious PowerShell Cmdlet associated with credential theft was invoked under the user account with AadUserId `2de70991-2799-4a95-b734-8e3df3a50118`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'Using the stolen credentials, an unusual addition of a Password credential was made to the OAuth application `SimulandApp` with OAuthObjectId `a66a4b44-d1f7-4563-95bf-a89d1b05b325`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

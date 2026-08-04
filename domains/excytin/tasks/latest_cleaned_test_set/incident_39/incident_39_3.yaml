@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_39_latest_cleaned_test_set_task_3
+  title: incident_39_latest_cleaned_test_set_task_3
+  description: 'For the Microsoft Defender Antivirus tampering alert on the same device, what was the exact command line used to disable real-time protection, and what was the process ID and creation time of that process?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'A security incident was flagged when a sequence of alerts indicative of human-operated malicious activity was observed on a device, potentially leading to ransomware or other payloads being installed. The activity involved the account `kyleg` (SID `S-0-6-5`) and the IP address `141.216.110.153`. Related alerts on the same device include an attempt to disable the Microsoft Defender Antivirus service, likely to evade detection.'
+    question: 'For the Microsoft Defender Antivirus tampering alert on the same device, what was the exact command line used to disable real-time protection, and what was the process ID and creation time of that process?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Command line: `powershell -command set-mppreference -disablerealtimemonitoring 1`, Process ID: 6968, Created Time (UTC): 2024-06-27T14:33:05.7932439Z'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Command line: `powershell -command set-mppreference -disablerealtimemonitoring 1`, Process ID: 6968, Created Time (UTC): 2024-06-27T14:33:05.7932439Z'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A sequence of alerts indicative of human-operated malicious activity was observed on the device with AadDeviceId `fafdcd65-46c6-45a6-aa85-ec9b77ca0bcb`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On that device, an attempt to tamper with Microsoft Defender Antivirus was detected: the process with Process ID `6968` ran the command line `powershell -command set-mppreference -disablerealtimemonitoring 1` at `2024-06-27t14:33:05.7932439z`, disabling real-time monitoring to evade detection.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_70
+  title: incident_5_latest_cleaned_test_set_task_70
+  description: 'A related ''Possible lateral movement'' alert from Microsoft Defender for Endpoint was raised at 2024-07-04 22:35:01 UTC, indicating a suspicious network event on the device. What is the IP address recorded in that alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage intrusion, Windows Defender flagged an "Unknown malware was detected and was active" alert on a compromised endpoint. The activity involved the files `mimikatz.exe` and `mimilib.dll`, with credential theft commands such as `"mimikatz.exe" privilege::debug sekurlsa::logonpasswords exit` (PID 1044 at 2024-06-20T08:59:25Z) followed by several pass-the-hash attempts like `"mimikatz.exe" privilege::debug "sekurlsa::pth /user:fk8mq /ntlm:96def1a633fc6790124d5f8fe21cc72b /domain:vnevado.alpineskihouse.co /run:..\notepad.exe \\vnevado-jump cmd.exe"` (PID 6600), spawning `notepad.exe` and `cmd.exe`. This credential theft was followed later by PSExec activity and SMB-based lateral movement attempts against the jump server that attack disruption blocked.'
+    question: 'A related ''Possible lateral movement'' alert from Microsoft Defender for Endpoint was raised at 2024-07-04 22:35:01 UTC, indicating a suspicious network event on the device. What is the IP address recorded in that alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '83.162.58.168'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '83.162.58.168'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Unknown malware was detected and was active on the account with AadUserId `1d94aaf6-efe6-4e76-ad56-ffd7d1257bc1`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The compromised account was then used for lateral movement via PSExec to the jump server from the IP address `99.83.111.100`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'Lateral movement using SMB remote file access was blocked on multiple devices, including the device with AadDeviceId `e5799261-6720-4297-961e-bd9ca4275033`.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'Possible lateral movement was observed in close time proximity to a suspicious network event involving the IP address `83.162.58.168`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

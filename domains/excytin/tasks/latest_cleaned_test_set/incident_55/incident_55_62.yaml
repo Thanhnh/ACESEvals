@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_62
+  title: incident_55_latest_cleaned_test_set_task_62
+  description: 'For the internal phishing campaign alert in this incident, what is the email address of the account that sent the phishing messages to internal recipients?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage intrusion, an alert was raised indicating that the domain controller `MB-DC1` read the DKM key of the AD FS object with id 4cac49d3-29d3-407e-8c9b-b7ebb21541b2, a technique often used by attackers to forge SAML tokens. Pivoting from this activity, the investigation leads through a suspected DCSync replication request and a malicious PowerShell Cmdlet invocation, and finally to an internal phishing campaign alert raised by Microsoft Defender for Office 365, where a compromised account was observed sending phishing emails to recipients inside the organization.'
+    question: 'For the internal phishing campaign alert in this incident, what is the email address of the account that sent the phishing messages to internal recipients?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'bjenkins@niseko.alpineskihouse.co'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'bjenkins@niseko.alpineskihouse.co'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The host `MB-DC1` was observed reading the DKM key of the AD FS object id 4cac49d3-29d3-407e-8c9b-b7ebb21541b2, indicating a suspected AD FS DKM key read.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The account with SID `S-1-5-21-551436448-9871687716-9837441745-1903` (Luciano Herrera, CIO) on MB-WINCLIENT sent a replication request to MB-DC1, indicating a suspected DCSync attack.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The account with SID `S-1-5-21-561436748-3867387497-1732241745-3701` invoked a malicious PowerShell Cmdlet on the machine, potentially associated with credential theft, exploitation, network reconnaissance or code injection.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'The compromised user account with email `bjenkins@niseko.alpineskihouse.co` was observed sending internal phishing emails to recipients inside the organization, indicating lateral movement by the attacker.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

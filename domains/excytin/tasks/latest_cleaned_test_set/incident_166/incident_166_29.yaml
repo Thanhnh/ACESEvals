@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_test_set_task_29
+  title: incident_166_latest_cleaned_test_set_task_29
+  description: 'This same compromised user account is also tied to an earlier alert on the same day about a suspicious inbox manipulation rule. What is the AppId of the cloud application associated with that inbox rule manipulation alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'In the ''SAP financial process manipulation'' incident, an alert was raised titled ''BEC-related user signed in to SAP'' on 2024-07-22. A user involved in a business email compromise-related alert also signed in to SAP in a suspicious manner from the IP address `107.253.5.27`, with the activity recorded against the cloud application AppId `100`. An attacker might have taken control of a user account to search through SAP with the intention of recording or modifying sensitive financial information.'
+    question: 'This same compromised user account is also tied to an earlier alert on the same day about a suspicious inbox manipulation rule. What is the AppId of the cloud application associated with that inbox rule manipulation alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'AppId: 20893 (Microsoft Exchange Online)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'AppId: 20893 (Microsoft Exchange Online)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A user account with AadUserId `89e933b9-5b2e-4bd6-bcdf-033db707ef82`, already involved in a business email compromise-related alert, signed in to SAP in a suspicious manner, suggesting the account was compromised and used to search for sensitive financial information.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The same compromised user account was then observed manipulating inbox rules in a suspicious manner (deleting or moving messages/folders to hide activity or exfiltrate data), an action performed through the cloud application with AppId `20893` (Microsoft Exchange Online).'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

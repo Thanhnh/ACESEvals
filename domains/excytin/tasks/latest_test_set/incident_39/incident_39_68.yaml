@@ -17,7 +17,7 @@ tasks:
     # To use static matching instead, change strategy to "static" and set:
     #   criteria:
     #     expected_answers:
-    #       - 'Emma Clark@vnevado.alpineskihouse.co'
+    #       - 'fk8mq@vnevado.alpineskihouse.co'
   scoring:
     llm_judge:
       model: "{judge_llm}"
@@ -28,7 +28,7 @@ tasks:
         target: submission
         judge_system_template: judge/submission_judge_system.md
         judge_user_template: judge/submission_judge_user.md
-        description: 'Emma Clark@vnevado.alpineskihouse.co'
+        description: 'fk8mq@vnevado.alpineskihouse.co'
         max_score: 1.0
       checkpoint_1:
         target: trajectory
@@ -51,7 +51,7 @@ tasks:
         weight: 1.0
         title: Checkpoint 3
         description: Several days later, on 2024-07-10 11:24:45.313631+00:00, a suspected overpass-the-hash Kerberos 
-          attack was attempted by the account with Email `Emma Clark@vnevado.alpineskihouse.co`, indicating that the 
+          attack was attempted by the account with Email `fk8mq@vnevado.alpineskihouse.co`, indicating that the 
           stolen or forged credentials were used to move laterally toward the domain controller.
   scoring_aggregation:
     max:

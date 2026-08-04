@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_test_set_task_85
+  title: incident_166_latest_cleaned_test_set_task_85
+  description: 'Earlier the same day, the same compromised user account triggered an ''Anonymous IP address'' alert, indicating a sign-in through an anonymizing service such as a Tor browser or anonymizer VPN. What was the source IP address of that anonymous sign-in?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a security incident involving SAP financial process manipulation, an alert for ''Suspicious SAP authentication'' was raised at 2024-07-22 12:59:26 UTC. It involved the user account `Jordan P` (email `laylaw@vnevado.alpineskihouse.co`, SID `S-1-5-21-1740051960-3534030288-108486866-1602`) signing in to the SAP cloud application (AppId 100) from the IP address `107.253.5.27`. The alert indicates an attacker might have taken control of the user account to search through SAP with the intention of recording or modifying sensitive financial information.'
+    question: 'Earlier the same day, the same compromised user account triggered an ''Anonymous IP address'' alert, indicating a sign-in through an anonymizing service such as a Tor browser or anonymizer VPN. What was the source IP address of that anonymous sign-in?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '192.238.237.190'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '192.238.237.190'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A user account with AadUserId `89e933b9-5b2e-4bd6-bcdf-033db707ef82` performed a suspicious sign-in to SAP, the enterprise application software, at 2024-07-22 12:59:26 UTC, indicating the account may have been taken over to search for sensitive financial information.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The same compromised account signed in from the anonymous IP address `192.238.237.190` (e.g., Tor browser or anonymizer VPN) at 2024-07-22 09:11:31 UTC, hiding the attacker''s true source location.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

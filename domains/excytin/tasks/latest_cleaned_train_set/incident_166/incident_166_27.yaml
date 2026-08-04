@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_train_set_task_27
+  title: incident_166_latest_cleaned_train_set_task_27
+  description: 'Which user account name was involved in the suspicious SAP authentication alert linked to this anonymous IP sign-in?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a security incident involving SAP financial process manipulation, an ''Anonymous IP address'' alert was raised for a sign-in originating from the IP address `192.238.237.190`, indicating use of a Tor browser or anonymizing VPN. Shortly afterwards, a related alert ''Suspicious SAP authentication'' was triggered, where a user account with a risky sign-in in Microsoft Entra ID signed in to the SAP enterprise application, potentially to search for or modify sensitive financial information.'
+    question: 'Which user account name was involved in the suspicious SAP authentication alert linked to this anonymous IP sign-in?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Jordan P'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Jordan P'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A sign-in from an anonymous IP address (e.g. Tor browser or anonymizer VPN) was detected for the account with AadUserId `89e933b9-5b2e-4bd6-bcdf-033db707ef82` at 2024-07-22 09:11:31 UTC.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The same compromised identity, the user account `Jordan P`, then signed in to the SAP enterprise application, triggering the ''Suspicious SAP authentication'' alert at 2024-07-22 13:19:46 UTC, indicating an attacker may be using the account to access sensitive financial information in SAP.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

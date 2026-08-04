@@ -32,7 +32,7 @@ tasks:
         max_score: 0.5
         weight: 1.0
         title: Checkpoint 1
-        description: 'Account (Email: Jordan P@vnevado.alpineskihouse.co) signed in to SAP via a risky Microsoft Entra ID
+        description: 'Account (Email: laylaw@vnevado.alpineskihouse.co) signed in to SAP via a risky Microsoft Entra ID
           session, indicating possible compromise.'
       checkpoint_2:
         target: trajectory

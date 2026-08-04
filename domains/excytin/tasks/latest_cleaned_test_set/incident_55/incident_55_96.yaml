@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_96
+  title: incident_55_latest_cleaned_test_set_task_96
+  description: 'On the same host, an alert was triggered around the same time for an attempt to hide the use of a dual-purpose tool, where a known public tool was observed running under an unexpected filename. Which user account was associated with that activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage security incident, an alert for ''Suspicious service registration'' was raised when a system program was registered as a service, which can indicate malicious intent to establish persistence or gain system privileges. The process involved was `services.exe` with ProcessId__CreatedTimeUtc__CommandLine of `764__2024-06-20t08:30:13.7925191z__services.exe`.'
+    question: 'On the same host, an alert was triggered around the same time for an attempt to hide the use of a dual-purpose tool, where a known public tool was observed running under an unexpected filename. Which user account was associated with that activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'gsmith'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'gsmith'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A system program was registered as a service on host `mb-adfs`, indicating a suspicious service registration used to establish persistence or gain system privileges.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On that host, the account `gsmith` ran a known dual-purpose public tool under an unexpected filename, attempting to hide its malicious usage.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

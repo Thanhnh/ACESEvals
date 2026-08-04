@@ -282,7 +282,7 @@ tasks:
         max_score: 0.125
         weight: 1.0
         title: Checkpoint 2
-        description: Emails containing a malicious URL were sent to `Hailey Johnson@vnevado.alpineskihouse.co` and later
+        description: Emails containing a malicious URL were sent to `alyssat@vnevado.alpineskihouse.co` and later
           removed.
       checkpoint_3:
         target: trajectory
@@ -385,7 +385,7 @@ tasks:
         max_score: 0.167
         weight: 1.0
         title: Checkpoint 1
-        description: The email account `Hailey Johnson@vnevado.alpineskihouse.co` clicked on a malicious URL.
+        description: The email account `alyssat@vnevado.alpineskihouse.co` clicked on a malicious URL.
       checkpoint_2:
         target: trajectory
         max_score: 0.167
@@ -448,7 +448,7 @@ tasks:
         max_score: 0.167
         weight: 1.0
         title: Checkpoint 2
-        description: The email account `Hailey Johnson@vnevado.alpineskihouse.co` clicked on a malicious URL on 
+        description: The email account `alyssat@vnevado.alpineskihouse.co` clicked on a malicious URL on 
           `2024-08-01 13:49:58.880422+00:00`.
       checkpoint_3:
         target: trajectory

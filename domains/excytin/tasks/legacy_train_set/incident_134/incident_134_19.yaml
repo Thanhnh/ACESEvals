@@ -4,7 +4,7 @@ tasks:
   description: 'Can you identify the IP address associated with the suspicious login activity?'
   inherit_shared: true
   initial_context:
-    incident_context: 'A security incident indicating that an account belonging to Nina Park (Email: Nina Park@vnevado.alpineskihouse.co)
+    incident_context: 'A security incident indicating that an account belonging to Nina Park (Email: raphaelt@vnevado.alpineskihouse.co)
       with the SID S-1-5-21-1874151667-3554330288-105586563-1715 and AadUserId e036dee7-fa23-42ef-a019-468c8d3401f1, was potentially
       compromised following a password-spray attack. The user was signed in from an unusual location and browser. This incident
       suggests an attacker might have accessed the network using this compromised account, posing serious security risks.'

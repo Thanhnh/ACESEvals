@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_33
+  title: incident_5_latest_cleaned_train_set_task_33
+  description: 'A related alert on the same machine flagged a suspicious WMI process creation, which malware often uses to spawn new processes and break process trees. What was the command line executed and the process ID of that WMI-spawned process?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation on the endpoint `vnevado-win11u` (Azure AD device ID `bc00e484-d0e5-4da4-9472-95568cccc07e`), a Command and Control behavior was blocked after a process (PID 5572, created 2024-06-20T09:32:04.8002759Z) ran the command `curl http://vectorsandarrows.com`, attempting to reach the URL `http://vectorsandarrows.com/`. Malware of this type can receive commands from remote attackers and perform activities associated with cyber attacks, so residual signs of infection on the same machine should be checked.'
+    question: 'A related alert on the same machine flagged a suspicious WMI process creation, which malware often uses to spawn new processes and break process trees. What was the command line executed and the process ID of that WMI-spawned process?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Command line: `vssblatemp.exe delete shadows /all`, Process ID: 7236 (created 2024-06-20T09:10:51.2193152Z)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Command line: `vssblatemp.exe delete shadows /all`, Process ID: 7236 (created 2024-06-20T09:10:51.2193152Z)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Command and Control behavior was blocked on a machine associated with the user account with AadUserId `731adb71-b11c-4bbf-850b-57989b350e96`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A suspicious WMI process creation was observed, spawning the process with Process ID `7236` at `2024-06-20t09:10:51.2193152z` with the command line `vssblatemp.exe delete shadows /all`, deleting all volume shadow copies.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

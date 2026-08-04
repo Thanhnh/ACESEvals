@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_93
+  title: incident_5_latest_cleaned_test_set_task_93
+  description: 'For the related ''Possible attempt to access Primary Refresh Token (PRT)'' alert, what is the Azure AD device ID of the affected host?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, a ''Suspicious WMI process creation'' alert was raised on host `vnevado-win10s` (AAD Device ID f5b847aa-8712-4bf6-b4f7-ed6cd89e1505), where processes such as `vssblatemp.exe delete shadows /all`, `bcdedit /set recoveryenabled no`, `bcdedit /set bootstatuspolicy ignoreallfailures`, `curl http://vectorsandarrows.com`, and `powershell -file c:\scripts\get-userprttoken.ps1` were executed. Malware frequently uses WMI to spawn new processes, breaking process trees and further infecting a machine. Shortly before this, a related alert flagged a possible attempt to access a Primary Refresh Token (PRT) on a different device, linked through the same user account.'
+    question: 'For the related ''Possible attempt to access Primary Refresh Token (PRT)'' alert, what is the Azure AD device ID of the affected host?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'e5799261-6720-4297-961e-bd9ca4275033'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'e5799261-6720-4297-961e-bd9ca4275033'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account `dp5hn` was observed creating a suspicious process via WMI, which malware frequently uses to spawn new processes and break process trees.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'From that same compromised session, a possible attempt to access the Primary Refresh Token (PRT) was detected on the device with AadDeviceId `e5799261-6720-4297-961e-bd9ca4275033`, indicating potential credential theft or lateral movement.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

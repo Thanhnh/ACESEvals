@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_39_latest_cleaned_test_set_task_61
+  title: incident_39_latest_cleaned_test_set_task_61
+  description: 'For the ''Suspicious process stopping services'' alert in this chain, what was the exact command line executed (including the service targeted) and the process ID of that process?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage intrusion, an attempt to disable Microsoft Defender Antivirus was detected on host `vnevado-win10b` (Azure AD device ID `fafdcd65-46c6-45a6-aa85-ec9b77ca0bcb`). The activity was performed by the account `fk8mq` (SID `S-1-5-21-1540151660-3530000288-105586595-1517`), which ran process ID 6968 with the command line `powershell -command set-mppreference -disablerealtimemonitoring 1` on 2024-06-27. Follow-on alerts on the same endpoint chain included the use of the Rubeus kerberoasting tool, PsExec launching commands on a remote device, and finally an alert for a suspicious process stopping services, which attackers commonly use to evade detection or prevent recovery.'
+    question: 'For the ''Suspicious process stopping services'' alert in this chain, what was the exact command line executed (including the service targeted) and the process ID of that process?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID 6428 (created 2024-06-27T14:34:10.8607851Z) executed the command line: `"net.exe" stop ntds /y` — i.e., net.exe was used to stop the NTDS (Active Directory Domain Services) service.'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID 6428 (created 2024-06-27T14:34:10.8607851Z) executed the command line: `"net.exe" stop ntds /y` — i.e., net.exe was used to stop the NTDS (Active Directory Domain Services) service.'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'An attempt to disable the Microsoft Defender Antivirus service was detected, performed by the user account with SID `S-1-5-21-1540151660-3530000288-105586595-1517`, indicating defense evasion activity.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The Rubeus kerberoasting tool was used on the endpoint, extracting Kerberos ticket data into the file `adminticket.txt` for credential theft or pass-the-ticket attacks.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'Using the stolen credentials, PsExec launched the command `net.exe` on a remote device to move laterally in the organization.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'The process with Process ID `6428`, created at `2024-06-27t14:34:10.8607851z`, ran the command line `"net.exe" stop ntds /y` to suspiciously stop the NTDS service on the device.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

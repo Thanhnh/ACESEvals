@@ -16,7 +16,7 @@ tasks:
     # To use static matching instead, change strategy to "static" and set:
     #   criteria:
     #     expected_answers:
-    #       - 'Ethan Brooks@vnevado.alpineskihouse.co'
+    #       - 'tgs2z@vnevado.alpineskihouse.co'
   scoring:
     llm_judge:
       model: "{judge_llm}"
@@ -27,7 +27,7 @@ tasks:
         target: submission
         judge_system_template: judge/submission_judge_system.md
         judge_user_template: judge/submission_judge_user.md
-        description: 'Ethan Brooks@vnevado.alpineskihouse.co'
+        description: 'tgs2z@vnevado.alpineskihouse.co'
         max_score: 1.0
       checkpoint_1:
         target: trajectory
@@ -48,7 +48,7 @@ tasks:
         max_score: 0.333
         weight: 1.0
         title: Checkpoint 3
-        description: During the same minute, account `Ethan Brooks@vnevado.alpineskihouse.co` performed SMB 
+        description: During the same minute, account `tgs2z@vnevado.alpineskihouse.co` performed SMB 
           reconnaissance, enumerating sessions on host `VNEVADO-DC` (2024-07-10 11:24:45 UTC).
   scoring_aggregation:
     max:

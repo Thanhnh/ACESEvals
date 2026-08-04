@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'In a recent attempt to move laterally within our network, a user account associated with Grace Chen
-      (email: Grace Chen@vnevado.alpineskihouse.co) had its attempts to modify files over server message block (SMB) protocol
+      (email: dp5hn@vnevado.alpineskihouse.co) had its attempts to modify files over server message block (SMB) protocol
       blocked by an automated attack disruption. This incident is part of a broader security concern involving possible attempts
       to access the Primary Refresh Token (PRT), which is a crucial artifact for Azure AD authentication on various devices.'
     question: 'Can you determine the IP address from which the possible attempt to access the Primary Refresh Token (PRT)

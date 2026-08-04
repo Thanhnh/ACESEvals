@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_17
+  title: incident_55_latest_cleaned_train_set_task_17
+  description: 'For the suspected DCSync (directory services replication) alert involving MB-WINCLIENT and MB-DC1, what is the email address of the user account tied to this replication activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a multi-stage security incident, a malicious URL `https://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/` was clicked on a compromised device in the environment. Pivoting from that device, analysts found further suspicious activity, including reconnaissance (system hardware discovery) and, later, a suspected DCSync attack in which a workstation named MB-WINCLIENT sent a directory services replication request to the domain controller MB-DC1.'
+    question: 'For the suspected DCSync (directory services replication) alert involving MB-WINCLIENT and MB-DC1, what is the email address of the user account tied to this replication activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'pwilson@niseko.alpineskihouse.co'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'pwilson@niseko.alpineskihouse.co'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A malicious URL was clicked on the device with HostName `mb-winclient`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On that device, suspicious system hardware discovery activity was performed by the account with SID `S-1-5-21-551436448-9871687716-9837441745-1903`, indicating the attacker was gathering information about the target device or network.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'A suspected DCSync attack (replication of directory services) was then detected from MB-WINCLIENT against MB-DC1, associated with the compromised account with Email `pwilson@niseko.alpineskihouse.co`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

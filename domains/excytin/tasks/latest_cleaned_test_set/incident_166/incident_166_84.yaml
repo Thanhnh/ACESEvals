@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_test_set_task_84
+  title: incident_166_latest_cleaned_test_set_task_84
+  description: 'A follow-up alert about business email compromise (BEC) financial fraud was raised roughly ten minutes later, involving a suspicious inbox rule created in a risky Azure Active Directory session. What is the display name of the account associated with that BEC financial fraud alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a security incident, a suspicious inbox manipulation rule was detected on the mailbox `laylaw@vnevado.alpineskihouse.co` in Microsoft Exchange Online / Office 365 (App IDs 20893 and 11161), with activity observed from IP addresses `95.202.65.202`, `192.238.237.190`, and `180.144.153.174`. The rule, named ITCleanup, was created to move incoming messages to the RSS Feeds folder, which may indicate the account was compromised.'
+    question: 'A follow-up alert about business email compromise (BEC) financial fraud was raised roughly ten minutes later, involving a suspicious inbox rule created in a risky Azure Active Directory session. What is the display name of the account associated with that BEC financial fraud alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Jordan P'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Jordan P'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious inbox manipulation rule named `ITCleanup` (MoveToFolder to the `RSS Feeds` folder) was created on the mailbox of the account with Email `laylaw@vnevado.alpineskihouse.co`, indicating the account may be compromised.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The same compromised account, with Name `Jordan P`, created a suspicious inbox rule hiding incoming messages during a risky Azure Active Directory session, indicating an attempted business email compromise (BEC) financial fraud.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

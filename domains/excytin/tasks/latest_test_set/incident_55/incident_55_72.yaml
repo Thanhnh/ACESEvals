@@ -12,7 +12,7 @@ tasks:
     # To use static matching instead, change strategy to "static" and set:
     #   criteria:
     #     expected_answers:
-    #       - 'Lucas Grey@niseko.alpineskihouse.co'
+    #       - 'bjenkins@niseko.alpineskihouse.co'
   scoring:
     llm_judge:
       model: "{judge_llm}"
@@ -23,14 +23,14 @@ tasks:
         target: submission
         judge_system_template: judge/submission_judge_system.md
         judge_user_template: judge/submission_judge_user.md
-        description: 'Lucas Grey@niseko.alpineskihouse.co'
+        description: 'bjenkins@niseko.alpineskihouse.co'
         max_score: 1.0
       checkpoint_1:
         target: trajectory
         max_score: 0.5
         weight: 1.0
         title: Checkpoint 1
-        description: 2024-07-09 11:49:57Z – Email account `Lucas Grey@niseko.alpineskihouse.co` had a message containing
+        description: 2024-07-09 11:49:57Z – Email account `bjenkins@niseko.alpineskihouse.co` had a message containing
           a malicious URL that was removed after delivery.
       checkpoint_2:
         target: trajectory

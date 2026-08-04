@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'There has been a sequence of suspicious activities involving an OAuth application associated with user
-      Luciano Herrera (Luciano Herrera@niseko.alpineskihouse.co). Initially, there was an unusual addition of credentials
+      Luciano Herrera (pwilson@niseko.alpineskihouse.co). Initially, there was an unusual addition of credentials
       to the OAuth app SimulandApp. This pattern is indicative of potential app compromise, potentially spreading phishing,
       exfiltrating data, or gaining access to other accounts and devices. Later, a sequence of exploration activities involving
       windows commands was observed, which can be used by attackers to identify valuable assets and coordinate lateral movement.'

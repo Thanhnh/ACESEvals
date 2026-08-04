@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_test_set_task_9
+  title: incident_39_latest_cleaned_test_set_task_9
+  description: 'For the ''Kekeo'' malware detection associated with this incident, what is the name of the file that was identified as malicious?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a SID history injection was detected on host `vnevado-dc`, where the account `lucasb` (SID S-1-5-21-1440151660-4837038288-105596163-1120) ran a PowerShell command (Process ID 3780) that stopped the NTDS service, added the SID history `S-1-5-32-544` to the account `bdadmin` via Add-ADDBSidHistory, and then restarted the service. Moments later, a known credential theft tool command line was detected on the same device, and an antimalware detection for the ''Kekeo'' malware family was also raised.'
+    question: 'For the ''Kekeo'' malware detection associated with this incident, what is the name of the file that was identified as malicious?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'rubeus.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'rubeus.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A SID history injection was detected, executed via the process `powershell.exe`, indicating an attacker attempted to elevate privileges by modifying the SID history attribute.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A known malicious credential theft tool execution was detected on the host `vnevado-win10v`, with a command line indicating intent to dump user credentials and plain-text passwords.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The ''Kekeo'' malware was detected on the device, associated with the file `rubeus.exe`, a known credential theft and Kerberos abuse tool.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

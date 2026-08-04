@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_100
+  title: incident_39_latest_cleaned_train_set_task_100
+  description: 'Looking at the earlier suspicious account creation alert linked to this incident, what is the name of the newly created user account?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, a suspected DCSync attack (replication of directory services) was detected on 2024-07-10, where the account `Julian Burke` (IT director, `lucasb@vnevado.alpineskihouse.co`) on the endpoint VNEVADO-Win10V sent a replication request to the domain controller VNEVADO-DC. Reconnaissance activity (SMB session enumeration) against the same domain controller was also observed from the same endpoint, and earlier in the incident an attacker appears to have established persistence by creating a new user account, which could serve as secondary or backup access to the device or organization.'
+    question: 'Looking at the earlier suspicious account creation alert linked to this incident, what is the name of the newly created user account?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'tgs2z'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'tgs2z'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspected DCSync attack (replication of directory services) was detected on host `VNEVADO-DC`, where Julian Burke (IT director) on VNEVADO-Win10V sent 1 replication request.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'User and IP address reconnaissance (SMB) was performed by the account with SID `S-5-7-21-1843151660-3234030288-105586167-1422` (Ethan Brooks, Account Executive) on VNEVADO-Win10V, enumerating SMB sessions on VNEVADO-DC and retrieving recent IP addresses of 2 accounts.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'A suspicious new user account named `tgs2z` was created, likely to establish secondary or backup access and maintain persistence in the organization.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

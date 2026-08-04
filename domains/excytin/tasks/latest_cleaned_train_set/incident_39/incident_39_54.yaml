@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_54
+  title: incident_39_latest_cleaned_train_set_task_54
+  description: 'Shortly before the PsExec activity, another alert in this incident flagged a sign-in attempt using a deceptive (decoy) user account. What was the source IP address associated with that sign-in attempt?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this incident, PsExec was observed launching commands on remote devices, including `psexec.exe \\vnevado-dc -accepteula cmd /c "powershell.exe -command "net.exe stop ntds /y; add-addbsidhistory -samaccountname bdadmin ...""` (PID 5612) and `psexec.exe \\vnevado-win10b -accepteula cmd /c "powershell -command set-mppreference -disablerealtimemonitoring 1"` (PID 6264), along with scripts such as `domaindominance27.ps1` and `get-krbticket.ps1`. PsExec is a tool used to launch programs on remote or local devices, and an attacker might be leveraging it to move laterally in the organization.'
+    question: 'Shortly before the PsExec activity, another alert in this incident flagged a sign-in attempt using a deceptive (decoy) user account. What was the source IP address associated with that sign-in attempt?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '35.202.74.47'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '35.202.74.47'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'PsExec was used to launch a command on a remote device identified by AadDeviceId `4d8d23e9-a77d-4e33-9435-b8c457e57ca1`, indicating possible lateral movement in the organization.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A sign-in attempt with a deceptive (decoy) user account was detected originating from the IP address `35.202.74.47`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

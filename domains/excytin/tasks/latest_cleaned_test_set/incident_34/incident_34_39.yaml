@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_test_set_task_39
+  title: incident_34_latest_cleaned_test_set_task_39
+  description: 'A follow-up alert flagged the creation of an anomalous scheduled task on this device. What was the full command line used to create that scheduled task, and what was its process ID?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an incident on host `vnevado-win10e` (AadDeviceId `02b8f519-1123-4228-b32a-ccb78af3449f`), an alert fired for a suspicious process executing a PowerShell command. The PowerShell command line (process ID 8604, created 2024-06-26T12:00:39Z) decoded a large base64 blob, wrote it to the user''s desktop as `winatp-intro-backdoor.exe`, and then invoked additional commands to establish persistence.'
+    question: 'A follow-up alert flagged the creation of an anomalous scheduled task on this device. What was the full command line used to create that scheduled task, and what was its process ID?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID 1348, command line: `"schtasks.exe" /create /sc once /tn yrei /tr "c:\users\samuelf\onedrive - (new) alpineskihouse\desktop\winatp-intro-backdoor.exe" /st 11:58 /f` (created 2024-06-26T12:00:40.0878355Z)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID 1348, command line: `"schtasks.exe" /create /sc once /tn yrei /tr "c:\users\samuelf\onedrive - (new) alpineskihouse\desktop\winatp-intro-backdoor.exe" /st 11:58 /f` (created 2024-06-26T12:00:40.0878355Z)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious process executed a PowerShell command on the host with AadDeviceId `02b8f519-1123-4228-b32a-ccb78af3449f`, potentially running a payload in memory to bypass security protections.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On that device, an anomalous scheduled task was created for persistence: process `schtasks.exe` with Process ID `1348` at `2024-06-26t12:00:40.0878355z` ran the command line `"schtasks.exe" /create /sc once /tn yrei /tr "c:\users\samuelf\onedrive - (new) alpineskihouse\desktop\winatp-intro-backdoor.exe" /st 11:58 /f`, scheduling the backdoor executable `winatp-intro-backdoor.exe` to launch.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

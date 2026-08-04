@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'On July 23 2024 at 16:09 UTC, a “Possible BEC financial fraud” alert was raised for the user account
-      “Jordan P” (Jordan P@vnevado.alpineskihouse.co). During the investigation, analysts discovered that this BEC alert is
+      “Jordan P” (laylaw@vnevado.alpineskihouse.co). During the investigation, analysts discovered that this BEC alert is
       linked to an earlier “Password Spray” attack that occurred the same day. To understand the attack chain, they must identify
       the network location from which the password-spray originated.'
     question: 'What is the IP address that was the source of the password-spray attack associated with the compromised account

@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During the investigation into a Business Email Compromise (BEC) attempt, we observed that the user
-      account "Jordan P" (email: Jordan P@vnevado.alpineskihouse.co, SID: S-1-5-21-1740051960-3534030288-108486866-1602) created
+      account "Jordan P" (email: laylaw@vnevado.alpineskihouse.co, SID: S-1-5-21-1740051960-3534030288-108486866-1602) created
       a suspicious inbox rule while connected from the IP address 255.246.85.58. This action occurred in what Microsoft Entra
       ID (Azure AD) classified as a risky session. Shortly before this rule was created, a separate alert reported a sign-in
       originating from an anonymous IP address that may be related to the same compromised account.'

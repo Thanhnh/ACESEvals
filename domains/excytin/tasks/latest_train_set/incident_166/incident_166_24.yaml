@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During investigation of a Business Email Compromise (BEC) incident, we observed that on 2024-07-22
-      a user account belonging to “Jordan P” (email: Jordan P@vnevado.alpineskihouse.co) sent suspicious messages from the
+      a user account belonging to “Jordan P” (email: laylaw@vnevado.alpineskihouse.co) sent suspicious messages from the
       IP address 255.246.85.58 to the mailbox tony@avoriaz.alpineskihouse.co. Approximately one day later, the monitoring
       system raised an additional alert titled “Password Spray,” indicating that an attacker attempted to guess multiple passwords
       for various accounts in the tenant.'

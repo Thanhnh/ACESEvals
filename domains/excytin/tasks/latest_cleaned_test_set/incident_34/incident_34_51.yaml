@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_test_set_task_51
+  title: incident_34_latest_cleaned_test_set_task_51
+  description: 'In the related alert about suspicious PowerShell download or encoded command execution, which parent application process kicked off this activity? Provide the process name, its process ID, and the file it opened.'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a multi-stage incident, an alert for ''Suspicious Task Scheduler activity'' was raised: a process involved in earlier malicious activity used `schtasks.exe` to create and run a scheduled task. The command lines observed were `1348__2024-06-26t12:00:40.0878355z__"schtasks.exe" /create /sc once /tn yrei /tr "c:\users\samuelf\onedrive - (new) alpineskihouse\desktop\winatp-intro-backdoor.exe" /st 11:58 /f` and `1616__2024-06-26t12:00:40.6793914z__"schtasks.exe" /run /tn yrei`, indicating an attempt to launch malicious code automatically and establish persistence. Shortly after, a related alert fired for a process executing PowerShell to download a file or run an encoded command.'
+    question: 'In the related alert about suspicious PowerShell download or encoded command execution, which parent application process kicked off this activity? Provide the process name, its process ID, and the file it opened.'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'winword.exe (Process ID 9780, created 2024-06-26T11:57:20.2959493Z) opening the file c:\scripts\rs4_winatp-intro-invoice.docm'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'winword.exe (Process ID 9780, created 2024-06-26T11:57:20.2959493Z) opening the file c:\scripts\rs4_winatp-intro-invoice.docm'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with SID `S-1-5-21-1870156660-7534030218-135086563-1193` was involved in suspicious Task Scheduler activity, where a process previously linked to malicious activity created, modified, or deleted a scheduled task to establish persistence.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The process `winword.exe c:\scripts\rs4_winatp-intro-invoice.docm` with Process ID `9780`, created at `2024-06-26t11:57:20.2959493z`, executed PowerShell to download a file or run an encoded command.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

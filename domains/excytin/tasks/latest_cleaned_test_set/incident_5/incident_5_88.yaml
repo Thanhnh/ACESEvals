@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_88
+  title: incident_5_latest_cleaned_test_set_task_88
+  description: 'A closely related alert attributes this activity to the Manatee Tempest activity group, a Russia-based cybercriminal group known for the Dridex trojan and Cobalt Strike deployments. What IP address is identified in that Manatee Tempest activity group alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this incident, suspicious remote activity was observed on a device (AAD Device ID `f5b847aa-8712-4bf6-b4f7-ed6cd89e1505`), including commands such as `bcdedit /set recoveryenabled no`, `vssblatemp.exe delete shadows /all`, `curl http://vectorsandarrows.com` and `powershell -file c:\scripts\get-userprttoken.ps1`, executed under the account SID `S-0-6-5`, with an associated remote address of `99.83.111.100`.'
+    question: 'A closely related alert attributes this activity to the Manatee Tempest activity group, a Russia-based cybercriminal group known for the Dridex trojan and Cobalt Strike deployments. What IP address is identified in that Manatee Tempest activity group alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '198.43.121.209'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '198.43.121.209'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Suspicious remote activity was observed on the machine, initiated by the account `dp5hn`, which attempted to start interactive sessions and run remote commands.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'This activity was attributed to the Manatee Tempest activity group, which established a command-and-control channel with the remote IP address `198.43.121.209`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

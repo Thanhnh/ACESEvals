@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_70
+  title: incident_5_latest_cleaned_train_set_task_70
+  description: 'For the alert about possible ransomware activity based on a known malicious extension, what is the name of the file that was flagged?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an incident investigation, a Command and Control behavior was blocked on a device after a process (PID 5572, created 2024-06-20T09:32:04Z) ran the command line `curl http://vectorsandarrows.com`, contacting the URL `http://vectorsandarrows.com/`. Shortly after, on the same device, numerous file system changes were observed involving a file extension known from past ransomware incidents, suggesting possible mass encryption of files.'
+    question: 'For the alert about possible ransomware activity based on a known malicious extension, what is the name of the file that was flagged?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'syncretic.7z'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'syncretic.7z'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Command and Control behavior was blocked on the device with AadDeviceId `bc00e484-d0e5-4da4-9472-95568cccc07e`, indicating an active malware infection communicating with a remote attacker.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On that same device, numerous file system changes were then observed consistent with mass encryption by ransomware, producing the file `syncretic.7z` bearing a file extension known from past ransomware incidents.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

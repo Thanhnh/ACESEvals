@@ -7,7 +7,7 @@ tasks:
   initial_context:
     incident_context: A security incident involving possible financial fraud through business email compromise (BEC) 
       characteristics was reported. Suspicious events were observed involving the account with the name Jordan P and 
-      email Jordan P@vnevado.alpineskihouse.co. This may be an attempt by an attacker to conduct a fraud attack against 
+      email laylaw@vnevado.alpineskihouse.co. This may be an attempt by an attacker to conduct a fraud attack against 
       our organization.
     question: Can you identify the IP address used by the anonymous sign-in which was part of the same incident 
       involving the account Jordan P?
@@ -247,7 +247,7 @@ tasks:
   initial_context:
     incident_context: A security incident involving a possible BEC financial fraud was detected where suspicious events 
       with business email compromise characteristics were observed. This was linked to an account with the name `Jordan 
-      P` and email `Jordan P@vnevado.alpineskihouse.co`. The incidents might involve someone attempting to conduct a 
+      P` and email `laylaw@vnevado.alpineskihouse.co`. The incidents might involve someone attempting to conduct a 
       fraud attack against your organization.
     question: There was also a sign-in from an anonymous IP address connected to this incident. Can you provide the IP 
       address that was used?
@@ -349,7 +349,7 @@ tasks:
     # To use static matching instead, change strategy to "static" and set:
     #   criteria:
     #     expected_answers:
-    #       - 'Jordan P@vnevado.alpineskihouse.co'
+    #       - 'laylaw@vnevado.alpineskihouse.co'
   scoring:
     llm_judge:
       model: "{judge_llm}"
@@ -360,7 +360,7 @@ tasks:
         target: submission
         judge_system_template: judge/submission_judge_system.md
         judge_user_template: judge/submission_judge_user.md
-        description: 'Jordan P@vnevado.alpineskihouse.co'
+        description: 'laylaw@vnevado.alpineskihouse.co'
         max_score: 1.0
       checkpoint_1:
         target: trajectory
@@ -368,7 +368,7 @@ tasks:
         weight: 1.0
         title: Checkpoint 1
         description: A suspicious event with business email compromise (BEC) characteristics was observed on the email 
-          account `Jordan P@vnevado.alpineskihouse.co`. An attacker might be attempting to conduct a financial fraud 
+          account `laylaw@vnevado.alpineskihouse.co`. An attacker might be attempting to conduct a financial fraud 
           attack against the organization.
   scoring_aggregation:
     max:

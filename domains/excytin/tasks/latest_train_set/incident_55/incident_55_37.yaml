@@ -5,7 +5,7 @@ tasks:
     alert related to this incident?'
   inherit_shared: true
   initial_context:
-    incident_context: 'On July 10 2024, the user account “Luciano Herrera” (Luciano Herrera@niseko.alpineskihouse.co) used
+    incident_context: 'On July 10 2024, the user account “Luciano Herrera” (pwilson@niseko.alpineskihouse.co) used
       IP address 2801:e0a:1eb:dea0:642e:5bb6:d315:fbb3 to add a new password-type credential to an OAuth application (App
       ID 11161, OAuth App ID 4d9476b8-6ae6-459b-a273-5837c15b5981) linked to Microsoft 365. This behavior was flagged as an
       unusual addition of credentials to an OAuth app and may indicate that the application has been compromised for malicious

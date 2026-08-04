@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_78
+  title: incident_39_latest_cleaned_train_set_task_78
+  description: 'Following this activity, a SID history injection was detected on the same device. What is the name of the file associated with that SID history injection alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'On host `vnevado-win10b` (AAD device ID `fafdcd65-46c6-45a6-aa85-ec9b77ca0bcb`), a sequence of alerts indicative of potential human-operated malicious activity was observed. Among the observed activity, PowerShell was used to disable real-time monitoring (`powershell -command set-mppreference -disablerealtimemonitoring 1`, PID 6968), followed by `cmd /c "c:\temp\rubeus.exe dump /service:xfbzkp /user:lucasb > c:\temp\adminticket.txt"` (PID 7644) and `rubeus.exe dump /service:xfbzkp /user:lucasb` (PID 2608). Accounts such as `kyleg` and `fk8mq` (SID S-1-5-21-1540151660-3530000288-105586595-1517) were involved. This activity is linked to the dropping of multiple dual-purpose tools and further credential/privilege escalation attempts on the same device.'
+    question: 'Following this activity, a SID history injection was detected on the same device. What is the name of the file associated with that SID history injection alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'dkwj.mze'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'dkwj.mze'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Human-operated malicious activity was detected on the device, where the credential theft tool file `rubeus.exe` was dropped.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Multiple dual-purpose tools were dropped on the same device using the process `powershell.exe`, which could be used for credential theft, privilege escalation, and lateral movement.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The activity escalated to a SID history injection on the device, associated with the suspicious file `dkwj.mze`, which was used to grant an existing domain user elevated privileges for persistence and access to sensitive resources.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

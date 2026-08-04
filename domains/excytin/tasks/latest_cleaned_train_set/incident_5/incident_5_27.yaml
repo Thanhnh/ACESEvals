@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_27
+  title: incident_5_latest_cleaned_train_set_task_27
+  description: 'For the related alert about the remotely launched ransomware payload, what is the IP address associated with that activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident, ''CommandAndControl'' malware was detected on a device during lateral movement, evidenced by a process (PID 5572, created 2024-06-20T09:32:04.8002759Z) running the command line `curl http://vectorsandarrows.com`. An attacker might have been attempting to move laterally to this device from another device on the network. Around the same time, a related alert reported that a ransomware payload was remotely launched on the device, potentially encrypting content and rendering it unusable to users.'
+    question: 'For the related alert about the remotely launched ransomware payload, what is the IP address associated with that activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '99.83.111.100'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '99.83.111.100'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account `dp5hn` was involved in a ''CommandAndControl'' malware detection on the device, indicating an attacker attempting lateral movement from another device on the network.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using that foothold, a ransomware payload was remotely launched on the device from the remote IP address `99.83.111.100`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

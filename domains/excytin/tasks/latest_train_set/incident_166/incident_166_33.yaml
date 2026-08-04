@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During an investigation of a suspicious SAP authentication alert, we saw that user "Jordan P" (email:
-      Jordan P@vnevado.alpineskihouse.co, SID S-1-5-21-1740051960-3534030288-108486866-1602) accessed the SAP enterprise application
+      laylaw@vnevado.alpineskihouse.co, SID S-1-5-21-1740051960-3534030288-108486866-1602) accessed the SAP enterprise application
       from the external IP address 107.253.5.27. This SAP sign-in was already considered risky because the same user had a
       Microsoft Entra ID risky sign-in associated with it. Shortly before this event, Microsoft Entra ID generated an additional
       alert indicating that the same account had signed in from an anonymous network (such as Tor or a VPN).'

@@ -236,3 +236,6 @@ notebooks/artifacts/
 # Local-only notebook (not part of the repo)
 notebooks/excytin_basic_analysis.ipynb
 nohup.out
+
+# Generated insane-mode SQL files (derived from original SQL files by setup hook)
+domains/excytin/data/sql_files/*_insane.sql

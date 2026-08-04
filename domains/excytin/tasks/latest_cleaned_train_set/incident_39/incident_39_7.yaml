@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_7
+  title: incident_39_latest_cleaned_train_set_task_7
+  description: 'For the related alert about the sign-in attempt with a deceptive user account, what is the name of the account that was used?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a SID history injection was detected on a device where `powershell.exe` ran the command `powershell.exe -command "net.exe stop ntds /y; add-addbsidhistory -samaccountname bdadmin -sidhistory \"s-1-5-32-544\" -databasepath (get-itemproperty -path registry::hklm\system\currentcontrolset\services\ntds\parameters).\"dsa database file\" -force; net.exe start ntds"` (Process ID 3780), along with a child process `net1 stop ntds /y` (Process ID 7712) and a suspicious file `dkwj.mze`. Related alerts show a file being dropped and launched from a remote location, and a sign-in attempt made with a deceptive (decoy) user account on the device.'
+    question: 'For the related alert about the sign-in attempt with a deceptive user account, what is the name of the account that was used?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'kyleg'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'kyleg'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A SID history injection was detected involving the account with SID `S-1-5-21-1440151660-4837038288-105596163-1120`, where the attacker modified the SID history attribute to gain elevated privileges.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A remote session from IP address `141.216.110.153` dropped a file on the device and executed it, indicating lateral movement or malware propagation.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'A sign-in attempt was detected using the deceptive user account `kyleg`, which the attacker likely used as a decoy account for lateral movement and accessing sensitive data.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

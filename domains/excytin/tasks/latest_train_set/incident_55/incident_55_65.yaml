@@ -5,7 +5,7 @@ tasks:
     registered as a service on the affected system?'
   inherit_shared: true
   initial_context:
-    incident_context: 'During an investigation, we observed that user "Lucas Grey" (email: Lucas Grey@niseko.alpineskihouse.co)
+    incident_context: 'During an investigation, we observed that user "Lucas Grey" (email: bjenkins@niseko.alpineskihouse.co)
       clicked the malicious URL http://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/ from the mailbox
       bjenkins@niseko.alpineskihouse.co on 2024-07-10. Subsequent correlated alerts show that the same activity chain involved
       a malicious PowerShell cmdlet execution and later a suspicious Task Scheduler modification on an endpoint, ultimately

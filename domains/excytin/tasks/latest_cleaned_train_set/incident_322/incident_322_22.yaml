@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_322_latest_cleaned_train_set_task_22
+  title: incident_322_latest_cleaned_train_set_task_22
+  description: 'For the alert reporting the potentially malicious URL click, which mailbox recipient address was involved?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, suspicious Azure Resource Management (ARM) activities were performed from IP address `253.1.244.215` by a user account that had signed in to a risky session. Related to this activity, the investigation also surfaced phishing emails: messages containing a malicious URL were delivered to a mailbox and later removed, and shortly afterwards a potentially malicious URL click was detected for one of the organization''s users.'
+    question: 'For the alert reporting the potentially malicious URL click, which mailbox recipient address was involved?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'alyssat@vnevado.alpineskihouse.co'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'alyssat@vnevado.alpineskihouse.co'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A user account with SID `S-1-5-21-1840151686-3534835288-156286563-1127` signed in to a risky session and performed suspicious Azure Resource Management (ARM) activities.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The mailbox `alyssat@vnevado.alpineskihouse.co` received email messages containing a malicious URL, which were removed after delivery.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The same recipient `alyssat@vnevado.alpineskihouse.co` clicked on the potentially malicious URL that was delivered in the email.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

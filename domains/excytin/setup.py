@@ -3,10 +3,15 @@
 Provides a ``DownloadExcytinData`` hook that downloads excytin benchmark
 data (csv_files/ and sql_files/) from HuggingFace if not already present
 locally at ``domains/excytin/data/``.
+
+Also provides a ``GenerateInsaneSQL`` hook that creates "insane mode"
+SQL init scripts by stripping SecurityAlert, AlertEvidence, AlertInfo,
+and SecurityIncident tables from each incident SQL file.
 """
 
 from __future__ import annotations
 
+import re
 import zipfile
 from pathlib import Path
 
@@ -160,6 +165,121 @@ class DownloadExcytinData:
         )
 
 
+# ---------------------------------------------------------------------------
+# Insane mode: strip alert/incident tables from SQL init scripts
+# ---------------------------------------------------------------------------
+
+# Tables removed in insane mode — the alert/incident signal tables that
+# encode all rule-based, ML-based, and expert security domain knowledge.
+INSANE_MODE_SKIP_TABLES = frozenset(
+    {"SecurityAlert", "AlertEvidence", "AlertInfo", "SecurityIncident"}
+)
+
+# Regex that matches a full CREATE TABLE + LOAD DATA block for a named table.
+# Captures everything from ``CREATE TABLE <name> (`` through the matching
+# ``IGNORE 1 ROWS;`` (with possible blank lines between the two statements).
+_TABLE_BLOCK_RE = re.compile(
+    r"CREATE TABLE (?P<name>{names}) \(.*?\);\s*"
+    r"LOAD DATA INFILE '/var/lib/mysql-files/(?P=name)\.csv'.*?IGNORE 1 ROWS;".format(
+        names="|".join(re.escape(t) for t in INSANE_MODE_SKIP_TABLES)
+    ),
+    re.DOTALL,
+)
+
+
+def _strip_tables(sql: str) -> str:
+    """Remove CREATE TABLE + LOAD DATA blocks for insane-mode tables."""
+    return _TABLE_BLOCK_RE.sub("", sql)
+
+
+def _validate_insane_sql_files(sql_dir: Path) -> None:
+    """Verify that insane SQL files do not reference any stripped tables.
+
+    Raises:
+        RuntimeError: If any ``_insane.sql`` file still contains a
+            ``CREATE TABLE`` statement for one of the stripped tables.
+    """
+    # Simple pattern: look for any CREATE TABLE <stripped_name> in the text
+    check_re = re.compile(
+        r"CREATE TABLE (?:" + "|".join(re.escape(t) for t in INSANE_MODE_SKIP_TABLES) + r")\b"
+    )
+    violations: list[str] = []
+    for insane_file in sorted(sql_dir.glob("incident_*_insane.sql")):
+        content = insane_file.read_text()
+        matches = check_re.findall(content)
+        if matches:
+            violations.append(f"{insane_file.name}: found {matches}")
+
+    if violations:
+        msg = (
+            "Insane-mode SQL validation FAILED — stripped tables still "
+            "present in generated files:\n  " + "\n  ".join(violations)
+        )
+        logger.error(msg)
+        raise RuntimeError(msg)
+
+
+class GenerateInsaneSQL:
+    """Setup hook that generates insane-mode SQL init scripts.
+
+    For each ``data/sql_files/incident_X.sql`` file, produces a
+    corresponding ``incident_X_insane.sql`` that omits the four
+    alert/incident signal tables (SecurityAlert, AlertEvidence,
+    AlertInfo, SecurityIncident).
+
+    The generated files are only rewritten when they are missing or
+    older than the source SQL file.
+    """
+
+    @property
+    def name(self) -> str:
+        return "generate_insane_sql"
+
+    def should_run(self, domain_root: Path) -> bool:
+        """Return True if any insane SQL file is missing or stale."""
+        sql_dir = domain_root / "data" / "sql_files"
+        if not sql_dir.is_dir():
+            return False  # no data yet — download hook will run first
+        for src in sql_dir.glob("incident_*.sql"):
+            if "_insane" in src.stem:
+                continue
+            dst = src.with_name(src.stem + "_insane.sql")
+            if not dst.exists() or dst.stat().st_mtime < src.stat().st_mtime:
+                return True
+        # Everything is current, so run() (which normally validates) won't fire.
+        # Validate the existing files here so up-to-date but bad/legacy
+        # _insane.sql files with stripped tables can't slip through unchecked.
+        _validate_insane_sql_files(sql_dir)
+        return False
+
+    def run(self, domain_root: Path) -> None:
+        """Generate insane-mode SQL files from the originals."""
+        sql_dir = domain_root / "data" / "sql_files"
+        generated = []
+        for src in sorted(sql_dir.glob("incident_*.sql")):
+            if "_insane" in src.stem:
+                continue
+            dst = src.with_name(src.stem + "_insane.sql")
+            if dst.exists() and dst.stat().st_mtime >= src.stat().st_mtime:
+                continue  # already up-to-date
+            original = src.read_text()
+            stripped = _strip_tables(original)
+            dst.write_text(stripped)
+            generated.append(dst.name)
+
+        if generated:
+            logger.info(
+                "Generated insane-mode SQL files: %s", ", ".join(generated)
+            )
+        else:
+            logger.info("Insane-mode SQL files already up-to-date.")
+
+        # Validate that generated insane SQL files do not contain the
+        # stripped tables.  This catches regex failures or upstream SQL
+        # format changes that could silently leave alert tables intact.
+        _validate_insane_sql_files(sql_dir)
+
+
 def _cli_bool(value: str | bool | None, default: bool = False) -> bool:
     """Coerce a CLI string to a boolean."""
     if value is None:
@@ -173,6 +293,7 @@ def get_hooks(
     domain_root: Path,  # noqa: ARG001
     *,
     force_download: str | bool | None = None,
+    mode: str | None = None,
     **kwargs: object,
 ) -> list[SetupHook]:
     """Return excytin setup hooks for auto-discovery.
@@ -183,13 +304,21 @@ def get_hooks(
     Args:
         domain_root: Path to the domain root directory.
         force_download: ``"true"`` / ``"false"`` (default: false).
+        mode: Evaluation mode. ``"insane"`` strips alert/incident signal
+            tables from the database, forcing the agent to reason from
+            raw logs only.
         **kwargs: Additional keyword arguments (ignored).
 
     Returns:
         List of setup hook instances.
     """
-    return [
+    hooks: list[SetupHook] = [
         DownloadExcytinData(
             force_download=_cli_bool(force_download, default=False),
-        )
+        ),
     ]
+
+    if mode == "insane":
+        hooks.append(GenerateInsaneSQL())
+
+    return hooks

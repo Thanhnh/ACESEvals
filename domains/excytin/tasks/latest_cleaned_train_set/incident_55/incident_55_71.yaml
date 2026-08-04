@@ -1,0 +1,64 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_71
+  title: incident_55_latest_cleaned_train_set_task_71
+  description: 'For that final ''Suspicious service registration'' alert, what was the process involved - specifically its process ID, creation time, and command line?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this incident, an alert titled "Email messages containing malicious URL removed after delivery" was raised: a message from sender `4qs6v9m@vnevado.alpineskihouse.co` (sender IP `106.214.87.198`) containing the malicious URL `http://kn017721628.wittytree-b6f239d6.northeurope.azurecontainerapps.io/` was delivered to the mailbox `santiago@vnevado.alpineskihouse.co` and later removed. Pivoting from the affected user account, the investigation leads through an internal phishing campaign, a malicious PowerShell cmdlet invocation, and hands-on-keyboard activity via the Impacket toolkit on a compromised device, ending with an alert for a suspicious service registration where a system program was registered as a service, potentially to establish persistence or gain system privileges.'
+    question: 'For that final ''Suspicious service registration'' alert, what was the process involved - specifically its process ID, creation time, and command line?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID: 764, Created Time (UTC): 2024-06-20T08:30:13.7925191Z, Command line: services.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID: 764, Created Time (UTC): 2024-06-20T08:30:13.7925191Z, Command line: services.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account with AadUserId `28058d92-fc24-4869-9231-6546a34b00f2` received emails containing a malicious URL, which were later removed after delivery.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The compromised account with SID `S-1-5-21-561436748-3867387497-1732241745-3701` was observed sending internal phishing emails to recipients inside the organization, indicating lateral movement.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'A malicious PowerShell Cmdlet was invoked on the machine via the process `powershell.exe`, potentially associated with credential theft, network reconnaissance, or code injection.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'An ongoing hands-on-keyboard attack via the Impacket toolkit was detected on the host `mb-adfs`, where the attacker executed remote commands to move laterally across the network.'
+      checkpoint_5:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 5
+        description: 'For persistence and privilege escalation, a system program was registered as a service through the process `services.exe` with Process ID `764`, created at `2024-06-20t08:30:13.7925191z`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4
+        - checkpoint_5

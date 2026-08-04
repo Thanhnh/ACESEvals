@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_91
+  title: incident_55_latest_cleaned_train_set_task_91
+  description: 'Less than a second earlier, a related alert flagged a suspected DCSync attack (replication of directory services) targeting the same domain controller `MB-DC1`. Which user account issued that directory replication request?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a security incident, an alert titled "Suspected AD FS DKM key read" was raised on 2024-07-10 at 11:24:45 UTC, indicating that the domain controller `MB-DC1` read the DKM key of the AD FS object with id 4cac49d3-29d3-407e-8c9b-b7ebb21541b2.'
+    question: 'Less than a second earlier, a related alert flagged a suspected DCSync attack (replication of directory services) targeting the same domain controller `MB-DC1`. Which user account issued that directory replication request?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Luciano Herrera (CIO), who sent the replication request from the host MB-WINCLIENT to MB-DC1.'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Luciano Herrera (CIO), who sent the replication request from the host MB-WINCLIENT to MB-DC1.'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The host `MB-DC1` was detected reading the DKM key of the AD FS object id `4cac49d3-29d3-407e-8c9b-b7ebb21541b2`, indicating a suspected AD FS DKM key read used to forge SAML tokens.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following that, a suspected DCSync attack (replication of directory services) was detected, where the account `Luciano Herrera` (CIO) on host `MB-WINCLIENT` sent a replication request to the domain controller `MB-DC1`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

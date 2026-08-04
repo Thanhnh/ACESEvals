@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_47
+  title: incident_55_latest_cleaned_train_set_task_47
+  description: 'For the alert about the unusual addition of credentials to the OAuth app `SimulandApp`, what is the display name of the user account that performed the action?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, an alert for "Sensitive credential memory read" was raised when a process scanned or dumped memory from the Local Security Authority Subsystem Service. The targeted process was `lsass.exe` with ProcessId__CreatedTimeUtc__CommandLine `760__2024-07-02t07:28:35.8580921z__lsass.exe`. Accessing this process memory allows an attacker to extract secrets such as authentication hashes or passwords, which can then be reused elsewhere. Following this credential theft activity, the investigation pivoted through a process-injection alert and eventually surfaced a cloud identity alert, where an unusual addition of a Password-type credential was made to the OAuth application `SimulandApp`.'
+    question: 'For the alert about the unusual addition of credentials to the OAuth app `SimulandApp`, what is the display name of the user account that performed the action?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Luciano Herrera'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Luciano Herrera'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A PowerShell process (Process ID `12412`, created at `2024-07-02t09:47:16.330794z`) with command line `"powershell.exe" -noexit -command set-location -literalpath ''c:\users\bjenkins\downloads\midnight14''` scanned or dumped credential memory from lsass.exe.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The account with SID `S-1-5-21-551436448-9871687716-9837441745-1903` was involved in a process injection, where potentially malicious code was injected into another process.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The user account `Luciano Herrera` performed an unusual addition of credentials (a Password credential) to the OAuth application SimulandApp.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

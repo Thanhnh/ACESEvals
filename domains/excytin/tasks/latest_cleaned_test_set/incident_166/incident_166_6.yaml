@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_test_set_task_6
+  title: incident_166_latest_cleaned_test_set_task_6
+  description: 'A related alert the following day (2024-07-23) flagged a password spray attack involving this same compromised identity. What is the Microsoft Entra (Azure AD) user ID of the account reported in that password spray alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a suspicious inbox manipulation rule alert was raised: a MoveToFolder rule named `ITCleanup` was created on the inbox of user Jordan P (`laylaw@vnevado.alpineskihouse.co`, SID `S-1-5-21-1740051960-3534030288-108486866-1602`) to move messages into the `RSS Feeds` folder. The activity was associated with cloud applications Microsoft Exchange Online and Office 365 (AppIds 11161 and 20893) and originated from IP addresses 255.246.85.58, 192.238.237.190, and 180.144.153.174. This may indicate the account is compromised and being used to spread phishing emails and gain access to other accounts and devices.'
+    question: 'A related alert the following day (2024-07-23) flagged a password spray attack involving this same compromised identity. What is the Microsoft Entra (Azure AD) user ID of the account reported in that password spray alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '89e933b9-5b2e-4bd6-bcdf-033db707ef82'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '89e933b9-5b2e-4bd6-bcdf-033db707ef82'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious inbox manipulation rule named `ITCleanup` (MoveToFolder to `RSS Feeds`) was created on the mailbox of user Jordan P (laylaw@vnevado.alpineskihouse.co), with AadUserId `89e933b9-5b2e-4bd6-bcdf-033db707ef82`, indicating the account may be compromised.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The same compromised account with AadUserId `89e933b9-5b2e-4bd6-bcdf-033db707ef82` was then involved in a password spray attack, showing the attacker attempting to expand access using this account.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

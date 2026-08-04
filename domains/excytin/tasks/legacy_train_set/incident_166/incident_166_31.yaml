@@ -31,7 +31,7 @@ tasks:
         max_score: 0.5
         weight: 1.0
         title: Checkpoint 1
-        description: The account with email `Jordan P@vnevado.alpineskihouse.co` had a risky sign-in and suspicious 
+        description: The account with email `laylaw@vnevado.alpineskihouse.co` had a risky sign-in and suspicious 
           authentication to SAP.
       checkpoint_2:
         target: trajectory

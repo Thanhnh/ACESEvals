@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_26
+  title: incident_55_latest_cleaned_test_set_task_26
+  description: 'In the ''Suspicious remote activity'' alert from 2024-07-04, what was the name of the file involved in the remotely initiated activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a Suspected AD FS DKM key read alert was raised where host `MB-DC1` read the DKM key of an AD FS object (id 4cac49d3-29d3-407e-8c9b-b7ebb21541b2). Following the chain of related alerts, this activity ties back to a suspected DCSync replication request, a suspicious LDAP query indicating reconnaissance, and ultimately to an earlier alert on 2024-07-04 for ''Suspicious remote activity'', where activity initiated remotely was observed on a machine (such as interactive sessions, file modifications, WMI commands, or scheduled task creation).'
+    question: 'In the ''Suspicious remote activity'' alert from 2024-07-04, what was the name of the file involved in the remotely initiated activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'powershell.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'powershell.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The host `MB-DC1` was observed reading the AD FS DKM key of the ADFS object id 4cac49d3-29d3-407e-8c9b-b7ebb21541b2, indicating credential/key theft on the domain controller.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The account with SID `S-1-5-21-551436448-9871687716-9837441745-1903` (Luciano Herrera, CIO) on MB-WINCLIENT sent a directory replication request to MB-DC1, indicating a suspected DCSync attack.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The same compromised account executed a suspicious LDAP reconnaissance query using the process `powershell.exe` to enumerate domain users, groups, and assets.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'The file `powershell.exe` was used for suspicious remotely initiated activity on the machine, such as launching interactive sessions, modifying files, or passing WMI/scheduled task commands from a remote host.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

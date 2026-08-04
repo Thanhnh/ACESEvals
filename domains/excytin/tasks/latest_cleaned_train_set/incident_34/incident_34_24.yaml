@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_train_set_task_24
+  title: incident_34_latest_cleaned_train_set_task_24
+  description: 'Based on the identity information tied to this reconnaissance activity, what is the account name (username) of the compromised user who ran the suspicious LDAP query?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident involving Execution & Discovery on one endpoint, a suspicious LDAP query was executed, indicating potential reconnaissance activity used by attackers to learn the organization''s structure by querying the domain controller for administrative users, groups and interesting assets. The activity was traced to the process `winword.exe` running the macro-enabled document with the command line `"winword.exe" c:\scripts\rs4_winatp-intro-invoice.docm` (Process ID 9780, created 2024-06-26T11:57:20.29Z) on the host `vnevado-win10e` (AAD Device ID `02b8f519-1123-4228-b32a-ccb78af3449f`). The activity was performed under a user context with SID `S-1-5-21-1870156660-7534030218-135086563-1193` and AAD User ID `16320fec-8d90-403b-b7fe-78f715d4728d`.'
+    question: 'Based on the identity information tied to this reconnaissance activity, what is the account name (username) of the compromised user who ran the suspicious LDAP query?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'samuelf'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'samuelf'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious LDAP query was executed against the domain controller, indicating reconnaissance activity aimed at mapping the organization''s users, groups, and assets.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The LDAP reconnaissance query was performed by the account with Name `samuelf`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

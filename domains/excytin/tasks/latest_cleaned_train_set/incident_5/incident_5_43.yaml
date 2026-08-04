@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_43
+  title: incident_5_latest_cleaned_train_set_task_43
+  description: 'Around the same time as the shadow copy deletion, Windows Defender detected an active, unknown malware on an affected asset within this same incident chain. What is the name of the malicious file that was detected?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a high-severity incident, an alert titled "File backups were deleted" fired on host `vnevado-win10r` (Azure AD device ID `9d4887ba-0b69-47d6-89bc-9b32787f379e`), where the process `vssblatemp.exe` (PID 7236) ran the command `vssblatemp.exe delete shadows /all` under the user account `dp5hn` (SID `S-1-5-21-1840191660-8534830288-125585561-1522`). Deleting all shadow copies and file snapshots is behavior commonly seen during ransomware infections. Follow-on alerts in the same incident showed assets exhibiting ransomware-like behavior and lateral movement via PSExec to the jump server.'
+    question: 'Around the same time as the shadow copy deletion, Windows Defender detected an active, unknown malware on an affected asset within this same incident chain. What is the name of the malicious file that was detected?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'mimikatz.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'mimikatz.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account with SID `S-1-5-21-1840191660-8534830288-125585561-1522` deleted all file snapshots and shadow copies via WMI or VSSAdmin, a behavior common during ransomware infection.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Potentially compromised assets, including the device with IP address `99.83.111.100`, exhibited ransomware-like behavior while moving laterally across the network.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The attacker used the account with AadUserId `1d94aaf6-efe6-4e76-ad56-ffd7d1257bc1` to perform PSExec lateral movement to the jump server `Vnevado-jump`.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'On the compromised host, unknown malware was detected and was active in the file `mimikatz.exe`, indicating credential theft tooling deployed by the attacker.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

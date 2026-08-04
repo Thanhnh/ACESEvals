@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During an investigation, we observed a suspected overpass-the-hash (Kerberos) attempt in which the
-      help-desk administrator Emma Clark (account Emma Clark@vnevado.alpineskihouse.co) used the workstation VNEVADO-Win10V
+      help-desk administrator Emma Clark (account fk8mq@vnevado.alpineskihouse.co) used the workstation VNEVADO-Win10V
       to try to authenticate against the domain controller VNEVADO-DC. The start of the alert chain involves Emma’s account
       and both hosts, but the security graph links this event to an earlier alert that flags suspicious remote activity initiated
       from another machine.'

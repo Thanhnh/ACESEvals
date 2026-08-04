@@ -42,7 +42,7 @@ tasks:
         weight: 1.0
         title: Checkpoint 2
         description: 'Another message containing the same malicious URL was later removed from the mailbox whose account.Email
-          was `Hailey Johnson@vnevado.alpineskihouse.co` (Time: 2024-08-01 12:44:53 UTC).'
+          was `alyssat@vnevado.alpineskihouse.co` (Time: 2024-08-01 12:44:53 UTC).'
       checkpoint_3:
         target: trajectory
         max_score: 0.25

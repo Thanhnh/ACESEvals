@@ -5,7 +5,7 @@ tasks:
     accessed the malicious URL?'
   inherit_shared: true
   initial_context:
-    incident_context: 'Security monitoring has flagged that user "Hailey Johnson" (email: Hailey Johnson@vnevado.alpineskihouse.co,
+    incident_context: 'Security monitoring has flagged that user "Hailey Johnson" (email: alyssat@vnevado.alpineskihouse.co,
       SID ending in -1127) clicked a suspicious link contained in an email that was later quarantined by Zero-hour Auto Purge
       (ZAP). The link visited was: https://dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io/
 

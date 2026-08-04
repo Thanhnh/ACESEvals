@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_36
+  title: incident_55_latest_cleaned_test_set_task_36
+  description: 'For that related ''System executable renamed and launched'' alert, what is the security identifier (SID) of the account tied to the activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this incident, an alert fired on host `mb-winclient` (Azure AD device ID `7661dfd4-218f-4016-8a87-66d68a7f098e`) indicating that a malicious PowerShell Cmdlet was invoked — process ID 13968 running `"powershell.exe" c:\script\contosoadfsblatempcreds.ps1` at 2024-07-02T09:47:59Z, involving accounts `bjenkins` and `pwilson` and the IP address `72.5.72.208`. Such Cmdlets are often associated with credential theft, exploitation, network reconnaissance or code injection. Roughly at the same time, a closely related alert reported that a renamed Windows system executable was launched, a common defense-evasion technique.'
+    question: 'For that related ''System executable renamed and launched'' alert, what is the security identifier (SID) of the account tied to the activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'S-2-2-78'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'S-2-2-78'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A malicious PowerShell Cmdlet was invoked on the machine through the process with ExtractedFileName `powershell.exe`, potentially associated with credential theft, exploitation, network reconnaissance, or code injection.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A renamed Windows system executable was launched by the account with SID `S-2-2-78`, indicating an attempt to evade behavior-based detection that relies on default paths and file names.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

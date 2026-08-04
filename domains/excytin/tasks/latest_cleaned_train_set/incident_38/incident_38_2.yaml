@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_38_latest_cleaned_train_set_task_2
+  title: incident_38_latest_cleaned_train_set_task_2
+  description: 'Following this injection activity, a related alert in the same incident flagged an outbound network connection to an external endpoint. What is the IP address of that remote endpoint?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert titled "Suspicious process injection observed" was raised on host `vnevado-win11a` (Azure AD device ID `39d8c57f-2d08-4888-b0cd-12cd0679337a`) under the user account `nathans` (SID `S-1-5-21-1240151660-3534038288-105586567-4122`, AAD user ID `12185914-91dd-4fb9-94f9-3252203b0426`). A process abnormally injected code into `notepad.exe` (Process ID 8932, created 2024-06-26T15:49:51.3043595Z), which then reached out to the URL `https://wcdstaticfilesprdeus.blob.core.windows.net/wcdstaticfiles/winatp-intro-fileless.txt`. Injection is often used to hide malicious code execution inside a trusted process, and the target process may then open a listening port or connect to a command-and-control server.'
+    question: 'Following this injection activity, a related alert in the same incident flagged an outbound network connection to an external endpoint. What is the IP address of that remote endpoint?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '72.5.72.208'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '72.5.72.208'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A process abnormally injected code into another process, allowing malicious code to run under a trusted process.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'As a result of the suspicious process injection, the compromised process initiated an outbound connection to the command and control server at IP address `72.5.72.208`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

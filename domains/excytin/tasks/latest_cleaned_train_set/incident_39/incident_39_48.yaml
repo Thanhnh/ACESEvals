@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_48
+  title: incident_39_latest_cleaned_train_set_task_48
+  description: 'For the related alert "File dropped and launched from remote location", which user account (identified by its security identifier, SID) was involved in dropping and executing the file?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage intrusion, an alert titled "Multiple dual-purpose tools were dropped" fired on a device after several known public tools that can be abused for malicious purposes — including `mimikatz.exe`, `psexec.exe`, `domaindominance27.ps1`, and `get-krbticket.ps1` — were copied to it. Follow-on activity showed `mimikatz.exe` being run repeatedly with commands such as `privilege::debug sekurlsa::logonpasswords exit`, pass-the-hash commands targeting users `fk8mq` and `kyleg` in the `vnevado.alpineskihouse.co` domain (process IDs 6880 and 4112), and `kerberos::ptt c:\m365dattack\admin-tickets` (process ID 5176). Related alerts in the same incident include "Possible use of the Rubeus kerberoasting tool" and "File dropped and launched from remote location", the latter indicating a remote session dropped a file and executed it, suggesting lateral movement.'
+    question: 'For the related alert "File dropped and launched from remote location", which user account (identified by its security identifier, SID) was involved in dropping and executing the file?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'S-1-5-21-1540151660-3530000288-105586595-1517'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'S-1-5-21-1540151660-3530000288-105586595-1517'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with SID `S-5-7-21-1843151660-3234030288-105586167-1422` dropped multiple dual-purpose tools on the device, which could be used for credential theft, privilege escalation, and lateral movement.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Among the dropped tools, the process with extracted file name `rubeus.exe` was executed, indicating possible use of the Rubeus kerberoasting tool to request and abuse Kerberos tickets.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'Using the stolen Kerberos credentials, a remote session under the account with SID `S-1-5-21-1540151660-3530000288-105586595-1517` dropped a file and launched it from a remote location, indicating lateral movement.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

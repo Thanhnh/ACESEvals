@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_70
+  title: incident_39_latest_cleaned_train_set_task_70
+  description: 'For the alert reporting the malicious credential theft tool execution, which IP address was recorded as an entity of that alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a multi-stage incident, an alert for "Potential human-operated malicious activity" was raised on the device `vnevado-win10b` (Azure AD device ID `fafdcd65-46c6-45a6-aa85-ec9b77ca0bcb`), involving the account `fk8mq` (SID `S-1-5-21-1540151660-3530000288-105586595-1517`, AAD user ID `97e6a954-b6bd-48a5-808c-bd8464cce677`) and the IP address `141.216.110.153`. This sequence of alerts may indicate hands-on-keyboard attacker activity that could lead to ransomware or other payloads being deployed. Follow-on activity on the same device included a sign-in attempt using a deceptive (decoy) user account, and shortly afterwards a known credential theft tool was executed, with its process or command line indicating intent to dump users'' credentials, keys and plain-text passwords.'
+    question: 'For the alert reporting the malicious credential theft tool execution, which IP address was recorded as an entity of that alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '65.233.23.156'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '65.233.23.156'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A sequence of alerts indicating potential human-operated malicious activity was observed involving the account `kyleg`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A sign-in attempt with a deceptive (decoy) user account with SID `S-5-7-21-1843151660-3234030288-105586167-1422` was detected on the device.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'A known malicious credential theft tool was executed to dump users'' credentials, associated with the IP address `65.233.23.156`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

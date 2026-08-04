@@ -31,7 +31,7 @@ tasks:
         max_score: 0.5
         weight: 1.0
         title: Checkpoint 1
-        description: 'Step 1 – account.Email `Nina Park@vnevado.alpineskihouse.co`: Suspicious emails were sent from this
+        description: 'Step 1 – account.Email `raphaelt@vnevado.alpineskihouse.co`: Suspicious emails were sent from this
           user, who is suspected to be involved in a BEC fraud attempt.'
       checkpoint_2:
         target: trajectory

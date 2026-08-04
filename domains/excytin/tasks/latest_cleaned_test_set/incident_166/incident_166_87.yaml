@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_test_set_task_87
+  title: incident_166_latest_cleaned_test_set_task_87
+  description: 'Following the alert-entity chain from this BEC-related email activity, another related alert in the same incident implicates a user account identified only by its display name rather than by an email address or SID. What is the display name of that user account?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a business email compromise (BEC) fraud attempt, an alert was raised for ''Suspicious emails sent by BEC-related user''. The suspicious mail was sent from `laylaw@vnevado.alpineskihouse.co` to the mailbox `tony@avoriaz.alpineskihouse.co`, originating from sender IP `255.246.85.58`. The sending account is identified by SID `S-1-5-21-1740051960-3534030288-108486866-1602` and Microsoft Entra user ID `89e933b9-5b2e-4bd6-bcdf-033db707ef82`.'
+    question: 'Following the alert-entity chain from this BEC-related email activity, another related alert in the same incident implicates a user account identified only by its display name rather than by an email address or SID. What is the display name of that user account?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Jordan P'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Jordan P'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A possibly compromised user account related to an ongoing BEC (business email compromise) fraud attempt sent suspicious emails at 2024-07-22 10:14:23 UTC.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The account involved in sending these suspicious BEC-related emails is the user with Name `Jordan P`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

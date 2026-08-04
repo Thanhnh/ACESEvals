@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_38
+  title: incident_5_latest_cleaned_test_set_task_38
+  description: 'Which device was the ransomware behavior in the file system detected on?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an incident investigation, a Command and Control behavior alert was blocked after the account `dp5hn` (SID `S-1-5-21-1840191660-8534830288-125585561-1522`, AAD user ID `731adb71-b11c-4bbf-850b-57989b350e96`) ran the process `curl http://vectorsandarrows.com` (Process ID 5572, created 2024-06-20T09:32:04.8002759Z), reaching out to the URL `http://vectorsandarrows.com/`. Seconds later, another alert fired indicating ransomware behavior in the file system, with suspicious file system changes suggesting possible mass encryption of files.'
+    question: 'Which device was the ransomware behavior in the file system detected on?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'The host `vnevado-win11u`'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'The host `vnevado-win11u`'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Command and Control behavior was detected and blocked on host `vnevado-win11u`, indicating active malware communicating with a remote attacker.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On the same host `vnevado-win11u`, ransomware behavior was detected in the file system, showing suspicious mass file changes consistent with ransomware encryption activity.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

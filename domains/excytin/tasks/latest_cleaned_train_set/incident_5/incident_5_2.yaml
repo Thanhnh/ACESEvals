@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_2
+  title: incident_5_latest_cleaned_train_set_task_2
+  description: 'For the alert about the renamed Windows Sysinternals tool, what was the file name under which the tool was launched?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, ''CommandAndControl'' malware was detected on the device `vnevado-win10s` (AAD Device ID `f5b847aa-8712-4bf6-b4f7-ed6cd89e1505`) while an attacker appeared to be moving laterally from another device on the network. The activity was tied to the account `dp5hn` (SID `S-1-5-21-1840191660-8534830288-125585561-1522`) and included the process `6460__2024-06-20t09:10:51.7817908z__curl http://vectorsandarrows.com`. Following this, alerts were raised about possible attempts to access the Primary Refresh Token (PRT), and shortly afterwards an alert fired indicating that a Windows Sysinternals tool had been renamed and then launched, potentially to covertly use the tool for malicious purposes.'
+    question: 'For the alert about the renamed Windows Sysinternals tool, what was the file name under which the tool was launched?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'mimikatz.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'mimikatz.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with SID `S-1-5-21-1840191660-8534830288-125585561-1522` was involved in a ''CommandAndControl'' malware detection during lateral movement to this device.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The process `browsercore.exe` was used in a possible attempt to access the Primary Refresh Token (PRT).'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The account with SID `S-5-7-21-1843151660-3234030288-105586167-1422` was associated with the attempt to access the Primary Refresh Token (PRT) for credential theft.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'A Windows Sysinternals tool was renamed to the file `mimikatz.exe` and then launched, indicating a covert attempt to use the tool for malicious purposes.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

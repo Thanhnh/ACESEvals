@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_83
+  title: incident_5_latest_cleaned_test_set_task_83
+  description: 'For the alert reporting the malicious credential theft tool execution, what IP address was recorded as an entity involved in that alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, an alert titled "Suspicious remote activity" was raised, flagging activity initiated remotely against the device with AAD Device ID `f5b847aa-8712-4bf6-b4f7-ed6cd89e1505` under the user account `dp5hn` (SID `S-1-5-21-1840191660-8534830288-125585561-1522`). On that host, destructive and suspicious commands were run, including `bcdedit /set recoveryenabled no` (PID 8136), `bcdedit /set bootstatuspolicy ignoreallfailures` (PID 1868), `vssblatemp.exe delete shadows /all` (PID 5512), `curl http://vectorsandarrows.com` (PID 6460), and the script `get-userprttoken.ps1`. This activity is also linked, through lateral movement via PSExec to the jump server, to another alert in the same incident where a known credential theft tool command line was detected attempting to dump users'' credentials, keys and plain-text passwords.'
+    question: 'For the alert reporting the malicious credential theft tool execution, what IP address was recorded as an entity involved in that alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '107.224.99.179'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '107.224.99.179'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Suspicious remote activity was observed on the machine, initiated remotely from the IP address `99.83.111.100`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Lateral movement via PSExec to the jump server (Vnevado-jump) was performed by the user with AadUserId `1d94aaf6-efe6-4e76-ad56-ffd7d1257bc1`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'A known malicious credential theft tool was executed to dump users'' credentials, keys, and plain-text passwords, associated with the IP address `107.224.99.179`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

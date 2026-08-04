@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_38_latest_cleaned_test_set_task_3
+  title: incident_38_latest_cleaned_test_set_task_3
+  description: 'What is the name of the host on which this suspicious process injection activity took place?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert titled "Suspicious process injection observed" was raised, indicating that a process abnormally injected code into another process so that unexpected code may run in the target process memory. The activity involved the account `nathans` (SID `S-1-5-21-1240151660-3534038288-105586567-4122`, AAD User ID `12185914-91dd-4fb9-94f9-3252203b0426`), where `powershell.exe` (PID 4656) ran with `-executionpolicy bypass -encodedcommand ...` that downloaded content from `https://wcdstaticfilesprdeus.blob.core.windows.net/wcdstaticfiles/winatp-intro-fileless.txt` (resolving to IP `72.5.72.208`) and then injected into `notepad.exe` (PID 8932). The activity was observed on a device with AAD Device ID `39d8c57f-2d08-4888-b0cd-12cd0679337a`.'
+    question: 'What is the name of the host on which this suspicious process injection activity took place?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'vnevado-win11a'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'vnevado-win11a'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A process abnormally injected code into another process, indicating suspicious process injection used to hide malicious code execution within a trusted process, observed at `2024-07-04 22:35:01.343148+00:00`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'This suspicious process injection activity was observed on the host with HostName `vnevado-win11a`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

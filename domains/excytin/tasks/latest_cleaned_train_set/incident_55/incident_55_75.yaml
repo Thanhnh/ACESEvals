@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_75
+  title: incident_55_latest_cleaned_train_set_task_75
+  description: 'For the alert about the unusual addition of credentials to the OAuth application `SimulandApp`, what is the full email address (UPN) of the user account that performed this action?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, an alert fired indicating that a process was injected with potentially malicious code, meaning code was written into another process''s memory to hide malicious execution within a trusted process. The activity was observed on the device with AAD Device ID `7661dfd4-218f-4016-8a87-66d68a7f098e`, where `powershell.exe` (PID 12412) was started from the folder `c:\users\bjenkins\downloads\midnight14` and later launched the script `contosoadfsblatempcreds.ps1` (PID 13968). Follow-on cloud activity linked to this incident includes an unusual addition of a Password-type credential to the OAuth application `SimulandApp`, which may indicate the attacker is abusing the app for phishing, data exfiltration, or access to other accounts and devices.'
+    question: 'For the alert about the unusual addition of credentials to the OAuth application `SimulandApp`, what is the full email address (UPN) of the user account that performed this action?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'pwilson@niseko.alpineskihouse.co'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'pwilson@niseko.alpineskihouse.co'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A process running under the account with SID `S-1-5-21-551436448-9871687716-9837441745-1903` was injected with potentially malicious code, indicating the account was compromised.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The compromised account, user Luciano Herrera with email `pwilson@niseko.alpineskihouse.co`, then performed an unusual addition of a Password-type credential to the OAuth application SimulandApp.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

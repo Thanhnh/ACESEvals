@@ -52,7 +52,7 @@ tasks:
         max_score: 0.2
         weight: 1.0
         title: Checkpoint 4
-        description: An internal user account `Nina Sullivan@vnevado.alpineskihouse.co` sent phishing emails within the 
+        description: An internal user account `santiago@vnevado.alpineskihouse.co` sent phishing emails within the 
           organization, indicating possible account compromise.
       checkpoint_5:
         target: trajectory

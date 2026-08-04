@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_test_set_task_12
+  title: incident_166_latest_cleaned_test_set_task_12
+  description: 'In the earlier BEC financial fraud alert that triggered this activity, which user account''s email address was associated with the creation of the suspicious hiding inbox rule?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a business email compromise (BEC) financial fraud incident, an alert was raised for suspicious emails sent by a possibly compromised user account. The suspicious message was delivered to the mailbox `tony@avoriaz.alpineskihouse.co` and originated from sender IP `255.246.85.58`. This alert was triggered based on a previous BEC-related alert in which a suspicious inbox rule that hides incoming email messages was created within a risky Azure Active Directory session.'
+    question: 'In the earlier BEC financial fraud alert that triggered this activity, which user account''s email address was associated with the creation of the suspicious hiding inbox rule?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'laylaw@vnevado.alpineskihouse.co'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'laylaw@vnevado.alpineskihouse.co'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Suspicious emails were sent from the IP address `255.246.85.58`, associated with a compromised user account involved in an ongoing BEC (business email compromise) fraud attempt.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The account with email `laylaw@vnevado.alpineskihouse.co` created a suspicious inbox rule that hides incoming email messages in a risky Azure Active Directory session, indicating BEC financial fraud.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

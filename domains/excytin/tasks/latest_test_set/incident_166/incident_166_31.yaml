@@ -5,7 +5,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'A possible Business Email Compromise (BEC) attempt was detected involving the user account "Jordan
-      P" (Jordan P@vnevado.alpineskihouse.co). While reviewing related alerts in the same incident, investigators noted a
+      P" (laylaw@vnevado.alpineskihouse.co). While reviewing related alerts in the same incident, investigators noted a
       separate warning about a sign-in from an anonymous source (such as Tor or a VPN), suggesting the attacker may have tried
       to hide their origin.'
     question: 'According to the alert about the anonymous sign-in, what IP address was used to access the environment?'

@@ -46,7 +46,7 @@ tasks:
         max_score: 0.333
         weight: 1.0
         title: Checkpoint 3
-        description: The user account `Hailey Johnson@vnevado.alpineskihouse.co` (account.Email) clicked the malicious 
+        description: The user account `alyssat@vnevado.alpineskihouse.co` (account.Email) clicked the malicious 
           URL on the device.
   scoring_aggregation:
     max:

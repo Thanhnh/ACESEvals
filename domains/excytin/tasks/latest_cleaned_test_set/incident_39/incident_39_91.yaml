@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_39_latest_cleaned_test_set_task_91
+  title: incident_39_latest_cleaned_test_set_task_91
+  description: 'Earlier in this incident, on 2024-07-04, an alert fired for the execution of a known credential theft tool whose process or command line indicated intent to dump users'' credentials, keys and plain-text passwords. What is the account name (logon/user name, not the display name) associated with that credential theft tool execution?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert titled "A potentially malicious URL click was detected" was raised on 2024-07-10, showing that a user named `Ethan Brooks` clicked on the link `https://ac27145722.livelygrass-8d4c4013.eastus2.azurecontainerapps.io/`, which was found to be malicious. Pivoting on the user''s SID revealed additional related activity earlier in the incident.'
+    question: 'Earlier in this incident, on 2024-07-04, an alert fired for the execution of a known credential theft tool whose process or command line indicated intent to dump users'' credentials, keys and plain-text passwords. What is the account name (logon/user name, not the display name) associated with that credential theft tool execution?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'tgs2z'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'tgs2z'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account with SID `S-5-7-21-1843151660-3234030288-105586167-1422` clicked on a potentially malicious URL, detected at `2024-07-10 11:24:45.397218+00:00`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the initial compromise, a known credential theft tool was executed under the account `tgs2z`, with a command line indicating intent to dump users'' credentials, keys, and plain-text passwords, detected at `2024-07-04 22:35:01.182306+00:00`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

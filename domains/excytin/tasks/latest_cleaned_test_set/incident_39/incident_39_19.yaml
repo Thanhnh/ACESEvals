@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_39_latest_cleaned_test_set_task_19
+  title: incident_39_latest_cleaned_test_set_task_19
+  description: 'For the final alert about the malicious credential theft tool execution, which user account was involved? Provide the Azure AD (Entra ID) user identifier.'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a multi-stage intrusion, an alert titled ''File dropped and launched from remote location'' was raised after a remote session dropped and executed a file, with the process details `7668__2024-06-27t14:34:10.0201983z__psexesvc.exe`. This activity was followed by related alerts on the same device, including SID history injection, detection of the Mimikatz credential theft tool, and finally an alert for ''Malicious credential theft tool execution detected'', where a known credential theft command line indicated an intent to dump users'' credentials, keys and plain-text passwords.'
+    question: 'For the final alert about the malicious credential theft tool execution, which user account was involved? Provide the Azure AD (Entra ID) user identifier.'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'AadUserId: 1d94aaf6-efe6-4e76-ad56-ffd7d1257bc1'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'AadUserId: 1d94aaf6-efe6-4e76-ad56-ffd7d1257bc1'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account with AadUserId `7fcf9695-68fc-4258-864d-e1e5b166c66f` used a remote session to drop a file and launch it on the device, indicating lateral movement.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A SID history injection was then performed on the device through the process `powershell.exe`, elevating privileges for the attacker.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The credential theft tool `mimikatz.exe` was detected running on the device, attempting to harvest passwords, hashes, and Kerberos tickets.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'The malicious credential theft tool execution command line was detected being run by the user account with AadUserId `1d94aaf6-efe6-4e76-ad56-ffd7d1257bc1`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

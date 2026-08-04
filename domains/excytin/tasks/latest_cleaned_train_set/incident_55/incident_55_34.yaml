@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_34
+  title: incident_55_latest_cleaned_train_set_task_34
+  description: 'Continuing the investigation, an alert was raised for a suspected AD FS DKM key read of the ADFS object id 4cac49d3-29d3-407e-8c9b-b7ebb21541b2. Which host performed this DKM key read?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, a malicious URL `https://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/` was clicked on a compromised device. Follow-on activity included suspicious system hardware discovery and a suspected DCSync attack, where a replication request was sent from the workstation MB-WINCLIENT by the account of Luciano Herrera (CIO).'
+    question: 'Continuing the investigation, an alert was raised for a suspected AD FS DKM key read of the ADFS object id 4cac49d3-29d3-407e-8c9b-b7ebb21541b2. Which host performed this DKM key read?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'MB-DC1'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'MB-DC1'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A malicious URL was clicked on the device with HostName `mb-winclient`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The account with SID `S-1-5-21-551436448-9871687716-9837441745-1903` performed suspicious system hardware discovery on the compromised device.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'A suspected DCSync attack was detected, where the user Luciano Herrera (CIO) on MB-WINCLIENT sent a replication request to the domain controller with HostName `MB-DC1`.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'A suspected AD FS DKM key read was detected on the host with HostName `MB-DC1`, which read the DKM key of ADFS object id 4cac49d3-29d3-407e-8c9b-b7ebb21541b2.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

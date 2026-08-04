@@ -35,7 +35,7 @@ tasks:
         max_score: 0.5
         weight: 1.0
         title: Checkpoint 1
-        description: 'The email account (Field: Email) `Jordan P@vnevado.alpineskihouse.co` created a suspicious inbox rule
+        description: 'The email account (Field: Email) `laylaw@vnevado.alpineskihouse.co` created a suspicious inbox rule
           named ITCleanup that moves messages to the RSS Feeds folder.'
       checkpoint_2:
         target: trajectory

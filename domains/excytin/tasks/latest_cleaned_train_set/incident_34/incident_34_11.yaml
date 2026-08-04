@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_34_latest_cleaned_train_set_task_11
+  title: incident_34_latest_cleaned_train_set_task_11
+  description: 'Immediately afterwards, a related "Suspicious Task Scheduler activity" alert was raised for the persistence attempt. What was the process ID, creation time, and full command line of the scheduled-task process that established this persistence?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'In this multi-stage incident, an alert for "Suspicious PowerShell download or encoded command execution" fired on host `vnevado-win10e` (AadDeviceId `02b8f519-1123-4228-b32a-ccb78af3449f`) for the account with SID `S-1-5-21-1870156660-7534030218-135086563-1193`. The `powershell.exe` process (PID 8604, created 2024-06-26T12:00:39Z) was launched with `-w movedn -exec bypass` and reassembled a large base64 blob that it decoded and wrote to disk as `winatp-intro-backdoor.exe`.'
+    question: 'Immediately afterwards, a related "Suspicious Task Scheduler activity" alert was raised for the persistence attempt. What was the process ID, creation time, and full command line of the scheduled-task process that established this persistence?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID: 1348, Created: 2024-06-26T12:00:40.0878355Z, Command line: `"schtasks.exe" /create /sc once /tn yrei /tr "c:\users\samuelf\onedrive - (new) alpineskihouse\desktop\winatp-intro-backdoor.exe" /st 11:58 /f`'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID: 1348, Created: 2024-06-26T12:00:40.0878355Z, Command line: `"schtasks.exe" /create /sc once /tn yrei /tr "c:\users\samuelf\onedrive - (new) alpineskihouse\desktop\winatp-intro-backdoor.exe" /st 11:58 /f`'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious PowerShell process (Process ID `8604`, created at `2024-06-26t12:00:39.2886108z`) was executed with the command line `powershell.exe -w movedn -exec bypass -command ...`, which decoded a large base64 blob into the file `winatp-intro-backdoor.exe` and wrote it to the user''s Desktop.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The same PowerShell command then invoked Task Scheduler to establish persistence for the dropped payload.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'This resulted in the suspicious Task Scheduler process with Process ID `1348`, created at `2024-06-26t12:00:40.0878355z`, running the command line `"schtasks.exe" /create /sc once /tn yrei /tr "c:\users\samuelf\onedrive - (new) alpineskihouse\desktop\winatp-intro-backdoor.exe" /st 11:58 /f`, which created the scheduled task `yrei` to automatically launch the backdoor.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

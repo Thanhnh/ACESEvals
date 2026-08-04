@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During an investigation, security telemetry flagged a potentially malicious URL click on 2024-07-10
-      by user Ethan Brooks (ethan brooks@vnevado.alpineskihouse.co). The click originated from a link hosted on an Azure Container
+      by user Ethan Brooks (tgs2z@vnevado.alpineskihouse.co). The click originated from a link hosted on an Azure Container
       Apps domain and triggered the alert “A potentially malicious URL click was detected.” Analysts suspect this activity
       may be related to subsequent credential-theft behavior observed elsewhere in the environment.'
     question: 'A few days earlier, on 2024-07-04, the alert “Possible use of the Rubeus kerberoasting tool” was raised on

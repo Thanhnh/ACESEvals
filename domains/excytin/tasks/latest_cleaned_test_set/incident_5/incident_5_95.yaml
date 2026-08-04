@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_95
+  title: incident_5_latest_cleaned_test_set_task_95
+  description: 'An earlier execution of the same credential theft tool was flagged a few minutes before this pass-the-hash attempt. What was the process ID and the full command line used in that earlier execution?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a malicious credential theft tool execution was detected. The command line observed was: `"mimikatz.exe" privilege::debug "sekurlsa::pth /user:fk8mq /ntlm:96def1a633fc6790124d5f8fe21cc72b /domain:vnevado.alpineskihouse.co /run:..\notepad.exe //vnevado-jump cmd.exe"` with process ID 2020, created at 2024-06-20T09:03:47.538167Z. This pass-the-hash attempt spawned `notepad.exe` and `cmd.exe`.'
+    question: 'An earlier execution of the same credential theft tool was flagged a few minutes before this pass-the-hash attempt. What was the process ID and the full command line used in that earlier execution?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID: 1044, Command line: `"mimikatz.exe" privilege::debug sekurlsa::logonpasswords exit` (created 2024-06-20T08:59:25.9440469Z)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID: 1044, Command line: `"mimikatz.exe" privilege::debug sekurlsa::logonpasswords exit` (created 2024-06-20T08:59:25.9440469Z)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A known credential theft tool was detected on the host — the executed file was identified as `mimikatz.exe` (ExtractedFileName: `mimikatz.exe`).'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The same credential theft tool was launched with the command line `"mimikatz.exe" privilege::debug sekurlsa::logonpasswords exit` at `2024-06-20t08:59:25.9440469z`, with Process ID `1044`, indicating an attempt to dump users'' credentials, keys, and plain-text passwords from LSASS.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_39_latest_cleaned_test_set_task_2
+  title: incident_39_latest_cleaned_test_set_task_2
+  description: 'For the suspicious remote activity alert observed on that same device, which account name was associated with the remotely initiated activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, the file `rubeus.exe` was flagged on a device as ''Kekeo'' malware detected during lateral movement, suggesting an attacker might be attempting to move laterally to this device from another device on the network. Around the same time, the same device also triggered an alert for suspicious remote activity, which can flag attempts to initiate interactive sessions, modify files, pass WMI commands, create scheduled tasks, and other potentially malicious activities initiated from a remote machine.'
+    question: 'For the suspicious remote activity alert observed on that same device, which account name was associated with the remotely initiated activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'LocalSystem'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'LocalSystem'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The ''Kekeo'' malware was detected during lateral movement on the device with AadDeviceId `fafdcd65-46c6-45a6-aa85-ec9b77ca0bcb`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Suspicious remote activity was initiated on this machine under the account `LocalSystem`, indicating remotely initiated malicious operations such as interactive sessions, file modification, WMI commands, or scheduled task creation.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

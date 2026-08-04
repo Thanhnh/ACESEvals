@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_train_set_task_1
+  title: incident_34_latest_cleaned_train_set_task_1
+  description: 'A closely related alert, ''Suspicious PowerShell command line'', captured the follow-on process that actually triggered the scheduled task run. What were the process ID and the creation time (UTC) of that `schtasks.exe` process?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'In this multi-stage incident, an alert titled ''Powershell dropped a suspicious file on the machine'' was raised on host `vnevado-win10e` (AadDeviceId `02b8f519-1123-4228-b32a-ccb78af3449f`) for the user account `samuelf` (SID `S-1-5-21-1870156660-7534030218-135086563-1193`). A `powershell.exe` process (PID 8604, started 2024-06-26T12:00:39.288Z) was launched with `-w hidden -exec bypass`, decoded a large base64 blob into the file `winatp-intro-backdoor.exe` on the user''s desktop, and then registered and launched a scheduled task named ''yrei'' to execute that binary.'
+    question: 'A closely related alert, ''Suspicious PowerShell command line'', captured the follow-on process that actually triggered the scheduled task run. What were the process ID and the creation time (UTC) of that `schtasks.exe` process?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID: 1616, Created Time (UTC): 2024-06-26T12:00:40.6793914Z (command line: "schtasks.exe" /run /tn yrei)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID: 1616, Created Time (UTC): 2024-06-26T12:00:40.6793914Z (command line: "schtasks.exe" /run /tn yrei)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account `samuelf` was observed running PowerShell, which dropped a suspicious file on the machine and executed it.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following this activity, a suspicious PowerShell command line was observed on the same machine, launching the process `"schtasks.exe" /run /tn yrei` with Process ID `1616` at `2024-06-26t12:00:40.6793914z`, indicating the attacker used a scheduled task to execute the dropped payload.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

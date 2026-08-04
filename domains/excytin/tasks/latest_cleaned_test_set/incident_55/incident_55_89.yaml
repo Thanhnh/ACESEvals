@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_89
+  title: incident_55_latest_cleaned_test_set_task_89
+  description: 'Earlier in this same incident, an alert titled ''Suspicious System Hardware Discovery'' was triggered when a known tool or technique was used to gather information about a device. Which Microsoft Entra ID (AAD) user ID was associated with the account in that discovery alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert was raised for an unusual addition of credentials to an OAuth app: the user Luciano Herrera (pwilson@niseko.alpineskihouse.co) added a Password-type credential to the application SimulandApp (OAuth App ID `4d9476b8-6ae6-459b-a273-5837c15b5981`, Object ID `a66a4b44-d1f7-4563-95bf-a89d1b05b325`) within the Office 365 / Microsoft 365 cloud application (AppId 11161), from the IP address `2801:e0a:1eb:dea0:642e:5bb6:d315:fbb3`. This pattern may indicate an attacker compromised the app to spread phishing, exfiltrate data, or gain access to other accounts and devices.'
+    question: 'Earlier in this same incident, an alert titled ''Suspicious System Hardware Discovery'' was triggered when a known tool or technique was used to gather information about a device. Which Microsoft Entra ID (AAD) user ID was associated with the account in that discovery alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'a2d0f7c2-b0a0-43bd-bce0-27d8ae3be4d0'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'a2d0f7c2-b0a0-43bd-bce0-27d8ae3be4d0'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user Luciano Herrera (pwilson@niseko.alpineskihouse.co), with AadUserId `2de70991-2799-4a95-b734-8e3df3a50118`, performed an unusual addition of a Password credential to the OAuth application SimulandApp, indicating the app may have been compromised for phishing, data exfiltration, or access to other accounts and devices.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the app compromise, a known tool or technique was used to perform suspicious system hardware discovery on a device, gathering information about the target device or network for later attacks; this activity was carried out under the account with AadUserId `a2d0f7c2-b0a0-43bd-bce0-27d8ae3be4d0`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

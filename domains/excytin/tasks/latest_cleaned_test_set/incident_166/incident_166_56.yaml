@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_test_set_task_56
+  title: incident_166_latest_cleaned_test_set_task_56
+  description: 'Later in this same incident, a user account flagged with a risky sign-in in Microsoft Entra ID authenticated to the SAP enterprise application. What was the IP address associated with that suspicious SAP authentication?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a security incident involving SAP financial process manipulation, a suspicious inbox manipulation rule was detected on the mailbox `laylaw@vnevado.alpineskihouse.co` (user Jordan P), where a MoveToFolder rule named ''ITCleanup'' was created to move incoming messages into the ''RSS Feeds'' folder. The activity involved the cloud applications Microsoft Exchange Online (AppId 20893) and Office 365 / Microsoft 365 (AppId 11161), and was associated with several IP addresses including 95.202.65.202, 192.238.237.190, 180.144.153.174 and 255.246.85.58. This behavior suggests the account may be compromised and used to spread phishing emails or gain access to other accounts.'
+    question: 'Later in this same incident, a user account flagged with a risky sign-in in Microsoft Entra ID authenticated to the SAP enterprise application. What was the IP address associated with that suspicious SAP authentication?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '107.253.5.27'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '107.253.5.27'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account with SID `S-1-5-21-1740051960-3534030288-108486866-1602` (Jordan P, laylaw@vnevado.alpineskihouse.co) had a suspicious inbox manipulation rule named `ITCleanup` created, moving messages to the `RSS Feeds` folder, indicating the account is compromised.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The same compromised user account was then used to sign in to the SAP enterprise application from a risky sign-in, originating from the IP address `107.253.5.27`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

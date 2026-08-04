@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_39_latest_cleaned_test_set_task_85
+  title: incident_39_latest_cleaned_test_set_task_85
+  description: 'Just before the tool-drop alert, a SID history injection was detected on the same device. What is the Security IDentifier (SID) of the account reported in that SID history injection alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, an alert titled "Multiple dual-purpose tools were dropped" fired on host `vnevado-win10v` (AAD Device ID `4d8d23e9-a77d-4e33-9435-b8c457e57ca1`). Known public tools that can also be used maliciously — `rubeus.exe`, `mimikatz.exe`, `psexec.exe` — along with a script `domaindominance27.ps1` were dropped on the device in the context of the account `tgs2z` (AAD User ID `1d94aaf6-efe6-4e76-ad56-ffd7d1257bc1`). Such tooling is typically staged for credential theft, privilege escalation, and lateral movement.'
+    question: 'Just before the tool-drop alert, a SID history injection was detected on the same device. What is the Security IDentifier (SID) of the account reported in that SID history injection alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'S-1-5-21-1440151660-4837038288-105596163-1120'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'S-1-5-21-1440151660-4837038288-105596163-1120'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Multiple dual-purpose tools were dropped on the device, including the process with extracted file name `powershell.exe`, which could be used for credential theft, privilege escalation, and lateral movement.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the tool drop, a SID history injection was detected on the same device, where the account with SID `S-1-5-21-1440151660-4837038288-105596163-1120` had its SID history modified to gain elevated privileges for persistence and access to sensitive resources.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

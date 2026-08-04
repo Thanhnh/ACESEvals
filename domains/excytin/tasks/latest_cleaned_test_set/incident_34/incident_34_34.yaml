@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_test_set_task_34
+  title: incident_34_latest_cleaned_test_set_task_34
+  description: 'Looking at the related activity on this host, what is the file name of the suspicious executable that triggered the PowerShell execution?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert was raised for "Suspicious process executed PowerShell command" on host `vnevado-win10e` (AAD device ID `02b8f519-1123-4228-b32a-ccb78af3449f`), involving the user account `samuelf` (SID `S-1-5-21-1870156660-7534030218-135086563-1193`, AAD user ID `16320fec-8d90-403b-b7fe-78f715d4728d`). The alert indicates that `powershell.exe` was launched by another suspicious process — PowerShell is often used by attackers to bypass security protection mechanisms by executing their payload in memory without touching the disk.'
+    question: 'Looking at the related activity on this host, what is the file name of the suspicious executable that triggered the PowerShell execution?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'winatp-intro-backdoor.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'winatp-intro-backdoor.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious process executed a PowerShell command, potentially to run a payload in memory and bypass security protections.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The suspicious process responsible for executing the PowerShell command was identified by the file name `winatp-intro-backdoor.exe`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

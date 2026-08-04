@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_322_latest_cleaned_test_set_task_57
+  title: incident_322_latest_cleaned_test_set_task_57
+  description: 'In that proxy log alert, besides the source host address 231.60.52.209, which other IP address entity was flagged as part of the malicious connection?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident, an alert fired for ''Ntdsutil collecting Active Directory information''. The activity involved `powershell.exe` running with a long base64 encoded command (Process ID 2556, created 2024-08-01T12:37:29.65Z) that ultimately spawned `ntdsutil.exe` (Process ID 6748, created 2024-08-01T12:37:30.27Z) with the command line `"ntdsutil.exe" "ac i ntds" ifm "create full c:\temp" q q`, a known technique for dumping the Active Directory database. Following this domain controller activity, the attack chain continued with cloud resource management operations from a suspicious proxy IP and a malicious URL being clicked on an endpoint. Around the same time, proxy logs also generated an alert for a connection from 231.60.52.209 (vnevado-win11h.vnevado.alpineskihouse.co) to login.micro.demo.antoinetest.ovh.'
+    question: 'In that proxy log alert, besides the source host address 231.60.52.209, which other IP address entity was flagged as part of the malicious connection?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '228.3.31.94'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '228.3.31.94'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Ntdsutil was used to collect Active Directory information on host `vnevado-dc`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A suspicious Azure Resource Manager operation from a proxy IP address was performed by the account with SID `S-1-5-21-1840151686-3534835288-156286563-1127`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'A malicious URL was clicked on the device with hostname `vnevado-win11h`.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'The proxy logs detected the malicious URL connection associated with the IP address `228.3.31.94`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

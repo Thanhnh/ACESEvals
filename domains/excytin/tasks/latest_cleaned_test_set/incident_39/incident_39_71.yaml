@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_39_latest_cleaned_test_set_task_71
+  title: incident_39_latest_cleaned_test_set_task_71
+  description: 'For the alert about the suspicious sequence of exploration activities, which discovery command was executed, and what were its process ID and creation time?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an attempt to disable Microsoft Defender Antivirus was detected on host `vnevado-win10b` (AAD device ID `fafdcd65-46c6-45a6-aa85-ec9b77ca0bcb`), where the account `fk8mq` (SID `S-1-5-21-1540151660-3530000288-105586595-1517`) ran the command `powershell -command set-mppreference -disablerealtimemonitoring 1` under process ID 6968 at 2024-06-27T14:33:05.79Z. This tampering activity is linked to further alerts on the same device, including the drop of multiple dual-purpose tools, detection of ''Kekeo'' malware, and a suspicious sequence of exploration activities in which a process invoked a set of Windows commands typically used to identify valuable assets and plan lateral movement.'
+    question: 'For the alert about the suspicious sequence of exploration activities, which discovery command was executed, and what were its process ID and creation time?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'The command executed was `"whoami.exe"`, with process ID 6512, created at 2024-06-27T14:32:19.285352Z.'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'The command executed was `"whoami.exe"`, with process ID 6512, created at 2024-06-27T14:32:19.285352Z.'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'An attempt to disable the Microsoft Defender Antivirus service was detected under the user account with AadUserId `97e6a954-b6bd-48a5-808c-bd8464cce677`, indicating defense evasion activity.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The ''Kekeo'' malware was detected on the device as the file `rubeus.exe`, suggesting an attacker attempting lateral movement via Kerberos ticket abuse.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'Multiple dual-purpose tools were dropped on the device by the process `powershell.exe -executionpolicy bypass -file c:\users\tgs2z\downloads\domaindominance27\domaindominance27.ps1` with Process ID `4676` at `2024-06-27t14:32:08.4041849z`.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'A suspicious sequence of exploration activities followed, ending with the process `whoami.exe` with Process ID `6512` at `2024-06-27t14:32:19.285352z`, used to identify assets of value and coordinate lateral movement.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_322_latest_cleaned_train_set_task_14
+  title: incident_322_latest_cleaned_train_set_task_14
+  description: 'For the related alert ''A potentially malicious URL click was detected'', what is the email address of the mail recipient who clicked the malicious link?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident in the vnevado.alpineskihouse.co tenant, an alert fired for "Email messages containing malicious URL removed after delivery" at 2024-08-01 12:44:53 UTC. The messages were sent from `raphaelt@vnevado.alpineskihouse.co` originating from sender IP `202.205.215.225`, and contained the malicious URL `dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io`. Although the emails were later removed, a related alert indicates that a user actually clicked the malicious link before removal.'
+    question: 'For the related alert ''A potentially malicious URL click was detected'', what is the email address of the mail recipient who clicked the malicious link?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'alyssat@vnevado.alpineskihouse.co'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'alyssat@vnevado.alpineskihouse.co'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A malicious email containing a malicious URL was delivered to the recipient `alyssat@vnevado.alpineskihouse.co` and later removed after delivery.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The user `alyssat@vnevado.alpineskihouse.co` clicked on the potentially malicious URL contained in that email.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

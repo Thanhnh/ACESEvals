@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_68
+  title: incident_5_latest_cleaned_test_set_task_68
+  description: 'For the final alert about the malicious credential theft tool execution, what is the name of the process file that was flagged?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a ransomware-related incident, an alert was raised that all file snapshots and shadow copies were deleted on host `vnevado-win10r` (AAD device ID `9d4887ba-0b69-47d6-89bc-9b32787f379e`). The activity was performed by account `dp5hn` (SID `S-1-5-21-1840191660-8534830288-125585561-1522`) using the process `vssblatemp.exe` with process ID 7236 and command line `vssblatemp.exe delete shadows /all`. Seconds later, related alerts were triggered on the same account, including possible attempts to access the Primary Refresh Token (PRT) and, finally, the detection of a known credential theft tool execution command line intended to dump users'' credentials, keys and plain-text passwords.'
+    question: 'For the final alert about the malicious credential theft tool execution, what is the name of the process file that was flagged?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'cmd.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'cmd.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with AadUserId `731adb71-b11c-4bbf-850b-57989b350e96` deleted all file snapshots and shadow copies via WMI or VSSAdmin, which is common during ransomware infection.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The process `browsercore.exe` was used in a possible attempt to access the Primary Refresh Token (PRT).'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The account with SID `S-5-7-21-1843151660-3234030288-105586167-1422` was involved in the possible attempt to access the Primary Refresh Token (PRT).'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'The process `cmd.exe` was executed with a known credential theft tool command line, indicating an intent to dump users'' credentials, keys, and plain-text passwords.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

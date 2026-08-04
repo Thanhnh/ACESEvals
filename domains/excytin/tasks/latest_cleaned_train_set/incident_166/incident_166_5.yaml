@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_train_set_task_5
+  title: incident_166_latest_cleaned_train_set_task_5
+  description: 'For that earlier alert about the suspicious inbox manipulation rule, which cloud application was involved, and what is its application ID (AppId)?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'As part of a business email compromise (BEC) investigation, an alert titled ''Suspicious emails sent by BEC-related user'' was raised at 2024-07-22 10:14:23 UTC. The suspicious messages were sent from the possibly compromised account `laylaw@vnevado.alpineskihouse.co` (sender IP `255.246.85.58`) to the mailbox `tony@avoriaz.alpineskihouse.co`. This alert was triggered based on an earlier BEC-related alert in the same incident, in which a suspicious MoveToFolder inbox rule named ''ITCleanup'' was created on the same user''s mailbox to move incoming messages into the ''RSS Feeds'' folder.'
+    question: 'For that earlier alert about the suspicious inbox manipulation rule, which cloud application was involved, and what is its application ID (AppId)?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'The cloud application involved is Microsoft Exchange Online, with AppId `11161`.'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'The cloud application involved is Microsoft Exchange Online, with AppId `11161`.'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account `Jordan P` sent suspicious emails as part of an ongoing BEC (business email compromise) fraud attempt, indicating the account was likely compromised.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On the compromised mailbox of `Jordan P` (laylaw@vnevado.alpineskihouse.co), a suspicious inbox manipulation rule named `ITCleanup` was created to move messages to the `RSS Feeds` folder, performed through the cloud application with AppId `11161` (Microsoft Exchange Online).'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

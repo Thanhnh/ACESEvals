@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_55
+  title: incident_5_latest_cleaned_train_set_task_55
+  description: 'Following the lateral movement in this incident, a ''Suspicious WMI process creation'' alert was triggered, where WMI was used to spawn new processes and break process trees. On which host did this suspicious WMI process creation occur?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a ransomware-related security incident, an alert titled "Ransomware behavior detected in the file system" was raised on host `vnevado-win11u` (AadDeviceId `bc00e484-d0e5-4da4-9472-95568cccc07e`), indicating suspicious file system changes consistent with mass encryption of files. This activity was linked to a broader alert about potentially compromised assets exhibiting ransomware-like behavior across several devices, where an attacker used a compromised user account to move laterally.'
+    question: 'Following the lateral movement in this incident, a ''Suspicious WMI process creation'' alert was triggered, where WMI was used to spawn new processes and break process trees. On which host did this suspicious WMI process creation occur?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'vnevado-win10r'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'vnevado-win10r'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Ransomware behavior was detected in the file system on the device with AadDeviceId `bc00e484-d0e5-4da4-9472-95568cccc07e`, indicating mass encryption of files.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The potentially compromised account `dp5hn` was observed exhibiting ransomware-like behavior across several devices, suggesting the attacker used it to move laterally and spread ransomware.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'A suspicious WMI process creation was observed on the host `vnevado-win10r`, where malware used WMI to spawn new processes and further infect the machine.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

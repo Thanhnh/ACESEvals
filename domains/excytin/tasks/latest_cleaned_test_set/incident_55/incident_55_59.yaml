@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_59
+  title: incident_55_latest_cleaned_test_set_task_59
+  description: 'For the alert about the attempt to hide the use of a dual-purpose tool, what is the Microsoft Entra (AAD) user ID of the account associated with that activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this incident, a potentially malicious URL click was detected — user `Lucas Grey` (`bjenkins@niseko.alpineskihouse.co`) clicked on the link `http://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/` that was delivered to their mailbox and found to be malicious. Pivoting from this activity leads to a chain of endpoint alerts, including a malicious PowerShell Cmdlet invocation, a suspicious sequence of exploration activities, and finally an alert for an attempt to hide the use of a dual-purpose tool, where a known public tool was observed running under an unexpected filename.'
+    question: 'For the alert about the attempt to hide the use of a dual-purpose tool, what is the Microsoft Entra (AAD) user ID of the account associated with that activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account with SID `S-1-5-21-561436748-3867387497-1732241745-3701` clicked on a potentially malicious URL, which was detected as the initial compromise.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the click, a malicious PowerShell cmdlet was invoked on the machine through the process `powershell.exe` (ExtractedFileName: `powershell.exe`), potentially used for credential theft, exploitation, network reconnaissance or code injection.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The same session then executed a suspicious sequence of exploration activities (a set of Windows discovery commands) under the account with AadUserId `ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5`, used to identify valuable assets and prepare lateral movement.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'Finally, an attempt to hide the use of a dual-purpose tool (a known public tool renamed to an unexpected filename) was observed for the account with AadUserId `ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

@@ -34,7 +34,7 @@ tasks:
         max_score: 0.5
         weight: 1.0
         title: Checkpoint 1
-        description: A potentially compromised account with Email `Jordan P@vnevado.alpineskihouse.co` sent suspicious 
+        description: A potentially compromised account with Email `laylaw@vnevado.alpineskihouse.co` sent suspicious 
           emails, indicating the start of a BEC (Business Email Compromise) attempt.
       checkpoint_2:
         target: trajectory

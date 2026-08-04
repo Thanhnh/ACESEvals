@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During a recent investigation, a "Possible BEC financial fraud" alert was raised. The alert points
-      to suspicious activity involving the user account "Jordan P" (email: Jordan P@vnevado.alpineskihouse.co, SID: S-1-5-21-1740051960-3534030288-108486866-1602).
+      to suspicious activity involving the user account "Jordan P" (email: laylaw@vnevado.alpineskihouse.co, SID: S-1-5-21-1740051960-3534030288-108486866-1602).
       Analysts suspect that an attacker may be attempting to execute business-email-compromise-style financial fraud using
       this identity.'
     question: 'To correlate on-premises account information with cloud activity, what is the Azure AD (AadUserId) associated

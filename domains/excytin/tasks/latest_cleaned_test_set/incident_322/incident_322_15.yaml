@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_322_latest_cleaned_test_set_task_15
+  title: incident_322_latest_cleaned_test_set_task_15
+  description: 'For that final alert about suspicious Azure Resource Management activities performed by a risky user, what is the security identifier (SID) of the account involved?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert for ''Suspicious credential dump from NTDS.dit'' was raised, where attackers dump NTDS.dit to obtain user credentials stored on the domain controller. The activity involved an encoded PowerShell command (`powershell.exe -encodedcommand ...`, PID 2556, created at 2024-08-01T12:37:29.65Z) followed by `ntdsutil.exe "ac i ntds" ifm "create full c:\temp" q q` (PID 6748, created at 2024-08-01T12:37:30.27Z). Shortly afterwards, at 13:09 UTC, Microsoft Defender for Resource Manager flagged an Azure Resource Manager operation coming from an IP address associated with proxy services such as TOR, and about ten minutes later a further alert reported suspicious Azure Resource Management activities performed by a user account that had signed in to a risky session.'
+    question: 'For that final alert about suspicious Azure Resource Management activities performed by a risky user, what is the security identifier (SID) of the account involved?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'S-1-5-21-1840151686-3534835288-156286563-1127'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'S-1-5-21-1840151686-3534835288-156286563-1127'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'At 2024-08-01 12:49:26 UTC, a suspicious credential dump from NTDS.dit was detected on host `vnevado-dc`, indicating the attacker extracted domain user credentials from the domain controller.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'At 2024-08-01 13:09:13 UTC, the compromised account with SID `S-1-5-21-1840151686-3534835288-156286563-1127` performed an Azure Resource Manager operation from a suspicious proxy (TOR-associated) IP address.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'At 2024-08-01 13:19:20 UTC, the same account with SID `S-1-5-21-1840151686-3534835288-156286563-1127` was flagged as a risky user performing suspicious Azure Resource Management (ARM) activities from that risky sign-in session.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

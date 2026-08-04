@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_42
+  title: incident_55_latest_cleaned_test_set_task_42
+  description: 'For the final alert in this chain, which device performed the read of the AD FS DKM key?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage intrusion, an alert for a "Suspicious sequence of exploration activities" was raised on host `mb-adfs` for account `gsmith` (SID S-2-5-21-571436798-3864380397-1837441745-3206). A set of Windows discovery commands were executed, including `whoami.exe` (PID 1120) and hidden, base64-encoded PowerShell launched via `iy2orr1e.rrg.exe` (PID 3116) — behavior commonly used by attackers to identify valuable assets and prepare for lateral movement. This activity was followed by suspicious LDAP reconnaissance and, later, a suspected DCSync (directory services replication) attack, and finally an alert indicating that the Distributed Key Manager (DKM) key of the AD FS object with id 4cac49d3-29d3-407e-8c9b-b7ebb21541b2 was read.'
+    question: 'For the final alert in this chain, which device performed the read of the AD FS DKM key?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'MB-DC1'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'MB-DC1'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious sequence of exploration (discovery) commands was executed by the process `powershell.exe`, indicating reconnaissance to identify valuable assets and plan lateral movement.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The account with SID `S-1-5-21-551436448-9871687716-9837441745-1903` executed a suspicious LDAP query against the domain controller to enumerate administrative users, groups, and assets.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'Using the harvested credentials, the user Luciano Herrera (CIO) on MB-WINCLIENT sent a directory services replication request to the domain controller host `MB-DC1`, indicating a suspected DCSync attack.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'On the same host `MB-DC1`, the AD FS DKM key of ADFS object id `4cac49d3-29d3-407e-8c9b-b7ebb21541b2` was read, which can be used to forge SAML tokens and escalate access.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

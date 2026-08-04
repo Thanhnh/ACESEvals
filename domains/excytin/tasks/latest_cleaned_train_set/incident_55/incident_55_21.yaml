@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_21
+  title: incident_55_latest_cleaned_train_set_task_21
+  description: 'In the final alert of this chain, where a system program was registered as a service, what is the file name of the process associated with that service registration activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this incident, a malicious URL `https://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/` was clicked on a device. Tracing the activity from that device, investigators found a chain of related alerts, including a suspicious LDAP query indicating reconnaissance against the domain controller, a suspicious sequence of Windows exploration commands used to identify valuable assets and coordinate lateral movement, and finally an alert where a system program was registered as a service, which can indicate an attempt to establish persistence or gain SYSTEM privileges.'
+    question: 'In the final alert of this chain, where a system program was registered as a service, what is the file name of the process associated with that service registration activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'services.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'services.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A malicious URL was clicked on the device with HostName `mb-winclient`, marking the initial compromise.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On the host `mb-adfs`, a suspicious sequence of exploration activities was observed, where a process ran a set of Windows commands used to identify valuable assets and prepare for lateral movement.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'During this reconnaissance, the process `powershell.exe` executed a suspicious LDAP query against the domain controller to enumerate administrative users, groups, and interesting assets.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'Following the reconnaissance, the process `services.exe` was involved in a suspicious service registration, where a system program was registered as a service to establish persistence or gain SYSTEM privileges.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

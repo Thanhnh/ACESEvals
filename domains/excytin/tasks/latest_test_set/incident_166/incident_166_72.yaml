@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During the investigation of a Business Email Compromise (BEC) attempt, a user named "Jordan P" (email:
-      Jordan P@vnevado.alpineskihouse.co, SID: S-1-5-21-1740051960-3534030288-108486866-1602) was observed creating a suspicious
+      laylaw@vnevado.alpineskihouse.co, SID: S-1-5-21-1740051960-3534030288-108486866-1602) was observed creating a suspicious
       inbox rule while signed in from the IP address 255.246.85.58. The activity was flagged in a "BEC financial fraud" alert
       on 2024-07-22. The next day, a separate "Password Spray" alert was triggered, indicating that an attacker attempted
       to guess user credentials shortly after the initial BEC-related activity.'

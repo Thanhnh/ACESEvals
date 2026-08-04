@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_31
+  title: incident_5_latest_cleaned_train_set_task_31
+  description: 'Almost simultaneously (about 50 milliseconds earlier), an identical ''System recovery setting tampering'' alert was triggered by the same recovery-tampering utilities on a different endpoint in the environment. What is the hostname of that other affected device?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this incident, a "System recovery setting tampering" alert was raised on the device `vnevado-win11t` (AAD Device ID `e5799261-6720-4297-961e-bd9ca4275033`), where the commands `vssblatemp.exe delete shadows /all` (PID 1900) and `bcdedit /set recoveryenabled no` (PID 3464) were executed around 2024-06-20 09:29 UTC. These actions indicate an adversary attempting to delete volume shadow copies and disable Windows recovery features, likely as a precursor to data destruction or ransomware encryption.'
+    question: 'Almost simultaneously (about 50 milliseconds earlier), an identical ''System recovery setting tampering'' alert was triggered by the same recovery-tampering utilities on a different endpoint in the environment. What is the hostname of that other affected device?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'vnevado-win11u'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'vnevado-win11u'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'System recovery setting tampering was detected: the process with extracted file name `vssblatemp.exe` was used to delete volume shadow copies (e.g., `vssblatemp.exe delete shadows /all /quiet`), preventing system recovery.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'This system recovery setting tampering activity involving `vssblatemp.exe` was observed on the device with HostName `vnevado-win11u`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

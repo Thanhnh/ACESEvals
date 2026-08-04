@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_test_set_task_84
+  title: incident_34_latest_cleaned_test_set_task_84
+  description: 'A few seconds earlier on the same machine, a ''Suspicious PowerShell command line'' alert was raised. What is the name of the executable file associated with that alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a multi-stage incident, a ''Suspicious PowerShell download or encoded command execution'' alert fired on host `vnevado-win10e` (AAD device ID `02b8f519-1123-4228-b32a-ccb78af3449f`) under the account `samuelf` (SID `S-1-5-21-1870156660-7534030218-135086563-1193`). The activity originated from process ID 9780, `"winword.exe" c:\scripts\rs4_winatp-intro-invoice.docm`, created at 2024-06-26T11:57:20Z, which spawned `powershell.exe` to download a file or run an encoded command.'
+    question: 'A few seconds earlier on the same machine, a ''Suspicious PowerShell command line'' alert was raised. What is the name of the executable file associated with that alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'winatp-intro-backdoor.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'winatp-intro-backdoor.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious PowerShell download or encoded command execution was detected on the host `vnevado-win10e`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The suspicious PowerShell command line was used to drop or execute the file `winatp-intro-backdoor.exe`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_test_set_task_33
+  title: incident_166_latest_cleaned_test_set_task_33
+  description: 'Earlier in the same incident, a ''BEC financial fraud'' alert fired when a suspicious inbox rule that hides incoming email messages was created during a risky Azure Active Directory session by the same user. From which IP address was that suspicious inbox rule activity performed?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a high-severity incident involving SAP financial process manipulation, an alert for ''Suspicious SAP authentication'' was raised: a user account with a risky sign-in in Microsoft Entra ID signed in to the SAP enterprise application (cloud application AppId `100`) from the IP address `107.253.5.27`. An attacker might have taken control of the account to search SAP for sensitive financial information.'
+    question: 'Earlier in the same incident, a ''BEC financial fraud'' alert fired when a suspicious inbox rule that hides incoming email messages was created during a risky Azure Active Directory session by the same user. From which IP address was that suspicious inbox rule activity performed?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '255.246.85.58'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '255.246.85.58'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account `Jordan P`, flagged with a risky sign-in alert in Microsoft Entra ID, signed in to the SAP enterprise application, indicating a possible account takeover used to search for sensitive financial information.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using the same compromised account''s risky Azure Active Directory session, a suspicious inbox rule that hides incoming email messages was created as part of a business email compromise (BEC) financial fraud attempt, originating from the IP address `255.246.85.58`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

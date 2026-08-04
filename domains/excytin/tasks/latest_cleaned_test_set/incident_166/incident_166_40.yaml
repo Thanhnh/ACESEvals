@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_test_set_task_40
+  title: incident_166_latest_cleaned_test_set_task_40
+  description: 'For that follow-up alert about the BEC-related user signing in to SAP, what is the AppId of the cloud application recorded in the alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a business email compromise (BEC) fraud attempt within our organization, an alert was raised for suspicious emails sent by a possibly compromised user account. The messages were sent from `laylaw@vnevado.alpineskihouse.co` to the mailbox `tony@avoriaz.alpineskihouse.co`, originating from sender IP `255.246.85.58`. A few hours later, a follow-up Microsoft Defender XDR alert showed that a user tied to this BEC activity signed in to SAP in a suspicious manner, potentially to view or modify sensitive financial information.'
+    question: 'For that follow-up alert about the BEC-related user signing in to SAP, what is the AppId of the cloud application recorded in the alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'The cloud application involved has AppId `100`.'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'The cloud application involved has AppId `100`.'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A possibly compromised user account with email `laylaw@vnevado.alpineskihouse.co` sent suspicious emails as part of an ongoing BEC (business email compromise) fraud attempt.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The same BEC-related user then signed in suspiciously to the SAP cloud application, identified by AppId `100`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

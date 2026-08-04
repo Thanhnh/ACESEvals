@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_322_latest_cleaned_test_set_task_26
+  title: incident_322_latest_cleaned_test_set_task_26
+  description: 'About 20 minutes later, Microsoft Defender for Resource Manager detected an Azure Resource Manager operation coming from an IP address associated with proxy services such as TOR. What is the security identifier (SID) of the account that performed that resource management operation?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, an alert titled "Suspicious credential dump from NTDS.dit" was raised on 2024-08-01 at 12:49 UTC. The attacker launched `powershell.exe` with a long Base64 encoded command (process ID 2556) and then executed `ntdsutil.exe` with the command line `"ntdsutil.exe" "ac i ntds" ifm "create full c:\temp" q q` (process ID 6748) in order to obtain user credentials stored on the domain controller.'
+    question: 'About 20 minutes later, Microsoft Defender for Resource Manager detected an Azure Resource Manager operation coming from an IP address associated with proxy services such as TOR. What is the security identifier (SID) of the account that performed that resource management operation?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'S-1-5-21-1840151686-3534835288-156286563-1127'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'S-1-5-21-1840151686-3534835288-156286563-1127'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious credential dump from NTDS.dit was detected on the domain controller host `vnevado-dc` at 2024-08-01 12:49:26 UTC, indicating the attacker harvested domain user credentials.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using the stolen credentials, an Azure Resource Manager operation was performed from a suspicious proxy (TOR) IP address at 2024-08-01 13:09:13 UTC by the compromised account with SID `S-1-5-21-1840151686-3534835288-156286563-1127`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

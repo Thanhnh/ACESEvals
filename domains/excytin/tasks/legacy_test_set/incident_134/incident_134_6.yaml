@@ -89,7 +89,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: A security incident involving a compromised account following a password-spray attack occurred. 
-      The user `Nina Park` with the email `Nina Park@vnevado.alpineskihouse.co` and SID 
+      The user `Nina Park` with the email `raphaelt@vnevado.alpineskihouse.co` and SID 
       `S-1-5-21-1874151667-3554330288-105586563-1715` was signed in from an unusual location and browser during the 
       attack. This suggests that an attacker may have compromised the user account for unauthorized access to the 
       network. Immediate investigation is recommended to mitigate potential security risks.
@@ -277,7 +277,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: A security incident was reported on 2024-07-18 indicating that the account `Nina Park` with email 
-      `Nina Park@vnevado.alpineskihouse.co` was potentially compromised following a password-spray attack. This incident
+      `raphaelt@vnevado.alpineskihouse.co` was potentially compromised following a password-spray attack. This incident
       involved an unusual sign-in from a location and browser, suggesting unauthorized access to the network. Immediate 
       investigation is recommended to mitigate security risks.
     question: Can you determine the malicious IP address associated with this account sign-in activity during the time 

@@ -103,7 +103,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'We detected a security incident involving suspicious SAP authentication, where an account associated
-      with Jordan P (email: Jordan P@vnevado.alpineskihouse.co) with risky sign-in alert in Microsoft Entra ID, signed in
+      with Jordan P (email: laylaw@vnevado.alpineskihouse.co) with risky sign-in alert in Microsoft Entra ID, signed in
       to SAP. There is a possibility that an attacker has taken control of this user account to search through SAP with the
       intention of recording or modifying sensitive financial information.'
     question: Can you identify the AppId of the cloud application involved in this suspicious activity?
@@ -204,7 +204,7 @@ tasks:
     # To use static matching instead, change strategy to "static" and set:
     #   criteria:
     #     expected_answers:
-    #       - 'Jordan P@vnevado.alpineskihouse.co'
+    #       - 'laylaw@vnevado.alpineskihouse.co'
   scoring:
     llm_judge:
       model: "{judge_llm}"
@@ -215,7 +215,7 @@ tasks:
         target: submission
         judge_system_template: judge/submission_judge_system.md
         judge_user_template: judge/submission_judge_user.md
-        description: 'Jordan P@vnevado.alpineskihouse.co'
+        description: 'laylaw@vnevado.alpineskihouse.co'
         max_score: 1.0
       checkpoint_1:
         target: trajectory
@@ -230,7 +230,7 @@ tasks:
         weight: 1.0
         title: Checkpoint 2
         description: Suspicious events indicative of business email compromise (BEC) were observed, potentially 
-          targeting the email account `Jordan P@vnevado.alpineskihouse.co`.
+          targeting the email account `laylaw@vnevado.alpineskihouse.co`.
   scoring_aggregation:
     max:
       scores:
@@ -293,7 +293,7 @@ tasks:
   initial_context:
     incident_context: 'A security incident involving suspicious SAP authentication was triggered when a user account with
       a risky sign-in alert in Microsoft Entra ID signed in to SAP. The user account details are as follows: Name `Jordan
-      P`, Email `Jordan P@vnevado.alpineskihouse.co`, and associated IP address `107.253.5.27`. The attacker might have taken
+      P`, Email `laylaw@vnevado.alpineskihouse.co`, and associated IP address `107.253.5.27`. The attacker might have taken
       control of this user account to search through SAP for sensitive financial information, which could be leveraged in
       later attack stages such as phishing or social engineering.'
     question: What is the Application ID (AppId) associated with the suspicious SAP authentication?
@@ -343,7 +343,7 @@ tasks:
     incident_context: 'A suspicious SAP authentication was detected, where a user account with a risky sign-in alert in Microsoft
       Entra ID signed in to SAP. This could indicate that an attacker might have taken control of a user account to search
       for or modify sensitive financial information in SAP. As part of the connection, there was an entity with the IP address
-      `107.253.5.27` linked to the user account: Name: Jordan P, Email: Jordan P@vnevado.alpineskihouse.co, and SID: S-1-5-21-1740051960-3534030288-108486866-1602.
+      `107.253.5.27` linked to the user account: Name: Jordan P, Email: laylaw@vnevado.alpineskihouse.co, and SID: S-1-5-21-1740051960-3534030288-108486866-1602.
       This might lead to later stages of the attack, such as phishing or social engineering.'
     question: Can you identify the IP address from which an anonymous sign-in was attempted in connection with this 
       suspicious SAP authentication?
@@ -390,7 +390,7 @@ tasks:
   initial_context:
     incident_context: During a security incident involving a suspicious inbox manipulation rule at 2024-07-22 
       10:00:07.502771+00:00, it was observed that a user account with the name Jordan P, SID 
-      S-1-5-21-1740051960-3534030288-108486866-1602, and email `Jordan P@vnevado.alpineskihouse.co` was potentially 
+      S-1-5-21-1740051960-3534030288-108486866-1602, and email `laylaw@vnevado.alpineskihouse.co` was potentially 
       compromised. The attacker's IP address involved in this activity was `255.246.85.58`.
     question: What is the AppId of the cloud application involved in the suspicious activity?
     # Main task submission evaluation - uses LLM-as-a-judge by default

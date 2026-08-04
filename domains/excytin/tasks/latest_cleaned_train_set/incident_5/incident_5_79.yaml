@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_79
+  title: incident_5_latest_cleaned_train_set_task_79
+  description: 'For the follow-up ransomware alert triggered on this device, can you provide the name of the affected file, including the appended malicious extension?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a suspicious WMI process creation was observed on host `vnevado-win10s` (AAD device ID f5b847aa-8712-4bf6-b4f7-ed6cd89e1505). The activity included processes such as `vssblatemp.exe delete shadows /all` (PID 5512), `bcdedit /set recoveryenabled no` (PID 8136), `bcdedit /set bootstatuspolicy ignoreallfailures` (PID 1868), `curl http://vectorsandarrows.com` (PID 6460), and `powershell -file c:\scripts\get-userprttoken.ps1` (PID 6168). Shortly after, a related alert fired reporting numerous file system changes indicative of mass encryption of files by ransomware, based on a file extension known from past ransomware incidents.'
+    question: 'For the follow-up ransomware alert triggered on this device, can you provide the name of the affected file, including the appended malicious extension?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'unstreaming.xlsx.lockbit'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'unstreaming.xlsx.lockbit'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with SID `S-1-5-21-1840191660-8534830288-125585561-1522` was observed spawning a suspicious WMI process creation on the machine.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the WMI abuse, mass file system changes were observed, producing the ransomware-encrypted file `unstreaming.xlsx.lockbit`, whose `.lockbit` extension indicates known ransomware activity.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

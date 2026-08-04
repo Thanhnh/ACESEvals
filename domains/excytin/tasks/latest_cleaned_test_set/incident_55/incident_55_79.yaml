@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_79
+  title: incident_55_latest_cleaned_test_set_task_79
+  description: 'Following this activity, the same user was involved in a suspected DCSync attack in which a directory services replication request was sent from the workstation MB-WINCLIENT. What is the name of the host that received this replication request?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'In this incident, an alert titled "Unusual addition of credentials to an OAuth app" was raised after the user Luciano Herrera (pwilson@niseko.alpineskihouse.co) added a Password-type credential to the application SimulandApp (OAuth App ID `4d9476b8-6ae6-459b-a273-5837c15b5981`, Object ID `a66a4b44-d1f7-4563-95bf-a89d1b05b325`) from IP address `36.193.21.220`, involving the cloud application Office 365 / Microsoft 365 (App ID 11161). This pattern may indicate that an attacker compromised the app to spread phishing, exfiltrate data, or gain access to other accounts and devices.'
+    question: 'Following this activity, the same user was involved in a suspected DCSync attack in which a directory services replication request was sent from the workstation MB-WINCLIENT. What is the name of the host that received this replication request?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'MB-DC1'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'MB-DC1'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account `Luciano Herrera` (pwilson@niseko.alpineskihouse.co) performed an unusual addition of a Password credential to the OAuth application SimulandApp, indicating the app may have been compromised.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using the compromised account `Luciano Herrera` on the device MB-WINCLIENT, the attacker sent a directory replication request in a suspected DCSync attack targeting the domain controller host `MB-DC1`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

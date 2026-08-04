@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During an investigation into a potential Business Email Compromise (BEC), the security team observed
-      that user account "Nina Park" (email: Nina Park@vnevado.alpineskihouse.co) was flagged for sending suspicious emails
+      that user account "Nina Park" (email: raphaelt@vnevado.alpineskihouse.co) was flagged for sending suspicious emails
       on July 17 2024. The e-mails originated from IP address 237.7.81.122 and were sent to the mailbox nathan@avoriaz.alpineskihouse.co,
       raising concerns of credential theft and further compromise attempts. The next day, a separate alert was raised indicating
       that a password-spray attack had been detected in the environment. Analysts now need to correlate these two alerts and

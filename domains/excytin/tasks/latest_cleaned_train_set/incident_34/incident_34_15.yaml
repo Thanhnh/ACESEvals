@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_train_set_task_15
+  title: incident_34_latest_cleaned_train_set_task_15
+  description: 'For the related ''Suspicious LDAP query'' alert in this incident, what is the name of the process image that issued the suspicious LDAP query?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident, an alert for "Suspicious PowerShell download or encoded command execution" was raised after `powershell.exe` was launched (PID 8604) with a bypass execution policy and a long concatenated base64 blob. The command reconstructed a binary, wrote it to the user''s desktop as `winatp-intro-backdoor.exe`, and then created and ran a scheduled task named ''yrei'' to execute it. The same compromised user account is linked to further reconnaissance activity in the incident, including a suspicious LDAP query against the domain controller, which attackers typically use to enumerate privileged users, groups and valuable assets.'
+    question: 'For the related ''Suspicious LDAP query'' alert in this incident, what is the name of the process image that issued the suspicious LDAP query?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'winword.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'winword.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A user account with AadUserId `16320fec-8d90-403b-b7fe-78f715d4728d` executed a suspicious PowerShell command to download a file or run an encoded command at 2024-07-04 22:35:01 UTC.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following this activity, a suspicious LDAP query indicating reconnaissance against the domain controller was executed by the process `winword.exe` at 2024-07-04 22:35:02 UTC.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

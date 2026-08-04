@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'On July 17 2024, an alert titled “BEC financial fraud” was raised after a risky Azure AD session in
-      which the user Nina Park (email: Nina Park@vnevado.alpineskihouse.co, SID S-1-5-21-1874151667-3554330288-105586563-1715)
+      which the user Nina Park (email: raphaelt@vnevado.alpineskihouse.co, SID S-1-5-21-1874151667-3554330288-105586563-1715)
       connected from IP address 237.7.81.122 and created an inbox rule designed to hide incoming messages—activity typical
       of business-email-compromise attempts. This alert is linked to a second alert, “Suspicious inbox manipulation rule,”
       indicating that the same mailbox’s rules were further tampered with. The second alert references a particular cloud
@@ -36,7 +36,7 @@ tasks:
         weight: 1.0
         title: Checkpoint 1
         description: The BEC financial fraud alert shows a suspicious inbox rule created for the account with Email 
-          `Nina Park@vnevado.alpineskihouse.co`.
+          `raphaelt@vnevado.alpineskihouse.co`.
       checkpoint_2:
         target: trajectory
         max_score: 0.5
