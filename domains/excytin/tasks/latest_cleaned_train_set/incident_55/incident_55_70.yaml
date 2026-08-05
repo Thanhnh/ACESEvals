@@ -1,0 +1,36 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_70
+  title: incident_55_latest_cleaned_train_set_task_70
+  description: 'For triage and blocking purposes, from which originating IP address was this malicious email message sent?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'An alert titled "Email messages containing malicious URL removed after delivery" was raised on 2024-07-07 at 08:54:40 UTC. The alert indicates that an email containing the malicious URL `http://kn017721628.wittytree-b6f239d6.northeurope.azurecontainerapps.io/` was delivered to the mailbox `santiago@vnevado.alpineskihouse.co` (account name Nina Sullivan, AAD user ID 28058d92-fc24-4869-9231-6546a34b00f2) from the sender address `4qs6v9m@vnevado.alpineskihouse.co`, and was later removed by the system.'
+    question: 'For triage and blocking purposes, from which originating IP address was this malicious email message sent?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '106.214.87.198'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '106.214.87.198'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 1.0
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Emails containing a malicious URL were delivered and later removed after delivery; the messages were sent from the sender IP address `106.214.87.198`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1

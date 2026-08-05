@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_28
+  title: incident_5_latest_cleaned_test_set_task_28
+  description: 'For the follow-up alert about LSASS process memory modification, which executable was used and what was its full command line (including the process ID and creation time)?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage intrusion, an alert fired for a possible attempt to access the Primary Refresh Token (PRT) on an affected device. The activity involved `powershell.exe` running a long Base64 encoded command (Process ID 2484, created 2024-06-20T08:51:01.97Z), which shortly afterwards spawned `browsercore.exe` (Process ID 4760, created 2024-06-20T08:51:07.05Z) — a known technique for stealing PRTs to move laterally or perform credential theft. About a second after this alert, a related alert reported that the Local Security Authority Subsystem Service (LSASS) process memory was modified on the same device.'
+    question: 'For the follow-up alert about LSASS process memory modification, which executable was used and what was its full command line (including the process ID and creation time)?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'The credential theft tool `mimikatz.exe` was used. Process ID: 2020, created 2024-06-20T09:03:47.538167Z, command line: `"mimikatz.exe" privilege::debug "sekurlsa::pth /user:fk8mq /ntlm:96def1a633fc6790124d5f8fe21cc72b /domain:vnevado.alpineskihouse.co /run:..\notepad.exe //vnevado-jump cmd.exe"`'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'The credential theft tool `mimikatz.exe` was used. Process ID: 2020, created 2024-06-20T09:03:47.538167Z, command line: `"mimikatz.exe" privilege::debug "sekurlsa::pth /user:fk8mq /ntlm:96def1a633fc6790124d5f8fe21cc72b /domain:vnevado.alpineskihouse.co /run:..\notepad.exe //vnevado-jump cmd.exe"`'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A possible attempt to access the Primary Refresh Token (PRT) was detected on the host with AadDeviceId `4d8d23e9-a77d-4e33-9435-b8c457e57ca1`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On that host, the LSASS process memory was modified by the attacker running mimikatz with the command line `"mimikatz.exe" privilege::debug "sekurlsa::pth /user:fk8mq /ntlm:96def1a633fc6790124d5f8fe21cc72b /domain:vnevado.alpineskihouse.co /run:..\notepad.exe //vnevado-jump cmd.exe"` at `2024-06-20t09:03:47.538167z`, with Process ID `2020`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_322_latest_cleaned_test_set_task_24
+  title: incident_322_latest_cleaned_test_set_task_24
+  description: 'For the related alert about email messages containing a malicious URL that were removed after delivery, which mailbox recipient received those emails?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident, the tool `ntdsutil.exe` was observed being launched via an encoded PowerShell command (process ID 6748, command line `"ntdsutil.exe" "ac i ntds" ifm "create full c:\temp" q q`), suggesting an attacker was collecting Active Directory information for persistence or lateral movement. This activity is linked through a shared host and compromised account to other alerts in the incident, including one reporting emails containing a malicious URL that were delivered and later removed from mailboxes.'
+    question: 'For the related alert about email messages containing a malicious URL that were removed after delivery, which mailbox recipient received those emails?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'alyssat@vnevado.alpineskihouse.co'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'alyssat@vnevado.alpineskihouse.co'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'On host `vnevado-dc`, Ntdsutil was launched to collect Active Directory information, indicating credential/AD database dumping activity.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The compromised account with SID `S-1-5-21-1840151686-3534835288-156286563-1127` performed an Azure Resource Manager operation from a suspicious proxy (TOR) IP address.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'That same identity was used to send phishing emails, and a message containing a malicious URL was delivered to the recipient mailbox `alyssat@vnevado.alpineskihouse.co` before being removed.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

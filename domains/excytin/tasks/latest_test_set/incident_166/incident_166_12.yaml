@@ -17,7 +17,7 @@ tasks:
     # To use static matching instead, change strategy to "static" and set:
     #   criteria:
     #     expected_answers:
-    #       - 'Jordan P@vnevado.alpineskihouse.co'
+    #       - 'laylaw@vnevado.alpineskihouse.co'
   scoring:
     llm_judge:
       model: "{judge_llm}"
@@ -28,7 +28,7 @@ tasks:
         target: submission
         judge_system_template: judge/submission_judge_system.md
         judge_user_template: judge/submission_judge_user.md
-        description: 'Jordan P@vnevado.alpineskihouse.co'
+        description: 'laylaw@vnevado.alpineskihouse.co'
         max_score: 1.0
       checkpoint_1:
         target: trajectory
@@ -36,7 +36,7 @@ tasks:
         weight: 1.0
         title: Checkpoint 1
         description: 'At 2024-07-22 10:00:07.521914+00:00, the “BEC financial fraud” alert indicated that the user account
-          with Email `Jordan P@vnevado.alpineskihouse.co` (Field: Email) created a suspicious inbox rule, a common step in
+          with Email `laylaw@vnevado.alpineskihouse.co` (Field: Email) created a suspicious inbox rule, a common step in
           business email compromise.'
       checkpoint_2:
         target: trajectory

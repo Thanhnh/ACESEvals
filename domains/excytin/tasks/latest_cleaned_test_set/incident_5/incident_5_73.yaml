@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_73
+  title: incident_5_latest_cleaned_test_set_task_73
+  description: 'For the suspicious WMI process creation alert, what was the command line executed and the process ID of that spawned process?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a ransomware-style incident, an alert fired on host `vnevado-win10s` (AAD device ID f5b847aa-8712-4bf6-b4f7-ed6cd89e1505) indicating that all file snapshots and shadow copies were deleted. The activity was performed by account `dp5hn` (AAD user ID 731adb71-b11c-4bbf-850b-57989b350e96) using the process `vssblatemp.exe` (PID 5512) with the command line `vssblatemp.exe delete shadows /all`. Shortly afterwards, a related alert for suspicious WMI process creation was raised on the same machine, since malware frequently uses WMI to spawn new processes and break process trees.'
+    question: 'For the suspicious WMI process creation alert, what was the command line executed and the process ID of that spawned process?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Command line: `bcdedit /set bootstatuspolicy ignoreallfailures`, Process ID: 1868 (created 2024-06-20T09:10:49.1654106Z)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Command line: `bcdedit /set bootstatuspolicy ignoreallfailures`, Process ID: 1868 (created 2024-06-20T09:10:49.1654106Z)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with SID `S-1-5-21-1840191660-8534830288-125585561-1522` deleted all file snapshots and shadow copies via WMI or VSSAdmin, a common ransomware behavior.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A suspicious WMI process creation was observed on the machine, spawning the process with Process ID `1868` at `2024-06-20t09:10:49.1654106z` with the command line `bcdedit /set bootstatuspolicy ignoreallfailures`, which disables Windows recovery options.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

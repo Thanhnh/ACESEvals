@@ -35,7 +35,7 @@ tasks:
         weight: 1.0
         title: Checkpoint 1
         description: A suspicious inbox rule (named 'ITCleanup') was created on the mailbox of the account with Email 
-          `Jordan P@vnevado.alpineskihouse.co`, indicating a possible compromise of this user.
+          `laylaw@vnevado.alpineskihouse.co`, indicating a possible compromise of this user.
       checkpoint_2:
         target: trajectory
         max_score: 0.5

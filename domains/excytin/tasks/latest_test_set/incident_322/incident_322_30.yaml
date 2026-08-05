@@ -42,7 +42,7 @@ tasks:
         weight: 1.0
         title: Checkpoint 2
         description: At 2024-08-01 13:09:13.222398+00:00 an Azure Resource Manager operation originated from a proxy IP 
-          using the account Email=Hailey Johnson@vnevado.alpineskihouse.co.
+          using the account Email=alyssat@vnevado.alpineskihouse.co.
       checkpoint_3:
         target: trajectory
         max_score: 0.25

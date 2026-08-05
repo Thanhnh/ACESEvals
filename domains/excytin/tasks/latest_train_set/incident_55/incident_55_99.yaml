@@ -35,7 +35,7 @@ tasks:
         max_score: 0.2
         weight: 1.0
         title: Checkpoint 1
-        description: 'Step 1 – account.Email: `Nina Sullivan@vnevado.alpineskihouse.co` A malicious URL-bearing message was
+        description: 'Step 1 – account.Email: `santiago@vnevado.alpineskihouse.co` A malicious URL-bearing message was
           delivered to (and later removed from) the mailbox of Nina Sullivan, indicating initial compromise by email.'
       checkpoint_2:
         target: trajectory

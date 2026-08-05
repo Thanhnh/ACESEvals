@@ -33,7 +33,7 @@ tasks:
         weight: 1.0
         title: Checkpoint 1
         description: A suspicious inbox rule that hides incoming email messages was created for the email account 
-          `Jordan P@vnevado.alpineskihouse.co`.
+          `laylaw@vnevado.alpineskihouse.co`.
       checkpoint_2:
         target: trajectory
         max_score: 0.5

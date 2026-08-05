@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_83
+  title: incident_55_latest_cleaned_test_set_task_83
+  description: 'Later in this incident chain, an alert flagged an unusual addition of a Password-type credential to the OAuth application ''SimulandApp''. What is the display name of the user account that performed this credential addition?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of an incident in the vnevado.alpineskihouse.co / niseko.alpineskihouse.co environment, an ''Internal phishing campaign'' alert was raised on 2024-07-07 after a user was observed sending phishing email from a device to recipients inside the organization, suggesting an account may have been compromised for lateral movement. Accounts seen in that alert include `Nina Sullivan` (santiago@vnevado.alpineskihouse.co, AadUserId 28058d92-fc24-4869-9231-6546a34b00f2) and `Lucas Grey` (bjenkins@niseko.alpineskihouse.co), along with the phishing URL `http://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/`. The activity chain also links to a ''Suspicious sequence of exploration activities'' alert and to later cloud application abuse.'
+    question: 'Later in this incident chain, an alert flagged an unusual addition of a Password-type credential to the OAuth application ''SimulandApp''. What is the display name of the user account that performed this credential addition?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Luciano Herrera (pwilson@niseko.alpineskihouse.co)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Luciano Herrera (pwilson@niseko.alpineskihouse.co)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The compromised account with AadUserId `a2d0f7c2-b0a0-43bd-bce0-27d8ae3be4d0` was observed sending internal phishing emails from the device to recipients inside the organization.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The account with SID `S-1-5-21-551436448-9871687716-9837441745-1903` ran a suspicious sequence of Windows exploration commands, used to identify valuable assets and coordinate lateral movement.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The user account `Luciano Herrera` (pwilson@niseko.alpineskihouse.co) performed an unusual addition of a Password credential to the OAuth application SimulandApp, indicating the app may be abused to spread phishing, exfiltrate data, or gain access to other accounts and devices.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

@@ -32,7 +32,7 @@ tasks:
         max_score: 0.25
         weight: 1.0
         title: Checkpoint 1
-        description: The user with the email `Nina Park@vnevado.alpineskihouse.co` clicked on a potentially malicious 
+        description: The user with the email `raphaelt@vnevado.alpineskihouse.co` clicked on a potentially malicious 
           URL.
       checkpoint_2:
         target: trajectory
@@ -153,7 +153,7 @@ tasks:
     incident_context: A security incident involving BEC financial fraud was reported. In this incident, a suspicious 
       inbox rule that hides incoming email messages was created during a risky Azure Active Directory session. This 
       might indicate an attempt at business email compromise, which is a form of financial fraud. The session involved 
-      the account `Nina Park` with the email `Nina Park@vnevado.alpineskihouse.co`, and IP address `237.7.81.122`.
+      the account `Nina Park` with the email `raphaelt@vnevado.alpineskihouse.co`, and IP address `237.7.81.122`.
     question: Can you find the anonymous IP address associated with a sign-in mentioned in this incident?
     # Main task submission evaluation - uses LLM-as-a-judge by default
     # To use static matching instead, change strategy to "static" and set:
@@ -431,7 +431,7 @@ tasks:
     incident_context: A security incident involving BEC financial fraud was identified, where a suspicious inbox rule 
       that hides incoming email messages was created in a risky Azure Active Directory session. The attack might be an 
       attempt to conduct business email compromise, a form of financial fraud. During the investigation, it was found 
-      that the user account `Nina Park` with email `Nina Park@vnevado.alpineskihouse.co` and SID 
+      that the user account `Nina Park` with email `raphaelt@vnevado.alpineskihouse.co` and SID 
       `S-1-5-21-1874151667-3554330288-105586563-1715` was involved, using the IP address `237.7.81.122`.
     question: Related to this incident, there was a sign-in from an IP address known to be malicious. Can you identify 
       the malicious IP address involved in the sign-in?

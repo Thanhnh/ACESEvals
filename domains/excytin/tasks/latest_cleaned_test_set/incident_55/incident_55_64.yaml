@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_64
+  title: incident_55_latest_cleaned_test_set_task_64
+  description: 'Almost immediately after this alert, another alert fired for a suspicious sequence of exploration activities where a process ran a set of Windows discovery commands. What is the security identifier (SID) of the account associated with that exploration activity alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this incident, a "Suspicious remote activity" alert was raised on host `mb-adfs`, where activity initiated remotely was observed — including interactive session attempts, file modifications, WMI commands and scheduled task creation. The alert involved processes such as `lsass.exe` and `cmd.exe` (with `%comspec%` referenced), a PowerShell encoded command (`6808__2024-07-02t09:48:12.7628138z__powershell.exe -encodedcommand qwa6afwauwbjahiaaqbwahqacwbcafiazqbuageabqblafaabwb3aguacgbzaggazqbsagwalgbwahmamqa=`), and accounts including `LocalSystem` and `gsmith` (AadUserId `ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5`).'
+    question: 'Almost immediately after this alert, another alert fired for a suspicious sequence of exploration activities where a process ran a set of Windows discovery commands. What is the security identifier (SID) of the account associated with that exploration activity alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'S-1-5-21-551436448-9871687716-9837441745-1903'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'S-1-5-21-551436448-9871687716-9837441745-1903'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Suspicious remote activity was observed involving the process `powershell.exe`, which was initiated remotely on the machine.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the remote PowerShell activity, a suspicious sequence of exploration commands was executed by the account with SID `S-1-5-21-551436448-9871687716-9837441745-1903`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

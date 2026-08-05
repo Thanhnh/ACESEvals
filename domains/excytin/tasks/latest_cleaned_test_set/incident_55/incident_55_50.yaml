@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_50
+  title: incident_55_latest_cleaned_test_set_task_50
+  description: 'For the internal phishing campaign alert at the end of this attack chain, what is the display name of the user account that was observed sending the phishing emails inside the organization?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a suspicious service registration was detected where a system program `services.exe` (Process ID 764, created 2024-06-20T08:30:13.7925191Z) was registered as a service, potentially indicating an attempt to establish persistence or gain SYSTEM privileges. This activity was linked through the affected host to further alerts, including an ongoing hands-on-keyboard attack via the Impacket toolkit and a sensitive credential memory read from lsass.exe, which allows an attacker to extract authentication hashes or passwords. The compromised credentials were then apparently leveraged to move laterally inside the organization, culminating in an internal phishing campaign alert raised by Microsoft Defender for Office 365, where phishing emails were sent from the device to recipients inside the organization.'
+    question: 'For the internal phishing campaign alert at the end of this attack chain, what is the display name of the user account that was observed sending the phishing emails inside the organization?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Nina Sullivan'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Nina Sullivan'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A system program was registered as a service on host `mb-adfs`, indicating an attempt to establish persistence or gain system privileges.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'An ongoing hands-on-keyboard attack via the Impacket toolkit was observed, executing commands through the process `powershell.exe` for lateral movement.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The account with SID `S-1-5-21-561436748-3867387497-1732241745-3701` performed a sensitive credential memory read against lsass.exe to dump authentication hashes or passwords.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'The compromised account `Nina Sullivan` was used to send internal phishing emails to recipients inside the organization.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

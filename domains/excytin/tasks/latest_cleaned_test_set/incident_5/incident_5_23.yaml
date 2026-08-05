@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_23
+  title: incident_5_latest_cleaned_test_set_task_23
+  description: 'Related to this chain of activity, ''CommandAndControl'' malware was detected on a device during the lateral movement. What is the security identifier (SID) of the account associated with that malware detection alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage intrusion, an alert fired for LSASS process memory modification after `mimikatz.exe` was executed with the command line `"mimikatz.exe" privilege::debug "sekurlsa::pth /user:fk8mq /ntlm:96def1a633fc6790124d5f8fe21cc72b /domain:vnevado.alpineskihouse.co /run:..\notepad.exe //vnevado-jump cmd.exe"` (Process ID 2020), spawning `notepad.exe` and `cmd.exe`. The attacker then used PSExec to move laterally to the jump server, and a ransomware payload was remotely launched on a device.'
+    question: 'Related to this chain of activity, ''CommandAndControl'' malware was detected on a device during the lateral movement. What is the security identifier (SID) of the account associated with that malware detection alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'S-1-5-21-1840191660-8534830288-125585561-1522'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'S-1-5-21-1840191660-8534830288-125585561-1522'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with AadUserId `1d94aaf6-efe6-4e76-ad56-ffd7d1257bc1` was involved in modifying the LSASS process memory to bypass security mechanisms and harvest credentials.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using the stolen credentials, the attacker performed lateral movement via PSExec to the jump server from the IP address `99.83.111.100`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'From the jump server, a ransomware payload was remotely launched on a device under the account with AadUserId `731adb71-b11c-4bbf-850b-57989b350e96`.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'During this lateral movement, ''CommandAndControl'' malware was detected on the device associated with the account with SID `S-1-5-21-1840191660-8534830288-125585561-1522`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

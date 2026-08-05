@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_42
+  title: incident_5_latest_cleaned_test_set_task_42
+  description: 'In the related suspicious WMI process creation alert on the same host, what was the name of the executable that was spawned?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert was raised for a possible attempt to access a Primary Refresh Token (PRT) — a key artifact of Microsoft Entra ID (Azure AD) authentication used to enable single sign-on. The alert involved the process `browsercore.exe` (Process ID 2676, created 2024-06-20T09:10:59.867384Z, command line `"browsercore.exe"`). Shortly after, on the same affected host, another alert fired for suspicious WMI process creation, a technique malware often uses to spawn new processes and break process trees.'
+    question: 'In the related suspicious WMI process creation alert on the same host, what was the name of the executable that was spawned?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'vssblatemp.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'vssblatemp.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A possible attempt to access the Primary Refresh Token (PRT) was detected on host `vnevado-win10s`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On that host, a suspicious WMI process creation was observed, spawning the process `vssblatemp.exe`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

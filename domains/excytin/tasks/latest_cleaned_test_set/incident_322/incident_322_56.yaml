@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_322_latest_cleaned_test_set_task_56
+  title: incident_322_latest_cleaned_test_set_task_56
+  description: 'For the alert about emails containing a malicious URL that were removed after delivery, what was the sender IP address of those email messages?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, a ''Suspicious credential dump from NTDS.dit'' alert was raised on 2024-08-01. Investigators observed `powershell.exe` running an encoded command that referenced NTDS-related activity, followed by `ntdsutil.exe` executing with the command line `"ntdsutil.exe" "ac i ntds" ifm "create full c:\temp" q q` (Process ID 6748). This activity is linked through a shared host and a compromised account to further cloud-based activity, including an Azure Resource Manager operation from a suspicious proxy IP address. The same chain also includes an alert for email messages containing a malicious URL that were delivered and later removed from mailboxes.'
+    question: 'For the alert about emails containing a malicious URL that were removed after delivery, what was the sender IP address of those email messages?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '202.205.215.225'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '202.205.215.225'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious credential dump from NTDS.dit was detected on the domain controller host `vnevado-dc`, indicating attackers extracted domain user credentials.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using the compromised credentials, an Azure Resource Manager operation was performed from a suspicious proxy IP address by the account with Name `Hailey Johnson`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'Emails containing a malicious URL were delivered to users and later removed; these messages originated from the sender IP `202.205.215.225`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

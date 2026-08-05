@@ -5,7 +5,7 @@ tasks:
     AD user ID (AadUserId) associated with this later alert?'
   inherit_shared: true
   initial_context:
-    incident_context: 'At 12:59 UTC on 22 July 2024, the user account "Jordan P" (email: Jordan P@vnevado.alpineskihouse.co,
+    incident_context: 'At 12:59 UTC on 22 July 2024, the user account "Jordan P" (email: laylaw@vnevado.alpineskihouse.co,
       SID: S-1-5-21-1740051960-3534030288-108486866-1602) signed in to the SAP cloud application from the external IP address
       107.253.5.27. Microsoft Entra ID classified the session as risky and Microsoft Defender generated a "Suspicious SAP
       authentication" alert, indicating that an attacker might have taken control of the account to access or manipulate sensitive

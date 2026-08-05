@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_test_set_task_38
+  title: incident_166_latest_cleaned_test_set_task_38
+  description: 'Earlier the same day, the same compromised user was involved in another alert where inbox rules were manipulated in a suspicious manner to delete or move messages. Which cloud application ID (AppId) was associated with that suspicious inbox manipulation rule alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a security incident involving SAP financial process manipulation, an alert for ''Suspicious SAP authentication'' was raised: a user account with a risky sign-in alert in Microsoft Entra ID signed in to SAP (cloud application AppId `100`) from the IP address `107.253.5.27`. An attacker might have taken control of the user account to search through SAP with the intention of recording or modifying sensitive financial information.'
+    question: 'Earlier the same day, the same compromised user was involved in another alert where inbox rules were manipulated in a suspicious manner to delete or move messages. Which cloud application ID (AppId) was associated with that suspicious inbox manipulation rule alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'AppId 20893 (the cloud application involved in the ''Suspicious inbox manipulation rule'' alert)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'AppId 20893 (the cloud application involved in the ''Suspicious inbox manipulation rule'' alert)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A user account named `Jordan P`, which had a risky sign-in alert in Microsoft Entra ID, signed in to the SAP enterprise application, indicating a possible account takeover used to search for sensitive financial information.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using the compromised account, the attacker then created a suspicious inbox manipulation rule in the cloud application with AppId `20893` (Microsoft Exchange Online), to delete or move messages and hide activity while exfiltrating data.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

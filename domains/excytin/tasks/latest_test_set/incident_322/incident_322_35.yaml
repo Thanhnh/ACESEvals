@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During the investigation you notice an alert titled "Suspicious Azure Resource Management activities
-      by a risky user" raised at 2024-08-01 13:19:20 UTC. It involves the account "Hailey Johnson" (email Hailey Johnson@vnevado.alpineskihouse.co,
+      by a risky user" raised at 2024-08-01 13:19:20 UTC. It involves the account "Hailey Johnson" (email alyssat@vnevado.alpineskihouse.co,
       SID S-1-5-21-1840151686-3534835288-156286563-1127) connecting from the external IP address 253.1.244.215. A related
       alert fired ten minutes earlier flagged an Azure Resource Manager operation originating from a proxy-associated IP.
       To understand the scope of the activity, you need to know exactly which Azure resource was targeted in that earlier

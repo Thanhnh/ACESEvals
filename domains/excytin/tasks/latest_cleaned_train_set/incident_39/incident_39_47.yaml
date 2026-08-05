@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_47
+  title: incident_39_latest_cleaned_train_set_task_47
+  description: 'Immediately after this alert, a related alert titled ''Potential human-operated malicious activity'' was raised on the same device, indicating a sequence of behaviors that could lead to ransomware deployment. Which user account name was associated with that follow-up alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a ''Suspicious remote activity'' alert was raised on a device where the file `psexesvc.exe` was executed under the `LocalSystem` account (Process ID 5512, created 2024-06-27T14:33:27.3525354Z). This alert flags remotely initiated activities such as interactive sessions, file modifications, WMI commands, or scheduled task creation.'
+    question: 'Immediately after this alert, a related alert titled ''Potential human-operated malicious activity'' was raised on the same device, indicating a sequence of behaviors that could lead to ransomware deployment. Which user account name was associated with that follow-up alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'kyleg'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'kyleg'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Suspicious remote activity was initiated on the machine by the account with Name `fk8mq`, indicating an attacker attempting remote interactive sessions, file modifications, or remote command execution.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The activity escalated into a sequence of alerts indicative of potential human-operated malicious activity on the device, performed under the account with Name `kyleg`, which could lead to ransomware or other payloads being installed.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

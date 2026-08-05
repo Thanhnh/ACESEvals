@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_74
+  title: incident_5_latest_cleaned_test_set_task_74
+  description: 'Related to this chain of activity, a known credential theft tool execution was also detected. What was the process ID, creation time, and full command line of that credential theft tool execution?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident, a suspicious WMI process creation was observed on host `vnevado-win10r` (AAD device ID `9d4887ba-0b69-47d6-89bc-9b32787f379e`), where an account with SID `S-1-5-21-1840191660-8534830288-125585561-1522` ran processes such as `vssblatemp.exe delete shadows /all`, `bcdedit /set bootstatuspolicy ignoreallfailures`, `curl http://vectorsandarrows.com`, and `powershell -file c:\scripts\get-userprttoken.ps1`. This activity chain also linked to a compromised account dropping ransomware-related files and to lateral movement via PSExec to a jump server.'
+    question: 'Related to this chain of activity, a known credential theft tool execution was also detected. What was the process ID, creation time, and full command line of that credential theft tool execution?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID: 2020, Created time: 2024-06-20T09:03:47.538167Z, Command line: `"mimikatz.exe" privilege::debug "sekurlsa::pth /user:fk8mq /ntlm:96def1a633fc6790124d5f8fe21cc72b /domain:vnevado.alpineskihouse.co /run:..\notepad.exe //vnevado-jump cmd.exe"`'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID: 2020, Created time: 2024-06-20T09:03:47.538167Z, Command line: `"mimikatz.exe" privilege::debug "sekurlsa::pth /user:fk8mq /ntlm:96def1a633fc6790124d5f8fe21cc72b /domain:vnevado.alpineskihouse.co /run:..\notepad.exe //vnevado-jump cmd.exe"`'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious WMI process creation was observed under the user account `dp5hn`, indicating malware spawning new processes to break process trees.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The compromised user account was observed delivering ransomware-related files across devices from IP address `99.83.111.100`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'Lateral movement via PSExec was detected originating from the host `vnevado-win10v` toward the jump server.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'A known credential theft tool was executed with Process ID `2020` at `2024-06-20t09:03:47.538167z` using the command line `"mimikatz.exe" privilege::debug "sekurlsa::pth /user:fk8mq /ntlm:96def1a633fc6790124d5f8fe21cc72b /domain:vnevado.alpineskihouse.co /run:..\notepad.exe //vnevado-jump cmd.exe"`, dumping credentials and performing a pass-the-hash attack against the jump server.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

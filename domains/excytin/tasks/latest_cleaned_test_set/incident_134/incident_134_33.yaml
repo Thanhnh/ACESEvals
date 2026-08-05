@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_134_latest_cleaned_test_set_task_33
+  title: incident_134_latest_cleaned_test_set_task_33
+  description: 'For the related alert about email messages containing a malicious URL that were removed after delivery, what was the sender address of those emails?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a security incident, an alert was raised for an account compromised following a password-spray attack, where a user signed in from an unusual location and browser from the IP address `170.54.121.63`. This activity is linked to earlier alert activity in the same incident involving emails containing a malicious URL that were delivered and later removed from mailboxes.'
+    question: 'For the related alert about email messages containing a malicious URL that were removed after delivery, what was the sender address of those emails?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'alyssat@vnevado.alpineskihouse.co'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'alyssat@vnevado.alpineskihouse.co'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'An account with SID `S-1-5-21-1874151667-3554330288-105586563-1715` was compromised following a password-spray attack, being signed in from an unusual location and browser.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using the compromised account, malicious emails were sent from the sender address `alyssat@vnevado.alpineskihouse.co`, which contained malicious URLs that were delivered and later removed.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

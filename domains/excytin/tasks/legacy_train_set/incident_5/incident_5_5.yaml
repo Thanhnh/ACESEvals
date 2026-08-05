@@ -16,7 +16,7 @@ tasks:
     # To use static matching instead, change strategy to "static" and set:
     #   criteria:
     #     expected_answers:
-    #       - 'Grace Chen@vnevado.alpineskihouse.co'
+    #       - 'dp5hn@vnevado.alpineskihouse.co'
   scoring:
     llm_judge:
       model: "{judge_llm}"
@@ -27,7 +27,7 @@ tasks:
         target: submission
         judge_system_template: judge/submission_judge_system.md
         judge_user_template: judge/submission_judge_user.md
-        description: 'Grace Chen@vnevado.alpineskihouse.co'
+        description: 'dp5hn@vnevado.alpineskihouse.co'
         max_score: 1.0
       checkpoint_1:
         target: trajectory
@@ -41,7 +41,7 @@ tasks:
         max_score: 0.5
         weight: 1.0
         title: Checkpoint 2
-        description: The email account `Grace Chen@vnevado.alpineskihouse.co` attempted lateral movement using SMB 
+        description: The email account `dp5hn@vnevado.alpineskihouse.co` attempted lateral movement using SMB 
           remote file access and was blocked by attack disruption.
   scoring_aggregation:
     max:

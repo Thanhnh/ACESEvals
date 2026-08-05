@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During our investigation we noted an unusual addition of credentials to the OAuth application “SimulandApp”.
-      This suspicious activity was performed by the user account Luciano Herrera (Luciano Herrera@niseko.alpineskihouse.co)
+      This suspicious activity was performed by the user account Luciano Herrera (pwilson@niseko.alpineskihouse.co)
       on July 7 2024. Such behaviour can indicate that an attacker may have compromised the application for further malicious
       activity such as phishing or data exfiltration. We are now trying to understand how this activity correlates with later
       events in the same incident, including a subsequent alert about a user who clicked a link that was later classified

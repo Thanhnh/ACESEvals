@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_test_set_task_83
+  title: incident_34_latest_cleaned_test_set_task_83
+  description: 'A closely related alert fired about a second later for suspicious PowerShell download or encoded command execution on the same device. What is the security identifier (SID) of the user account associated with that alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident involving Execution & Discovery on the endpoint `vnevado-win10e` (AAD device ID 02b8f519-1123-4228-b32a-ccb78af3449f), an alert was raised for a suspicious process executing a PowerShell command under the user account `samuelf` (AAD user ID 16320fec-8d90-403b-b7fe-78f715d4728d). The PowerShell command (process ID 8604, created 2024-06-26T12:00:39Z) was launched with `-w movedn -exec bypass`, reassembled a large base64 blob into a binary named `winatp-intro-backdoor.exe`, wrote it to the user''s Desktop, and then created and ran a scheduled task named ''yrei'' to execute it.'
+    question: 'A closely related alert fired about a second later for suspicious PowerShell download or encoded command execution on the same device. What is the security identifier (SID) of the user account associated with that alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'S-1-5-21-1870156660-7534030218-135086563-1193'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'S-1-5-21-1870156660-7534030218-135086563-1193'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious process launched PowerShell with the command line `"powershell.exe" -w movedn -exec bypass -command cd /;$filebase64prefix = '''' ... $file= [convert]::frombase64string([string]$filebase64);$filename= ''winatp-intro-backdoor.exe'' ... schtasks /create /sc once /tn yrei /tr $fullpath ... schtasks /run /tn yrei` at `2024-06-26t12:00:39.2886108z`, with Process ID `8604`, which decodes an embedded base64 payload, writes `winatp-intro-backdoor.exe` to the desktop, and creates and runs a scheduled task named ''yrei'' for persistence.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The same PowerShell activity was flagged as a suspicious PowerShell download or encoded command execution, performed by the user account with SID `S-1-5-21-1870156660-7534030218-135086563-1193`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_19
+  title: incident_55_latest_cleaned_train_set_task_19
+  description: 'In the alert reporting the ongoing hands-on-keyboard attack via the Impacket toolkit, what was the name of the file used to execute the suspicious command?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a suspected DCSync attack (replication of directory services) was detected where the account of Luciano Herrera (CIO), with email `pwilson@niseko.alpineskihouse.co`, on host `MB-WINCLIENT` sent a replication request to the domain controller `MB-DC1`. Pivoting from this account, earlier activity on the same compromised device included a suspicious sequence of exploration commands and an ongoing hands-on-keyboard attack, where a suspicious command was executed via the Impacket toolkit — a tool that connects to other hosts to explore network shares and execute commands, often used by attackers to move laterally before deploying ransomware.'
+    question: 'In the alert reporting the ongoing hands-on-keyboard attack via the Impacket toolkit, what was the name of the file used to execute the suspicious command?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'powershell.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'powershell.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with SID `S-1-5-21-551436448-9871687716-9837441745-1903` (Luciano Herrera, CIO) on MB-WINCLIENT sent a directory services replication request to MB-DC1, indicating a suspected DCSync attack.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'From that compromised account''s session, a process launched `powershell.exe` (ExtractedFileName: `powershell.exe`) to run a suspicious sequence of Windows exploration commands used to identify valuable assets and prepare for lateral movement.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The same file `powershell.exe` was executed via the Impacket toolkit on the device, showing an ongoing hands-on-keyboard attack used to connect to other hosts, explore network shares, and execute commands for lateral movement.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

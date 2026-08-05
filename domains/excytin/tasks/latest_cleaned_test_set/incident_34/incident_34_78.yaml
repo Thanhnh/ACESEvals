@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_test_set_task_78
+  title: incident_34_latest_cleaned_test_set_task_78
+  description: 'For the follow-up alert where PowerShell dropped and executed a suspicious file, which user account was associated with that activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'In a multi-stage incident involving Execution & Discovery on one endpoint, a suspicious PowerShell command line was observed on a machine. The related activity chain included `winword.exe` opening the document `c:\scripts\rs4_winatp-intro-invoice.docm` (Process ID 9780) and `schtasks.exe` running a scheduled task named `yrei` (Process ID 1616, command line: `"schtasks.exe" /run /tn yrei`). Moments later, another alert fired indicating that PowerShell dropped a suspicious file on the machine and executed it.'
+    question: 'For the follow-up alert where PowerShell dropped and executed a suspicious file, which user account was associated with that activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'samuelf'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'samuelf'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious PowerShell command line was observed on the machine, with the process `powershell.exe` being used to invoke modules, download external payloads, or execute payloads in memory to bypass security protections.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The same PowerShell process (`powershell.exe`) then dropped a suspicious file on the machine and executed it, an activity performed under the user account `samuelf`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -5,7 +5,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'In a recent security incident, an unusual addition of credentials to an OAuth application was performed
-      by the user Luciano Herrera, which indicated a potential compromise. The user, associated with the email Luciano Herrera@niseko.alpineskihouse.co,
+      by the user Luciano Herrera, which indicated a potential compromise. The user, associated with the email pwilson@niseko.alpineskihouse.co,
       might be involved in spreading phishing, exfiltrating data, or gaining access to other accounts. Subsequent alerts indicated
       suspicious LDAP queries and exploration activities, eventually leading to an observed attempt to hide the use of a dual-purpose
       tool under an unexpected filename.'

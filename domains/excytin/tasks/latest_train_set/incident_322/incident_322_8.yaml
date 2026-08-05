@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'Defender has raised an alert for suspicious Azure Resource Management (ARM) activity performed by the
-      risky user account "Hailey Johnson" (email: Hailey Johnson@vnevado.alpineskihouse.co) coming from IP address 253.1.244.215.
+      risky user account "Hailey Johnson" (email: alyssat@vnevado.alpineskihouse.co) coming from IP address 253.1.244.215.
       While investigating this cloud-based activity, we also found an earlier endpoint alert indicating that Active Directory
       information was being collected with Ntdsutil. That alert shows a PowerShell executable launching an encoded command,
       which is commonly used by attackers to hide their intent.'

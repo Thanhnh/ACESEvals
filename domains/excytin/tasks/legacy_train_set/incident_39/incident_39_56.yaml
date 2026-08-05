@@ -6,7 +6,7 @@ tasks:
   initial_context:
     incident_context: 'A multi-faceted security incident started with emails containing a malicious URL `https://ac27145722.livelygrass-8d4c4013.eastus2.azurecontainerapps.io/`
       being delivered and later removed. The emails were associated with accounts including Ethan Brooks with the email address
-      `Ethan Brooks@vnevado.alpineskihouse.co`. Later, there was activity indicating the use of Rubeus tool to perform kerberoasting
+      `tgs2z@vnevado.alpineskihouse.co`. Later, there was activity indicating the use of Rubeus tool to perform kerberoasting
       or pass-the-ticket attacks, followed by detection of ''Kekeo'' malware which could have been stopped before paying out
       its payload.'
     question: 'Can you analyze the suspicious service activity and provide the command line details for the process involved?'

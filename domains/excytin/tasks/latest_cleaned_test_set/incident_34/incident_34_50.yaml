@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_test_set_task_50
+  title: incident_34_latest_cleaned_test_set_task_50
+  description: 'For the related alert ''An uncommon file was created and added to a Run Key'', what IP address was recorded as an entity of that alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident involving Execution & Discovery on one endpoint, a suspicious PowerShell command line alert was raised: `winword.exe` (PID 9780) opened the macro document `c:\scripts\rs4_winatp-intro-invoice.docm`, which then launched `powershell.exe` (PID 8604) with an encoded/obfuscated command that reassembled a base64 blob and wrote the file `winatp-intro-backdoor.exe` to the user''s Desktop. The script then used `schtasks.exe` (PIDs 1348 and 1616) to create and run a scheduled task named ''yrei'' pointing at that backdoor. As part of the same incident chain, a follow-on alert fired for an uncommon file that was created and then added to a Registry Run Key for persistence.'
+    question: 'For the related alert ''An uncommon file was created and added to a Run Key'', what IP address was recorded as an entity of that alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '72.5.72.208'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '72.5.72.208'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with SID `S-1-5-21-1870156660-7534030218-135086563-1193` executed a suspicious PowerShell command line on the machine, potentially used for installation, exploration, or lateral movement.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'An uncommon file was created and added to a Run Key for persistence, associated with the IP address `72.5.72.208`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

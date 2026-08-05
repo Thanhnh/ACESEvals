@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During the investigation of a BEC-related security incident, we observed that the user account "Jordan
-      P" (AadUserId 89e933b9-5b2e-4bd6-bcdf-033db707ef82, email Jordan P@vnevado.alpineskihouse.co) connected from IP address
+      P" (AadUserId 89e933b9-5b2e-4bd6-bcdf-033db707ef82, email laylaw@vnevado.alpineskihouse.co) connected from IP address
       255.246.85.58 and created a suspicious inbox rule in a risky Azure AD session. This activity triggered the alert "BEC
       financial fraud." Further correlation revealed a second alert titled "Suspicious inbox manipulation rule" that is tied
       to the same user activity and references a specific cloud application used to carry out the rule manipulation.'

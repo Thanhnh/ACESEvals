@@ -5,7 +5,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'Our monitoring systems have flagged several potentially malicious activities. Initially, Lucas Grey
-      (Email: Lucas Grey@niseko.alpineskihouse.co) accessed a suspicious URL: `http://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/`.
+      (Email: bjenkins@niseko.alpineskihouse.co) accessed a suspicious URL: `http://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/`.
       Following this event, there was an alert indicating the execution of a malicious PowerShell Cmdlet on a device. Further
       investigation revealed a potential DCSync attack initiated by Luciano Herrera (CIO) from MB-WINCLIENT, who sent a replication
       request to another machine. The final alert indicated that a key was accessed on that machine.'

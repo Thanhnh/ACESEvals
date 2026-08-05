@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During an investigation, an alert titled "Suspicious SAP authentication" was raised when the user account
-      "Jordan P" (email: Jordan P@vnevado.alpineskihouse.co, SID: S-1-5-21-1740051960-3534030288-108486866-1602) accessed
+      "Jordan P" (email: laylaw@vnevado.alpineskihouse.co, SID: S-1-5-21-1740051960-3534030288-108486866-1602) accessed
       the SAP enterprise application (AppId 100) from IP address 107.253.5.27. This activity is linked to a risky sign-in
       detected in Microsoft Entra ID and may indicate that an attacker has taken control of the account.'
     question: 'What is the Azure AD user ID (AadUserId) of the account associated with this suspicious SAP authentication

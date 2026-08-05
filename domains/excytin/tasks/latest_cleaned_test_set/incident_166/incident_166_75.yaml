@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_test_set_task_75
+  title: incident_166_latest_cleaned_test_set_task_75
+  description: 'The same compromised identity was also linked to a Password Spray alert about a day later. What source IP address was observed conducting that password spray attack?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a security incident involving SAP financial process manipulation, an alert was raised showing that a user involved in a business email compromise-related alert (account name `Jordan P`, email `laylaw@vnevado.alpineskihouse.co`, SID `S-1-5-21-1740051960-3534030288-108486866-1602`) also signed in to SAP in a suspicious manner from IP address `107.253.5.27`. An attacker might have taken control of the user account to search through SAP with the intention of recording or modifying sensitive financial information.'
+    question: 'The same compromised identity was also linked to a Password Spray alert about a day later. What source IP address was observed conducting that password spray attack?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '95.202.65.202'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '95.202.65.202'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A user account with AadUserId `89e933b9-5b2e-4bd6-bcdf-033db707ef82`, previously involved in a business email compromise-related alert, signed in to SAP in a suspicious manner, possibly to access sensitive financial information.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A password spray attack was detected originating from the IP address `95.202.65.202`, indicating the attacker attempted to compromise additional accounts from this source.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

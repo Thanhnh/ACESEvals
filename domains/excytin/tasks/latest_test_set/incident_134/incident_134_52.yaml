@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During investigation of a potential Business Email Compromise (BEC) campaign, we observed that user
-      account "Nina Park" (email: Nina Park@vnevado.alpineskihouse.co) sent multiple suspicious messages. These messages originated
+      account "Nina Park" (email: raphaelt@vnevado.alpineskihouse.co) sent multiple suspicious messages. These messages originated
       from the sender IP 237.7.81.122 and were addressed to nathan@avoriaz.alpineskihouse.co. The alert, raised at 2024-07-17
       11:55:04 UTC, flags this user as possibly compromised. A related sign-in alert was later generated, indicating that
       the same user (linked through their Microsoft Entra ID) accessed the environment from an anonymous network location

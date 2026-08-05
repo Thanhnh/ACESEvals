@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'In the recent security incident involving email messages containing a malicious URL that were delivered
-      and later removed, Lucas Grey (email: Lucas Grey@niseko.alpineskihouse.co) was one of the involved accounts. This email
+      and later removed, Lucas Grey (email: bjenkins@niseko.alpineskihouse.co) was one of the involved accounts. This email
       was sent from santiago@vnevado.alpineskihouse.co to bjenkins@niseko.alpineskihouse.co with the malicious URL `https://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/`.
       Following this, there was a suspicious sequence of exploration activities linked to an unknown account. The investigation
       led to another alert indicating that the user Luciano Herrera (pwilson@niseko.alpineskihouse.co) performed an unusual

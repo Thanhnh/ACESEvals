@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_62
+  title: incident_39_latest_cleaned_train_set_task_62
+  description: 'A nearly identical credential theft tool execution was detected about a second earlier on the same machine, impersonating a different account. What was the process ID of that earlier execution, and which user account was specified in its pass-the-hash command line?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a malicious credential theft tool execution was detected: the process `mimikatz.exe` was run with process ID 6880 at 2024-06-27T14:32:37.7041174Z using the command line `"mimikatz.exe" privilege::debug "sekurlsa::pth /user:fk8mq /ntlm:96def1a633fc6790124d5f8fe21cc72b /domain:vnevado.alpineskihouse.co /run:\"powershell.exe dir \\vnevado-win10b\c$\"" exit`, indicating a pass-the-hash attempt against a remote share.'
+    question: 'A nearly identical credential theft tool execution was detected about a second earlier on the same machine, impersonating a different account. What was the process ID of that earlier execution, and which user account was specified in its pass-the-hash command line?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID 4112 (created 2024-06-27T14:32:36.6706405Z), targeting the user account `kyleg` (NTLM hash 96def1a633fc6790124d5f8fe31cc72b, domain vnevado.alpineskihouse.co)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID 4112 (created 2024-06-27T14:32:36.6706405Z), targeting the user account `kyleg` (NTLM hash 96def1a633fc6790124d5f8fe31cc72b, domain vnevado.alpineskihouse.co)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A known credential theft tool execution was detected on host `vnevado-win10v`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On that host, the attacker ran the credential theft tool Mimikatz with the command line `"mimikatz.exe" privilege::debug "sekurlsa::pth /user:kyleg /ntlm:96def1a633fc6790124d5f8fe31cc72b /domain:vnevado.alpineskihouse.co /run:\"powershell.exe dir \\vnevado-win10b\c$\"" exit` at `2024-06-27t14:32:36.6706405z`, with Process ID `4112`, performing a pass-the-hash attack for user `kyleg` to access `vnevado-win10b`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

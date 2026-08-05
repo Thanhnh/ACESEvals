@@ -5,7 +5,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'A suspicious inbox manipulation rule was detected on 2024-07-22 at 10:00:07 UTC for the user "Jordan
-      P" (email "Jordan P@vnevado.alpineskihouse.co", SID S-1-5-21-1740051960-3534030288-108486866-1602). The activity was
+      P" (email "laylaw@vnevado.alpineskihouse.co", SID S-1-5-21-1740051960-3534030288-108486866-1602). The activity was
       performed through cloud application ID 20893 and came from IP address 255.246.85.58. Correlation with other alerts shows
       that, earlier the same morning at 08:45:32 UTC, the same user account triggered an "Anonymous IP address" sign-in alert,
       indicating use of a privacy-enhancing service such as Tor or a VPN.'

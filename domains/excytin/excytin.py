@@ -31,6 +31,12 @@ def excytin(
             (e.g., task_filter, agent, rebuild, run_preflight,
             keep_permanent, persona_file).
 
+            Special parameter ``mode``:
+                ``"insane"`` — Removes SecurityAlert, AlertEvidence,
+                AlertInfo, and SecurityIncident tables from the database.
+                The agent must reason entirely from raw logs with no
+                pre-computed alert signals.
+
     Returns:
         Fully configured inspect_ai Task.
     """
@@ -39,5 +45,11 @@ def excytin(
     # preserves the original hard-coded LLM judge behavior when the var isn't provided
     if "judge_llm" not in kwargs:
         kwargs["judge_llm"] = "openai/azure/gpt-4.1"
+
+    # Insane mode: use the stripped-down compose file (no alert/incident tables)
+    if kwargs.get("mode") == "insane":
+        kwargs.setdefault(
+            "permanent_compose", "compose/all_incidents_insane.compose.yml"
+        )
 
     return create_task(**kwargs)

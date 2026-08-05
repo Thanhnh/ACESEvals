@@ -1,0 +1,64 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_78
+  title: incident_55_latest_cleaned_train_set_task_78
+  description: 'For the alert reporting the attempt to hide the use of a dual-purpose tool by renaming it, which user account was associated with that activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a multi-stage identity attack, an alert was raised indicating that the domain controller `MB-DC1` read the DKM key of the AD FS object with id 4cac49d3-29d3-407e-8c9b-b7ebb21541b2 — a technique commonly associated with AD FS token-signing certificate theft. Tracing the activity backwards through the incident leads to earlier endpoint alerts, including one where a well-known public dual-purpose tool was observed running under an unexpected filename, likely an attempt to hide its malicious usage.'
+    question: 'For the alert reporting the attempt to hide the use of a dual-purpose tool by renaming it, which user account was associated with that activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'gsmith'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'gsmith'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'On the domain controller host `MB-DC1`, a suspected AD FS DKM key read was detected — `MB-DC1` read the DKM key of the ADFS object id 4cac49d3-29d3-407e-8c9b-b7ebb21541b2.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The account with SID `S-1-5-21-551436448-9871687716-9837441745-1903` (Luciano Herrera, CIO) on MB-WINCLIENT sent a directory services replication request to MB-DC1, indicating a suspected DCSync attack.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'A malicious PowerShell Cmdlet was invoked on the machine through the process `powershell.exe`, potentially used for credential theft, exploitation, network reconnaissance or code injection.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'The account `gsmith` ran a suspicious sequence of exploration activities, calling a set of Windows commands used to identify valuable assets and coordinate lateral movement.'
+      checkpoint_5:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 5
+        description: 'The same account `gsmith` also attempted to hide the use of a dual-purpose tool by running a known public tool under an unexpected filename.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4
+        - checkpoint_5

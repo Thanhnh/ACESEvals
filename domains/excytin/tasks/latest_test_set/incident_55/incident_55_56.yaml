@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During the investigation of an internal phishing campaign, security telemetry showed that the account
-      "Nina Sullivan" (Nina Sullivan@vnevado.alpineskihouse.co) sent malicious emails containing the URL http://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/.
+      "Nina Sullivan" (santiago@vnevado.alpineskihouse.co) sent malicious emails containing the URL http://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/.
       Shortly after, a suspicious sequence of Windows exploration commands was executed, possibly indicating lateral movement
       activity. A few days later, another alert reported that an unidentified user managed to read the Data Protection (DKM)
       key for an AD FS object (ID 4cac49d3-29d3-407e-8c9b-b7ebb21541b2), which is a strong indicator of privilege-escalation

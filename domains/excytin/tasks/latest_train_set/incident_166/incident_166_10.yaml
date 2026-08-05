@@ -34,7 +34,7 @@ tasks:
         max_score: 0.5
         weight: 1.0
         title: Checkpoint 1
-        description: 'Account compromise indicator: The user with Email `Jordan P@vnevado.alpineskihouse.co` had suspicious
+        description: 'Account compromise indicator: The user with Email `laylaw@vnevado.alpineskihouse.co` had suspicious
           inbox rules created or modified.'
       checkpoint_2:
         target: trajectory

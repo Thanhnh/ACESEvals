@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_test_set_task_73
+  title: incident_166_latest_cleaned_test_set_task_73
+  description: 'About 10 minutes earlier, a related alert flagged a suspicious MoveToFolder inbox rule named ''ITCleanup'' created on the same user''s mailbox to move messages into the ''RSS Feeds'' folder. What IP address was recorded in that earlier alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a business email compromise (BEC) financial fraud incident, an alert was raised at 2024-07-22 10:00:07 UTC after a suspicious inbox rule that hides incoming email messages was created within a risky Azure AD session. The alert involved the account `Jordan P` (laylaw@vnevado.alpineskihouse.co, AAD user ID 89e933b9-5b2e-4bd6-bcdf-033db707ef82, SID S-1-5-21-1740051960-3534030288-108486866-1602) and was associated with the IP address 255.246.85.58.'
+    question: 'About 10 minutes earlier, a related alert flagged a suspicious MoveToFolder inbox rule named ''ITCleanup'' created on the same user''s mailbox to move messages into the ''RSS Feeds'' folder. What IP address was recorded in that earlier alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '95.202.65.202'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '95.202.65.202'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account with SID `S-1-5-21-1740051960-3534030288-108486866-1602` created a suspicious inbox rule that hides incoming email messages during a risky Azure Active Directory session, indicating a possible business email compromise (BEC) financial fraud attempt.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The suspicious inbox manipulation rule named `ITCleanup` (moving messages to the `RSS Feeds` folder) was set on the mailbox of Jordan P (laylaw@vnevado.alpineskihouse.co) from the IP address `95.202.65.202`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -4,7 +4,7 @@ tasks:
   description: 'From which external IP address did the "Password Spray" activity originate on 2024-07-23?'
   inherit_shared: true
   initial_context:
-    incident_context: 'During the investigation we saw that user account "Jordan P" (email: Jordan P@vnevado.alpineskihouse.co,
+    incident_context: 'During the investigation we saw that user account "Jordan P" (email: laylaw@vnevado.alpineskihouse.co,
       SID: S-1-5-21-1740051960-3534030288-108486866-1602) signed in to the SAP enterprise application (App ID: 100) from the
       external IP address 107.253.5.27 on 2024-07-22. Microsoft Entra ID had already flagged this sign-in as risky, raising
       the alert "Suspicious SAP authentication", suggesting the account might have been compromised. The following day, another

@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_45
+  title: incident_55_latest_cleaned_test_set_task_45
+  description: 'For the alert reporting that a user clicked on a potentially malicious link, what was the full URL that was clicked?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an ''ADFS private key extraction attempt'' alert was raised on host `mb-adfs`, where a suspicious LDAP query was launched. The activity involved the account `gsmith` (SID `S-2-5-21-571436798-3864380397-1837441745-3206`) and a renamed executable `iy2orr1e.rrg.exe` running with hidden window style and an encoded PowerShell command (process ID 3116). The same user account was later associated with additional suspicious activity, including a mail-related alert reporting that a user clicked on a link found to be malicious.'
+    question: 'For the alert reporting that a user clicked on a potentially malicious link, what was the full URL that was clicked?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'http://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'http://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious LDAP query was launched by the renamed PowerShell process `iy2orr1e.rrg.exe` with Process ID `3116` at `2024-07-02t09:48:23.9439954z`, using the hidden window style and an encoded command, in an attempt to extract ADFS private keys.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'This process was identified as a renamed system executable, with the original extracted file name `powershell.exe`, launched to evade path- and name-based detections.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The same activity chain included a suspicious sequence of exploration commands run under the user account with AadUserId `a2d0f7c2-b0a0-43bd-bce0-27d8ae3be4d0`, used to discover assets and prepare for lateral movement.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'That same compromised user later clicked a potentially malicious URL `http://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/`, which was detected as malicious.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

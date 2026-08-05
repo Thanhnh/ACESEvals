@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_100
+  title: incident_55_latest_cleaned_test_set_task_100
+  description: 'In the ''Suspicious remote activity'' alert that followed the hardware discovery activity, what is the name of the file entity associated with the remotely initiated activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this incident, the user Luciano Herrera (pwilson@niseko.alpineskihouse.co) performed an unusual addition of a Password credential to the OAuth application SimulandApp (OAuthAppId `4d9476b8-6ae6-459b-a273-5837c15b5981`) within the Office 365 / Microsoft 365 cloud application, originating from the IP address `2801:e0a:1eb:dea0:642e:5bb6:d315:fbb3`. This activity is linked through the same compromised account to endpoint activity, including a Suspicious System Hardware Discovery alert where a known tool was used to gather information about the device, and a subsequent ''Suspicious remote activity'' alert flagging activity initiated remotely on that machine (such as interactive sessions, file modifications, WMI commands, or scheduled task creation).'
+    question: 'In the ''Suspicious remote activity'' alert that followed the hardware discovery activity, what is the name of the file entity associated with the remotely initiated activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '%comspec%'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '%comspec%'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with SID `S-1-5-21-551436448-9871687716-9837441745-1903` (Luciano Herrera, pwilson@niseko.alpineskihouse.co) performed an unusual addition of a Password credential to the OAuth application SimulandApp.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using the compromised access, a suspicious system hardware discovery was performed on the device via the process `powershell.exe`, gathering information about the target device or network.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'Suspicious remote activity was then observed on the machine, involving the file `%comspec%`, indicating remotely initiated command execution such as interactive sessions, WMI commands, or scheduled tasks.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

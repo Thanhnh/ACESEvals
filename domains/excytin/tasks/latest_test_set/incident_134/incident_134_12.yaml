@@ -4,7 +4,7 @@ tasks:
   description: 'According to the later alert about the risky sign-in, which IP address was recognized as malicious?'
   inherit_shared: true
   initial_context:
-    incident_context: 'During an investigation of suspicious inbox manipulation for user Nina Park (email: "Nina Park@vnevado.alpineskihouse.co"),
+    incident_context: 'During an investigation of suspicious inbox manipulation for user Nina Park (email: "raphaelt@vnevado.alpineskihouse.co"),
       the security team noted that the activity originated from the external IP address 237.7.81.122 and was tied to cloud
       application ID 20893. The user’s Azure AD identifier is still being confirmed. Less than 24 hours later, another alert
       was raised for a sign-in attempt that Microsoft threat intelligence flagged as coming from a known malicious source.'

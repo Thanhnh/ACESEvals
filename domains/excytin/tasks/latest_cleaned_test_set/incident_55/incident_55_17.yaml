@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_17
+  title: incident_55_latest_cleaned_test_set_task_17
+  description: 'For the internal phishing campaign alert linked to this same compromised account, what malicious URL was included in the phishing email?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a suspected DCSync attack (replication of directory services) was detected where the account `Luciano Herrera` (CIO), associated with the email `pwilson@niseko.alpineskihouse.co`, sent a replication request from the host `MB-WINCLIENT` to the domain controller `MB-DC1`. Following the alert-entity chain from this compromised account, we also see a ''Suspicious System Hardware Discovery'' alert and an ''Internal phishing campaign'' alert, where a user sent phishing emails to recipients inside the organization, indicating possible lateral movement by the attacker.'
+    question: 'For the internal phishing campaign alert linked to this same compromised account, what malicious URL was included in the phishing email?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'http://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'http://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The compromised account with AadUserId `2de70991-2799-4a95-b734-8e3df3a50118` (Luciano Herrera, CIO) on MB-WINCLIENT sent a replication request to MB-DC1, indicating a suspected DCSync attack.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The account with AadUserId `a2d0f7c2-b0a0-43bd-bce0-27d8ae3be4d0` was used to run a known tool or technique performing suspicious system hardware discovery on the device.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'From that device, an internal phishing campaign was launched, sending phishing emails to recipients inside the organization containing the malicious URL `http://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

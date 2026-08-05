@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_37
+  title: incident_5_latest_cleaned_train_set_task_37
+  description: 'Around the same time as this PRT access attempt, an alert was raised for suspicious access to the LSASS service, where attackers attempt to decrypt clear-text credentials from LSASS memory. What is the name of the file (library) flagged in that LSASS-related alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this incident, a possible attempt to access a Primary Refresh Token (PRT) was detected on host `vnevado-win11u` (AAD device ID `bc00e484-d0e5-4da4-9472-95568cccc07e`), involving the account `dp5hn` (SID `S-1-5-21-1840191660-8534830288-125585561-1522`, AAD user ID `731adb71-b11c-4bbf-850b-57989b350e96`). The activity was tied to the process `1640__2024-06-20t09:32:12.1031042z__"browsercore.exe"`. PRTs are JSON Web Tokens issued to Microsoft first party token brokers to enable single sign-on, and attackers may target them for lateral movement or credential theft.'
+    question: 'Around the same time as this PRT access attempt, an alert was raised for suspicious access to the LSASS service, where attackers attempt to decrypt clear-text credentials from LSASS memory. What is the name of the file (library) flagged in that LSASS-related alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'winscard.dll'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'winscard.dll'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A possible attempt to access the Primary Refresh Token (PRT) was detected involving the process with extracted file name `browsercore.exe`, which attackers abuse to request PRT-derived tokens.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The PRT access attempt was associated with the user account with AadUserId `1d94aaf6-efe6-4e76-ad56-ffd7d1257bc1`, indicating potential credential theft or lateral movement using that identity.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'Following this, suspicious access to the LSASS service was detected on the same context, where the file `winscard.dll` was involved in the attempt to read/decrypt credentials from LSASS memory.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

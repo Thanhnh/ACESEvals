@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_test_set_task_70
+  title: incident_34_latest_cleaned_test_set_task_70
+  description: 'A closely related alert for suspicious PowerShell download or encoded command execution was triggered moments earlier on the same device. Which process initiated that activity, and what were its process ID, creation time, and full command line?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident on host `vnevado-win10e` (Azure AD device ID `02b8f519-1123-4228-b32a-ccb78af3449f`) involving the account `samuelf` (SID `S-1-5-21-1870156660-7534030218-135086563-1193`), an alert was raised for a suspicious process executing a PowerShell command. The PowerShell instance (PID 8604, created 2024-06-26T12:00:39Z) ran with `-w movedn -exec bypass` and reassembled a large base64 blob into `winatp-intro-backdoor.exe`, wrote it to the desktop, and then created and ran a scheduled task named ''yrei'' for persistence.'
+    question: 'A closely related alert for suspicious PowerShell download or encoded command execution was triggered moments earlier on the same device. Which process initiated that activity, and what were its process ID, creation time, and full command line?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'The initiating process was Microsoft Word — `winword.exe`, process ID 9780, created 2024-06-26T11:57:20.2959493Z, with the command line: `"winword.exe" c:\scripts\rs4_winatp-intro-invoice.docm` (a macro-enabled document that spawned PowerShell).'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'The initiating process was Microsoft Word — `winword.exe`, process ID 9780, created 2024-06-26T11:57:20.2959493Z, with the command line: `"winword.exe" c:\scripts\rs4_winatp-intro-invoice.docm` (a macro-enabled document that spawned PowerShell).'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious process executed a PowerShell command, spawning the process with extracted file name `powershell.exe`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The PowerShell activity was used to download a file or run an encoded command, and it was traced back to the parent process launched with command line `"winword.exe" c:\scripts\rs4_winatp-intro-invoice.docm` at `2024-06-26t11:57:20.2959493z` with Process ID `9780`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

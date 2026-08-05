@@ -145,6 +145,8 @@ Cybersecurity incident response with database forensics and SQL analysis across 
 |----------|-------|-------------|
 | `latest_test_set` | 599 | O3-generated test questions — **use for benchmarking** |
 | `latest_train_set` | 418 | O3-generated training questions — **use for fine-tuning** |
+| `latest_cleaned_test_set` | 599 | Opus-5–regenerated test set |
+| `latest_cleaned_train_set` | 418 | Opus-5–regenerated training set |
 | `legacy_test_set` | 589 | O1-preview questions — paper comparison only |
 | `legacy_train_set` | 418 | O1-preview questions — paper comparison only |
 
@@ -167,6 +169,43 @@ uv run inspect eval domains/excytin --model openai/azure/gpt-4.1 \
 # Quick test (limit samples)
 uv run inspect eval domains/excytin --model openai/azure/gpt-4.1 --limit 10
 ```
+
+#### Insane Mode
+
+Excytin supports an **insane mode** (`-T mode=insane`) that removes four key alert and incident signal tables from the database:
+
+| Removed Table | Purpose |
+|---------------|---------|
+| `SecurityAlert` | Pre-computed security alert records (rule-based, ML-based, expert-curated detections) |
+| `AlertEvidence` | Evidence artifacts linked to alerts (files, IPs, accounts, processes) |
+| `AlertInfo` | Lightweight alert metadata (category, severity, detection source) |
+| `SecurityIncident` | Incident grouping, classification, ownership, and linked alert IDs |
+
+These four tables encode **all rule-based, ML-based, and expert security domain knowledge** that a human SOC analyst would normally rely on to triage and investigate incidents. Removing them forces the agent to reason entirely from raw telemetry logs (Device events, Sign-in logs, Email events, Network events, etc.) — effectively recreating the alert detection pipeline from scratch.
+
+**Why "insane"?** This task would be practically impossible for a human analyst who relies on alert signals to parse through the massive volume of raw logs. For an AI agent, however, this tests whether it can derive security insights without any pre-computed intelligence — a fundamentally harder capability evaluation.
+
+```bash
+# Run insane mode
+uv run inspect eval domains/excytin --model openai/azure/gpt-4.1 \
+  -T mode=insane
+
+# Insane mode with task filtering
+uv run inspect eval domains/excytin --model openai/azure/gpt-4.1 \
+  -T mode=insane -T task_filter="incident_5*"
+
+# Insane mode with specific dataset
+uv run inspect eval domains/excytin --model openai/azure/gpt-4.1 \
+  -T mode=insane -T dataset=latest_test_set
+
+# Compare normal vs insane on same tasks
+uv run inspect eval domains/excytin --model openai/azure/gpt-4.1 \
+  -T task_filter="incident_5_1" --limit 1
+uv run inspect eval domains/excytin --model openai/azure/gpt-4.1 \
+  -T mode=insane -T task_filter="incident_5_1" --limit 1
+```
+
+> **How it works:** A setup hook generates `incident_X_insane.sql` files by stripping the four table definitions and data-load statements from the original SQL init scripts. A separate Docker Compose file (`compose/all_incidents_insane.compose.yml`) mounts these stripped SQL files. The generated `_insane.sql` files are cached and only regenerated when the source SQL files change.
 
 ### CTI Realm — Cyber Threat Intelligence
 
@@ -384,6 +423,7 @@ All parameters are passed via `inspect eval -T key=value`:
 | `dataset` | From `global.yaml` | Select a named task group (preferred over `task_filter` for known sets) |
 | `task_filter` | None | Glob or comma-separated task name filter (applied after `dataset`) |
 | `agent` | `"react"` | Agent: `react`, `copilot`, `claude_code` |
+| `mode` | None | Evaluation mode. Excytin supports `"insane"` (strips alert/incident tables) |
 | `rebuild` | None | `"true"` = all images, `"name1,name2"` = specific images |
 | `run_preflight` | `false` | Validate compose files before evaluation |
 | `keep_permanent` | `false` | Keep permanent Docker services alive after eval |

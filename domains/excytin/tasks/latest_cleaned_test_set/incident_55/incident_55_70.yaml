@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_70
+  title: incident_55_latest_cleaned_test_set_task_70
+  description: 'For that earlier suspicious LDAP query alert, what was the IP address associated with the reconnaissance activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert for a suspected DCSync attack (replication of directory services) was raised, showing that the account `Luciano Herrera` (CIO), with email `pwilson@niseko.alpineskihouse.co`, sent a replication request from the host `MB-WINCLIENT` to the domain controller `MB-DC1` on 2024-07-10. Reviewing earlier activity tied to the same compromised account, an earlier alert flagged a suspicious LDAP query indicating reconnaissance activity, where an attacker queries the domain controller for administrative users, groups and interesting assets to learn the organization''s structure.'
+    question: 'For that earlier suspicious LDAP query alert, what was the IP address associated with the reconnaissance activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '72.5.72.208'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '72.5.72.208'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with SID `S-1-5-21-551436448-9871687716-9837441745-1903` (Luciano Herrera, CIO) on MB-WINCLIENT sent a replication request to MB-DC1, indicating a suspected DCSync attack.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A suspicious LDAP query was executed from the IP address `72.5.72.208`, indicating potential reconnaissance activity against the domain controller.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

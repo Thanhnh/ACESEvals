@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_72
+  title: incident_39_latest_cleaned_train_set_task_72
+  description: 'In the related alert about a potentially malicious URL click, what is the full URL that was clicked?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a suspected overpass-the-hash (Kerberos) attack was flagged involving the account `Emma Clark` (Helpdesk Administrator, email `fk8mq@vnevado.alpineskihouse.co`, SID `S-1-5-21-1540151660-3530000288-105586595-1517`, AAD user ID `97e6a954-b6bd-48a5-808c-bd8464cce677`), who attempted to authenticate against VNEVADO-DC from VNEVADO-Win10V. This activity is linked, through the affected device and a related user account performing SMB user and IP address reconnaissance, to another alert in the same incident where a user clicked a link that was found to be malicious.'
+    question: 'In the related alert about a potentially malicious URL click, what is the full URL that was clicked?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'https://ac27145722.livelygrass-8d4c4013.eastus2.azurecontainerapps.io/'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'https://ac27145722.livelygrass-8d4c4013.eastus2.azurecontainerapps.io/'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspected overpass-the-hash attack (Kerberos) was detected on host `VNEVADO-Win10V`, where Emma Clark (Helpdesk Administrator) attempted to authenticate against VNEVADO-DC.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'From the same host, the account with AadUserId `1d94aaf6-efe6-4e76-ad56-ffd7d1257bc1` (Ethan Brooks, Account Executive) performed user and IP address reconnaissance (SMB), enumerating SMB sessions on VNEVADO-DC and retrieving recent IP addresses of 2 accounts.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The compromised user then clicked on a potentially malicious URL `https://ac27145722.livelygrass-8d4c4013.eastus2.azurecontainerapps.io/`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

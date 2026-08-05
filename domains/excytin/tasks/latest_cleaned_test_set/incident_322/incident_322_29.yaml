@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_322_latest_cleaned_test_set_task_29
+  title: incident_322_latest_cleaned_test_set_task_29
+  description: 'For the later alert in this chain where a malicious URL was clicked on the device, what IP address was recorded as associated with that event?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident, the tool `ntdsutil.exe` was launched via an encoded PowerShell command (`powershell.exe -encodedcommand ...`, PID 2556) and then executed as PID 6748 with the command line `"ntdsutil.exe" "ac i ntds" ifm "create full c:\temp" q q`, indicating an attacker collecting Active Directory information. The activity chain later pivoted to cloud activity, including an Azure Resource Manager operation from a suspicious proxy IP address, and eventually to an alert reporting that a malicious URL was clicked on a device.'
+    question: 'For the later alert in this chain where a malicious URL was clicked on the device, what IP address was recorded as associated with that event?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '172.33.118.200'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '172.33.118.200'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'On host `vnevado-dc`, ntdsutil.exe was launched to collect Active Directory information (possible credential/DB dump for persistence or lateral movement) at 2024-08-01 12:54:34 UTC.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using the compromised access, the user account with AadUserId `5e5dd0bd-f7ed-4583-8e9e-52f91e31a360` performed an Azure Resource Manager operation from a suspicious proxy (TOR) IP address at 2024-08-01 13:09:13 UTC.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'A malicious URL was then clicked on the device with IP address `172.33.118.200` at 2024-08-01 13:49:58 UTC.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

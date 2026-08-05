@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_37
+  title: incident_39_latest_cleaned_train_set_task_37
+  description: 'For the related alert where a user clicked a link in an email that zero-hour auto purge (ZAP) had quarantined, what is the email address of the account that accessed that link?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, a SID history injection was detected on host `vnevado-dc`, tied to the account `lucasb` (SID `S-1-5-21-1440151660-4837038288-105596163-1120`, AAD ID `7fcf9695-68fc-4258-864d-e1e5b166c66f`). The offending process (PID 3780, created 2024-06-27T14:34:10Z) ran: `powershell.exe -command "net.exe stop ntds /y; add-addbsidhistory -samaccountname bdadmin -sidhistory \"s-1-5-32-544\" -databasepath (get-itemproperty -path registry::hklm\system\currentcontrolset\services\ntds\parameters).\"dsa database file\" -force; net.exe start ntds"`. Attackers typically use such tools to change the SID history of an existing domain user to an SID with elevated privileges, enabling access to sensitive files, persistence, and system modification. This activity is linked through shared entities to other alerts in the incident, including one raised by Microsoft Defender for Office 365 about a user who clicked a link inside an email that had been quarantined by zero-hour auto purge (ZAP).'
+    question: 'For the related alert where a user clicked a link in an email that zero-hour auto purge (ZAP) had quarantined, what is the email address of the account that accessed that link?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'tgs2z@vnevado.alpineskihouse.co'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'tgs2z@vnevado.alpineskihouse.co'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A SID history injection was detected involving the process `powershell.exe`, where attackers modified the SID history attribute to gain elevated privileges.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Multiple dual-purpose tools were dropped on the device under the account with SID `S-5-7-21-1843151660-3234030288-105586167-1422`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The user with email `tgs2z@vnevado.alpineskihouse.co` clicked on a link in an email that had been quarantined by zero-hour auto purge (ZAP).'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_2
+  title: incident_5_latest_cleaned_test_set_task_2
+  description: 'A few days later, attack disruption automatically blocked a contained user''s attempts to create, delete, or modify files over SMB on multiple devices. What is the email address of the user account that was contained and blocked in that lateral movement alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an incident, potentially compromised assets were observed exhibiting ransomware-like behavior across several devices. The activity involved the account named `dp5hn` (SID `S-0-6-5`) and files such as `get-userprttoken.ps1`, `characterical.zip`, and the encrypted artifact `characterical.zip.lockbit`, suggesting an attacker was moving laterally to infect as many devices as possible with ransomware.'
+    question: 'A few days later, attack disruption automatically blocked a contained user''s attempts to create, delete, or modify files over SMB on multiple devices. What is the email address of the user account that was contained and blocked in that lateral movement alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'dp5hn@vnevado.alpineskihouse.co'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'dp5hn@vnevado.alpineskihouse.co'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Potentially compromised assets exhibiting ransomware-like behavior were detected involving the IP address `99.83.111.100`, suggesting an attacker was moving laterally across the network to infect devices with ransomware.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'From that activity, lateral movement using SMB remote file access was blocked on multiple devices, tied to the contained user account with email `dp5hn@vnevado.alpineskihouse.co`, whose attempts to create, delete, or modify files over SMB were automatically blocked by attack disruption.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

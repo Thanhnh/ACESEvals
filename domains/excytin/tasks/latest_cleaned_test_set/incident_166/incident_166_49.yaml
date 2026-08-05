@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_test_set_task_49
+  title: incident_166_latest_cleaned_test_set_task_49
+  description: 'One of the user accounts involved in the BEC-related activity also signed in to SAP in a suspicious manner on 2024-07-22. What was the source IP address used for that SAP sign-in?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During investigation of a business email compromise (BEC) and SAP-related security incident, an alert titled ''Password Spray'' was raised on 2024-07-23, showing a password spray attack originating from the IP address `95.202.65.202` against user accounts in the tenant. One of the accounts targeted in this activity was later linked to further suspicious behavior in the environment.'
+    question: 'One of the user accounts involved in the BEC-related activity also signed in to SAP in a suspicious manner on 2024-07-22. What was the source IP address used for that SAP sign-in?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '107.253.5.27'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '107.253.5.27'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A password spray attack was detected against the user account with AadUserId `89e933b9-5b2e-4bd6-bcdf-033db707ef82`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The compromised user, involved in a business email compromise-related alert, then signed in to SAP in a suspicious manner from the IP address `107.253.5.27`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

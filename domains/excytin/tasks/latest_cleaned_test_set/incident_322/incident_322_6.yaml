@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_322_latest_cleaned_test_set_task_6
+  title: incident_322_latest_cleaned_test_set_task_6
+  description: 'For the alert about Ntdsutil collecting Active Directory information, what was the process ID and the full command line used to run the tool?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, a potentially malicious URL click was detected after a phishing email was delivered to the recipient `alyssat@vnevado.alpineskihouse.co`. The attack chain progressed from the removal of emails containing the malicious URL, to a suspicious Azure Resource Manager operation from a proxy IP address, and finally to activity on a domain controller where Ntdsutil was used to collect Active Directory information.'
+    question: 'For the alert about Ntdsutil collecting Active Directory information, what was the process ID and the full command line used to run the tool?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID: 6748, Command line: "ntdsutil.exe" "ac i ntds" ifm "create full c:\temp" q q (created at 2024-08-01T12:37:30.2769191Z)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID: 6748, Command line: "ntdsutil.exe" "ac i ntds" ifm "create full c:\temp" q q (created at 2024-08-01T12:37:30.2769191Z)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The mailbox recipient `alyssat@vnevado.alpineskihouse.co` received an email and a potentially malicious URL click was detected at 2024-08-01 12:44:53 UTC.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The user account with SID `S-1-5-21-1840151686-3534835288-156286563-1127` was associated with the emails containing the malicious URL that were removed after delivery at 2024-08-01 12:44:53 UTC.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The compromised activity reached the host `vnevado-dc`, where an Azure Resource Manager operation from a suspicious proxy IP address was detected at 2024-08-01 13:09:13 UTC.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'On that host, the attacker launched the process with Process ID `6748` at `2024-08-01t12:37:30.2769191z` using the command line `"ntdsutil.exe" "ac i ntds" ifm "create full c:\temp" q q` to collect Active Directory information.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

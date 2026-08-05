@@ -5,7 +5,7 @@ tasks:
     access to the LSASS service. According to that LSASS access alert, what is the name of the file that was involved?'
   inherit_shared: true
   initial_context:
-    incident_context: 'During an investigation, we observed that on 2024-07-10 the user "Luciano Herrera" (Luciano Herrera@niseko.alpineskihouse.co)
+    incident_context: 'During an investigation, we observed that on 2024-07-10 the user "Luciano Herrera" (pwilson@niseko.alpineskihouse.co)
       performed an unusual addition of a password-type credential to the OAuth application "SimulandApp" (AppId 11161) while
       connected from IPv6 address 2801:e0a:1eb:dea0:642e:5bb6:d315:fbb3. This activity raised concerns that the application
       or account might have been compromised.'

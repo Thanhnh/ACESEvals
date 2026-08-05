@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_134_latest_cleaned_train_set_task_8
+  title: incident_134_latest_cleaned_train_set_task_8
+  description: 'An earlier related alert in this incident reported emails containing a malicious URL that were delivered and later removed. What was the recipient email address of those messages?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert was raised for ''Suspicious inbox manipulation rule'', where a user''s inbox rules were manipulated in a suspicious manner, possibly indicating an attacker gained access to a mailbox to delete or move messages and exfiltrate data. The activity was associated with cloud application AppId `20893` and originated from IP address `237.7.81.122`.'
+    question: 'An earlier related alert in this incident reported emails containing a malicious URL that were delivered and later removed. What was the recipient email address of those messages?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'raphaelt@vnevado.alpineskihouse.co'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'raphaelt@vnevado.alpineskihouse.co'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A user account with SID `S-1-5-21-1874151667-3554330288-105586563-1715` had its inbox rules manipulated in a suspicious manner, indicating an attacker gained access to the mailbox and created rules to delete or move messages to exfiltrate data.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Related to this compromised mailbox activity, emails containing a malicious URL were delivered and later removed, with the mail message recipient being `raphaelt@vnevado.alpineskihouse.co`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

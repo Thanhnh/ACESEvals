@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_test_set_task_16
+  title: incident_39_latest_cleaned_test_set_task_16
+  description: 'This activity is linked to another alert where a remote session dropped a file and executed it, suggesting lateral movement or propagation. Which user account was associated with that remote drop-and-execute activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this security incident, an alert titled "Suspicious process stopping services" was raised on a domain controller. The activity involved `powershell.exe` (Process ID 3780) running the command `powershell.exe -command "net.exe stop ntds /y; add-addbsidhistory -samaccountname bdadmin -sidhistory \"s-1-5-32-544\" -databasepath (get-itemproperty -path registry::hklm\system\currentcontrolset\services\ntds\parameters).\"dsa database file\" -force; net.exe start ntds"`, which spawned `net.exe` (Process ID 6428) with the command line `"net.exe" stop ntds /y`. Stopping services like NTDS is often done by attackers to evade detection or to tamper with the Active Directory database.'
+    question: 'This activity is linked to another alert where a remote session dropped a file and executed it, suggesting lateral movement or propagation. Which user account was associated with that remote drop-and-execute activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'fk8mq'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'fk8mq'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account `lucasb` was used to run a process that suspiciously stopped services on the device, likely to evade detection and prevent recovery.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A remote session originating from the IP address `141.216.110.153` dropped a file on the device and executed it, indicating lateral movement or propagation.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The remote session that dropped and launched the file from the remote location was performed under the account `fk8mq`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

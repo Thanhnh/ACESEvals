@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'On 2024-07-17 at 11:34 UTC, Microsoft security signaled a Business Email Compromise (BEC) attempt against
-      the account “Nina Park” (Nina Park@vnevado.alpineskihouse.co, SID S-1-5-21-1874151667-3554330288-105586563-1715). The
+      the account “Nina Park” (raphaelt@vnevado.alpineskihouse.co, SID S-1-5-21-1874151667-3554330288-105586563-1715). The
       alert noted that, during a risky Azure AD session originating from the external IP address 237.7.81.122, a malicious
       inbox rule was created to hide incoming email—classic behaviour in financial-fraud–related BEC attacks.'
     question: 'A few minutes earlier, the same user account was observed signing in from an anonymous network source. What

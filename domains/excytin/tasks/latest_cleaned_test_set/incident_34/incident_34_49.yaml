@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_test_set_task_49
+  title: incident_34_latest_cleaned_test_set_task_49
+  description: 'A second, nearly simultaneous alert of the same type was triggered on this device just moments earlier in the attack chain. Which process (with its process ID, creation time, and full command line, including the document it opened) was flagged in that related alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident on the endpoint `vnevado-win10e` (AadDeviceId `02b8f519-1123-4228-b32a-ccb78af3449f`), an alert for "Suspicious PowerShell download or encoded command execution" was raised for the user account `samuelf` (SID `S-1-5-21-1870156660-7534030218-135086563-1193`). The PowerShell command line (PID 8604, created 2024-06-26T12:00:39.288Z) reassembled a large base64 blob, wrote it to the desktop as `winatp-intro-backdoor.exe`, and then created and ran a scheduled task named ''yrei'' to launch it.'
+    question: 'A second, nearly simultaneous alert of the same type was triggered on this device just moments earlier in the attack chain. Which process (with its process ID, creation time, and full command line, including the document it opened) was flagged in that related alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID 9780, created at 2024-06-26T11:57:20.2959493Z, command line: "winword.exe" c:\scripts\rs4_winatp-intro-invoice.docm'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID 9780, created at 2024-06-26T11:57:20.2959493Z, command line: "winword.exe" c:\scripts\rs4_winatp-intro-invoice.docm'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account with AadUserId `16320fec-8d90-403b-b7fe-78f715d4728d` executed a suspicious PowerShell command that downloaded a file or ran an encoded command.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The suspicious PowerShell activity originated from the process `winword.exe c:\scripts\rs4_winatp-intro-invoice.docm` with Process ID `9780`, created at `2024-06-26t11:57:20.2959493z`, which opened a macro-enabled document to launch the encoded PowerShell download.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

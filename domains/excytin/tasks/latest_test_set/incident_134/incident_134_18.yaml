@@ -5,7 +5,7 @@ tasks:
     ID (AadUserId) of the account targeted in that password spray attempt?'
   inherit_shared: true
   initial_context:
-    incident_context: 'A security investigation revealed that the user account "Nina Park" (email: Nina Park@vnevado.alpineskihouse.co,
+    incident_context: 'A security investigation revealed that the user account "Nina Park" (email: raphaelt@vnevado.alpineskihouse.co,
       SID: S-1-5-21-1874151667-3554330288-105586563-1715) was flagged as "Account compromised following a password-spray attack"
       after a sign-in from an unusual location and browser on 2024-07-18 at 14:54 UTC.'
     question: 'Looking at the earlier "Password Spray" alert that is linked to this compromise, what is the Azure AD user

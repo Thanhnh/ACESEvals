@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_16
+  title: incident_5_latest_cleaned_train_set_task_16
+  description: 'In the related ''Active unknown malware was detected'' alert, what is the name of the malicious file that was identified?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage intrusion, the alert "''CommandAndControl'' malware was detected during lateral movement" fired on host `vnevado-win10r` (AAD device ID `9d4887ba-0b69-47d6-89bc-9b32787f379e`) for the account `dp5hn` (SID `S-1-5-21-1840191660-8534830288-125585561-1522`, AAD user ID `731adb71-b11c-4bbf-850b-57989b350e96`). The suspicious activity included process ID 1332 created at 2024-06-20T09:10:52Z running the command line `curl http://vectorsandarrows.com`. Following this, attack disruption blocked the contained user''s SMB-based file activity across multiple devices, and PsExec was used for lateral movement to the jump server. Around the same time, another detection reported active unknown malware running on an affected machine.'
+    question: 'In the related ''Active unknown malware was detected'' alert, what is the name of the malicious file that was identified?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'mimikatz.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'mimikatz.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A ''CommandAndControl'' malware was detected during lateral movement, involving the account with AadUserId `731adb71-b11c-4bbf-850b-57989b350e96`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The contained user''s lateral movement attempt using SMB remote file access was blocked on multiple devices, originating from IP address `99.83.111.100`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The account named `tgs2z` was used to perform PSExec lateral movement to the jump server Vnevado-jump.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'Active unknown malware was detected on the device in the form of the file `mimikatz.exe`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: During a security incident involving suspicious SAP authentication, a user account with the name 
-      'Jordan P' and email 'Jordan P@vnevado.alpineskihouse.co' signed in to SAP from the IP address `107.253.5.27`. 
+      'Jordan P' and email 'laylaw@vnevado.alpineskihouse.co' signed in to SAP from the IP address `107.253.5.27`. 
       This activity could indicate that an attacker is researching or altering sensitive financial information in SAP 
       with possible intentions for later phishing or social engineering attacks. The alert was based on a Microsoft 
       Entra ID warning.
@@ -56,7 +56,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: During the investigation of a suspicious email incident, involving the user account of Jordan P 
-      with email `Jordan P@vnevado.alpineskihouse.co`, and the mailbox address `tony@avoriaz.alpineskihouse.co`, another
+      with email `laylaw@vnevado.alpineskihouse.co`, and the mailbox address `tony@avoriaz.alpineskihouse.co`, another
       notable finding emerged. There was an alert named 'Password Spray' detected on 2024-07-23.
     question: Can you provide the IP address involved in this password spray attack?
     # Main task submission evaluation - uses LLM-as-a-judge by default
@@ -259,7 +259,7 @@ tasks:
     # To use static matching instead, change strategy to "static" and set:
     #   criteria:
     #     expected_answers:
-    #       - 'Jordan P@vnevado.alpineskihouse.co'
+    #       - 'laylaw@vnevado.alpineskihouse.co'
   scoring:
     llm_judge:
       model: "{judge_llm}"
@@ -270,7 +270,7 @@ tasks:
         target: submission
         judge_system_template: judge/submission_judge_system.md
         judge_user_template: judge/submission_judge_user.md
-        description: 'Jordan P@vnevado.alpineskihouse.co'
+        description: 'laylaw@vnevado.alpineskihouse.co'
         max_score: 1.0
       checkpoint_1:
         target: trajectory
@@ -434,7 +434,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: A security incident involving possible BEC (business email compromise) financial fraud was 
-      reported. The user `Jordan P` with email address `Jordan P@vnevado.alpineskihouse.co` and user ID 
+      reported. The user `Jordan P` with email address `laylaw@vnevado.alpineskihouse.co` and user ID 
       `89e933b9-5b2e-4bd6-bcdf-033db707ef82` was flagged for suspicious activities that might be an attempt to conduct a
       fraud attack against the organization.
     question: As part of this BEC incident, suspicious emails were sent by a potentially compromised user account. Can 

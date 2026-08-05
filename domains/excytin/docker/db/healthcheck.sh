@@ -181,6 +181,44 @@ test_required_tables() {
     return 0
 }
 
+# Validate insane mode: verify stripped tables are absent
+# Only runs when EXCYTIN_MODE=insane is set in the container environment
+test_insane_mode_tables() {
+    if [ "${EXCYTIN_MODE:-}" != "insane" ]; then
+        # Not in insane mode — skip this check
+        return 0
+    fi
+
+    log_info "Testing insane mode: verifying alert/incident tables are absent..."
+
+    local INSANE_STRIPPED_TABLES="SecurityAlert AlertEvidence AlertInfo SecurityIncident"
+    local leaked_tables=""
+
+    for table in $INSANE_STRIPPED_TABLES; do
+        local exists=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" -D "$DB_NAME" \
+            -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='$DB_NAME' AND TABLE_NAME='$table';" \
+            -s -N 2>/dev/null || echo "0")
+
+        if [ "$exists" -gt 0 ]; then
+            if [ -z "$leaked_tables" ]; then
+                leaked_tables="$table"
+            else
+                leaked_tables="$leaked_tables, $table"
+            fi
+        fi
+    done
+
+    if [ -n "$leaked_tables" ]; then
+        log_error "INSANE MODE VIOLATION: The following tables should NOT exist but were found: $leaked_tables"
+        log_error "The agent would have access to pre-computed alert signals — eval results are invalid!"
+        log_error "Check that the correct _insane.sql file is mounted in docker-entrypoint-initdb.d"
+        return 1
+    fi
+
+    log_info "✅ Insane mode verified: all 4 alert/incident signal tables are absent"
+    return 0
+}
+
 # Test data integrity and query functionality
 test_data_integrity() {
     log_info "Testing data integrity and complex query functionality..."
@@ -299,6 +337,7 @@ main() {
         if test_mysql_connectivity && \
            test_admin_credentials && \
            test_required_tables && \
+           test_insane_mode_tables && \
            test_data_integrity && \
            test_permissions && \
            test_file_operations; then

@@ -42,7 +42,7 @@ tasks:
         max_score: 0.333
         weight: 1.0
         title: Checkpoint 2
-        description: Shortly after, the compromised account with Email `Nina Sullivan@vnevado.alpineskihouse.co` began 
+        description: Shortly after, the compromised account with Email `santiago@vnevado.alpineskihouse.co` began 
           an internal phishing campaign from its device.
       checkpoint_3:
         target: trajectory

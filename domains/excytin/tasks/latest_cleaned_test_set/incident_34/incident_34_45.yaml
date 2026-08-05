@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_test_set_task_45
+  title: incident_34_latest_cleaned_test_set_task_45
+  description: 'A related alert in this incident reports that an uncommon file was created on the machine and then added to a Registry Run Key for persistence. What IP address is associated with that persistence alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident involving Execution & Discovery on an endpoint, `winword.exe` was launched with the command line `"winword.exe" c:\scripts\rs4_winatp-intro-invoice.docm` (Process ID 9780). Shortly afterward, a suspicious LDAP query was executed on the same machine, indicating potential reconnaissance activity against the domain controller.'
+    question: 'A related alert in this incident reports that an uncommon file was created on the machine and then added to a Registry Run Key for persistence. What IP address is associated with that persistence alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '72.5.72.208'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '72.5.72.208'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account with SID `S-1-5-21-1870156660-7534030218-135086563-1193` executed a suspicious LDAP query against the domain controller, indicating reconnaissance of the organization''s users, groups, and assets.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On the same machine, an uncommon file was created and registered under a Registry Run Key to establish persistence after reboot, with the associated network activity involving IP address `72.5.72.208`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

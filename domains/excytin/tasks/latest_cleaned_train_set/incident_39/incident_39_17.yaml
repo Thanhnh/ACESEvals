@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_17
+  title: incident_39_latest_cleaned_train_set_task_17
+  description: 'Roughly at the same time (about two seconds earlier), a related "Possible lateral movement" alert was triggered by Microsoft Defender for Endpoint on the basis of a suspicious network event. Which IP address was recorded in that lateral movement alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this investigation, a "Suspicious remote activity" alert was raised on a device after activity initiated remotely was observed. The alert involved the service binary `psexesvc.exe` (process ID 5512, created 2024-06-27T14:33:27Z) executing under the `LocalSystem` account (SID S-0-6-5), along with the user account `fk8mq` (SID S-1-5-21-1540151660-3530000288-105586595-1517, Entra ID 97e6a954-b6bd-48a5-808c-bd8464cce677), and a remote source IP address of `141.216.110.153`. This activity is typical of PsExec being used to launch interactive sessions or commands from another machine.'
+    question: 'Roughly at the same time (about two seconds earlier), a related "Possible lateral movement" alert was triggered by Microsoft Defender for Endpoint on the basis of a suspicious network event. Which IP address was recorded in that lateral movement alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '35.202.74.47'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '35.202.74.47'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Suspicious remote activity was observed on the host with AadDeviceId `fafdcd65-46c6-45a6-aa85-ec9b77ca0bcb`, indicating an attacker initiated actions such as interactive sessions, file modifications, WMI commands, or scheduled tasks from a remote machine.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'In close time proximity, possible lateral movement was detected involving the remote IP address `35.202.74.47`, suggesting the attacker used this address to move laterally across devices to gather data or elevate privileges.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

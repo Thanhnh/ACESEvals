@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_39_latest_cleaned_test_set_task_78
+  title: incident_39_latest_cleaned_test_set_task_78
+  description: 'A few seconds after this Rubeus activity, a related alert was raised for PsExec being used to launch a command on a remote device. What is the Microsoft Entra (Azure AD) user ID of the account tied to that PsExec alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, activity indicating the use of the Rubeus tool was observed on the endpoint `vnevado-win10b` (AadDeviceId `fafdcd65-46c6-45a6-aa85-ec9b77ca0bcb`). The alert involved the account `fk8mq` (SID `S-1-5-21-1540151660-3530000288-105586595-1517`) and processes such as `psexesvc.exe` (PID 5512) and a command line `"cmd" /c "c:\temp\rubeus.exe dump /service:xfbzkp /user:lucasb > c:\temp\adminticket.txt"` spawning `rubeus.exe` (PID 2608). Rubeus can perform kerberoasting, pass-the-ticket, and other Kerberos-based attacks used to obtain credentials or authenticate without decrypting tickets.'
+    question: 'A few seconds after this Rubeus activity, a related alert was raised for PsExec being used to launch a command on a remote device. What is the Microsoft Entra (Azure AD) user ID of the account tied to that PsExec alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '1d94aaf6-efe6-4e76-ad56-ffd7d1257bc1'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '1d94aaf6-efe6-4e76-ad56-ffd7d1257bc1'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The Rubeus kerberoasting tool was used on the endpoint, extracting Kerberos ticket data into the file `adminticket.txt`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using the harvested credentials, PsExec launched a command on a remote device for lateral movement, performed by the account with AadUserId `1d94aaf6-efe6-4e76-ad56-ffd7d1257bc1`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

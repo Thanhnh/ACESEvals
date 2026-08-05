@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_94
+  title: incident_5_latest_cleaned_test_set_task_94
+  description: 'In the related alert about potentially compromised assets exhibiting ransomware-like behavior, what is the name of the file associated with that activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a multi-stage incident, a ''Suspicious WMI process creation'' alert fired on host `vnevado-win10r` (AAD device ID `9d4887ba-0b69-47d6-89bc-9b32787f379e`). The observed processes included `vssblatemp.exe delete shadows /all` (PID 7236), `bcdedit /set recoveryenabled no` (PID 4312), `bcdedit /set bootstatuspolicy ignoreallfailures` (PID 7092), `curl http://vectorsandarrows.com` (PID 1332), and `powershell -file c:\scripts\get-userprttoken.ps1` (PID 2820). This activity is linked through a shared compromised user account to a later alert about potentially compromised assets exhibiting ransomware-like behavior across several devices.'
+    question: 'In the related alert about potentially compromised assets exhibiting ransomware-like behavior, what is the name of the file associated with that activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'characterical.zip'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'characterical.zip'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious WMI process creation was observed, initiated by the user account with AadUserId `731adb71-b11c-4bbf-850b-57989b350e96`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The same potentially compromised account was then seen exhibiting ransomware-like behavior across several devices, involving the file `characterical.zip`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

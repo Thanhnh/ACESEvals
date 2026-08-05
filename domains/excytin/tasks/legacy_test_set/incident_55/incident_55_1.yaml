@@ -93,7 +93,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'An unusual addition of credentials to an OAuth app was observed where the user Luciano Herrera (email:
-      Luciano Herrera@niseko.alpineskihouse.co) added a credential of type Password to the application SimulandApp. This could
+      pwilson@niseko.alpineskihouse.co) added a credential of type Password to the application SimulandApp. This could
       indicate potential compromise, where the attacker could be spreading phishing or exfiltrating data. The IP address involved
       in this suspicious activity was 36.193.21.220. Another related alert involves a malicious PowerShell Cmdlet invocation
       on a machine which could be associated with credential theft or exploitation.'
@@ -427,7 +427,7 @@ tasks:
     # To use static matching instead, change strategy to "static" and set:
     #   criteria:
     #     expected_answers:
-    #       - 'Luciano Herrera@niseko.alpineskihouse.co'
+    #       - 'pwilson@niseko.alpineskihouse.co'
   scoring:
     llm_judge:
       model: "{judge_llm}"
@@ -438,7 +438,7 @@ tasks:
         target: submission
         judge_system_template: judge/submission_judge_system.md
         judge_user_template: judge/submission_judge_user.md
-        description: 'Luciano Herrera@niseko.alpineskihouse.co'
+        description: 'pwilson@niseko.alpineskihouse.co'
         max_score: 1.0
       checkpoint_1:
         target: trajectory

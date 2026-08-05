@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_64
+  title: incident_5_latest_cleaned_test_set_task_64
+  description: 'For the alert reporting ransomware behavior detected in the file system, what is the Azure AD device ID of the affected host?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this incident, a ''System recovery setting tampering'' alert fired on host `vnevado-win10r` (AAD Device ID `9d4887ba-0b69-47d6-89bc-9b32787f379e`), where processes `vssblatemp.exe delete shadows /all` (PID 7236) and `bcdedit /set recoveryenabled no` (PID 4312) were executed to delete volume shadow copies and disable Windows recovery. Shortly before that, suspicious remote activity was observed, and an alert for ransomware behavior detected in the file system was raised, indicating possible mass encryption of files.'
+    question: 'For the alert reporting ransomware behavior detected in the file system, what is the Azure AD device ID of the affected host?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'e5799261-6720-4297-961e-bd9ca4275033'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'e5799261-6720-4297-961e-bd9ca4275033'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account `dp5hn` performed system recovery setting tampering, attempting to delete backups and disable recovery services on the device.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Suspicious remote activity was initiated against the device with AadDeviceId `e5799261-6720-4297-961e-bd9ca4275033`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'Ransomware behavior was detected in the file system of the same host with AadDeviceId `e5799261-6720-4297-961e-bd9ca4275033`, indicating mass encryption of files.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

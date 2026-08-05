@@ -77,9 +77,9 @@ package = false
 # Choose ONE saber source based on your repository:
 #
 # GitHub (external — default for ACESEvals repo):
-saber = { git = "https://github.com/microsoft/ACES.git", branch = "main" }
+# saber = { git = "https://github.com/microsoft/ACES.git", branch = "main" }
 # Azure DevOps (Microsoft internal — default for oss_saber repo):
-# saber = { git = "https://MSECAIModels@dev.azure.com/MSECAIModels/Benchmarking/_git/SABER", branch = "main" }
+saber = { git = "https://MSECAIModels@dev.azure.com/MSECAIModels/Benchmarking/_git/SABER", branch = "main" }
 # Local editable (for development against a local checkout):
 # saber = { path = "./external/saber", editable = true }
 #

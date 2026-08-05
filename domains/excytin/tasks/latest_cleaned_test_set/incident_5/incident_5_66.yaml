@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_66
+  title: incident_5_latest_cleaned_test_set_task_66
+  description: 'A closely related alert in the same incident flagged a suspicious WMI process creation, where malware commonly uses WMI to spawn new processes and break process trees. What is the name of the script file that was executed in that alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of activity attributed to the Manatee Tempest activity group — a Russia-based cybercriminal group known for the Dridex banking trojan, drive-by download/FakeUpdates infections, and Cobalt Strike deployment — analysts observed on host `vnevado-win10r` (AAD device ID `9d4887ba-0b69-47d6-89bc-9b32787f379e`) a process (PID 1332, created 2024-06-20T09:10:52Z) running the command `curl http://vectorsandarrows.com`, reaching out to the URL `vectorsandarrows.com` resolving to IP `198.43.121.209`.'
+    question: 'A closely related alert in the same incident flagged a suspicious WMI process creation, where malware commonly uses WMI to spawn new processes and break process trees. What is the name of the script file that was executed in that alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'get-userprttoken.ps1'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'get-userprttoken.ps1'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account `dp5hn` was observed conducting activity associated with the Manatee Tempest activity group at 2024-07-04 22:35:02 UTC.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using that compromised account, a suspicious WMI process creation was observed on the machine, spawning a new process that broke the process tree.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The WMI-spawned process executed the extracted script file `get-userprttoken.ps1`, a PowerShell script used to steal the user''s Primary Refresh Token.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_test_set_task_28
+  title: incident_34_latest_cleaned_test_set_task_28
+  description: 'A follow-up alert about an uncommon file being created and added to a Run Key was triggered about a second later. What is the account name of the user associated with that alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident on the endpoint `vnevado-win10e` (AAD device ID `02b8f519-1123-4228-b32a-ccb78af3449f`), an alert titled ''Anomaly detected in ASEP registry'' was raised. The process created at 2024-06-26T13:17:18.826Z with process ID 10208 ran the command `reg add hkcu\software\microsoft\windows\currentversion\runonce /f /v yrei /t reg_expand_sz /d %userprofile%\desktop\winatp-intro-backdoor.exe`, registering the file `winatp-intro-backdoor.exe` to run after a reboot. The activity was associated with the account SID `S-1-5-21-1870156660-7534030218-135086563-1193` (AAD user ID `16320fec-8d90-403b-b7fe-78f715d4728d`) and the IP address `72.5.72.208`.'
+    question: 'A follow-up alert about an uncommon file being created and added to a Run Key was triggered about a second later. What is the account name of the user associated with that alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'samuelf'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'samuelf'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'An anomaly was detected in an ASEP registry key — a process registered a suspicious command or file that would run after reboot — performed under the account `samuelf`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'An uncommon file was created on the machine and added to a Run Key for persistence, associated with the same account, Name: `samuelf`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

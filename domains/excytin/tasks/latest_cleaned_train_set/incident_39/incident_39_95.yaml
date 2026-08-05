@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_95
+  title: incident_39_latest_cleaned_train_set_task_95
+  description: 'In the related follow-up credential theft alert, what was the process ID and the full command line used by the attacker''s mimikatz execution?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a malicious credential theft tool execution was detected on an endpoint: the process `mimikatz.exe` was launched (Process ID 6880, created 2024-06-27T14:32:37.7041174Z) with the command line `"mimikatz.exe" privilege::debug "sekurlsa::pth /user:fk8mq /ntlm:96def1a633fc6790124d5f8fe21cc72b /domain:vnevado.alpineskihouse.co /run:\"powershell.exe dir \\vnevado-win10b\c$\"" exit`, indicating a pass-the-hash attempt that spawned `powershell.exe`. A second, closely related credential theft tool alert was raised about a minute later, tied to the same user SID.'
+    question: 'In the related follow-up credential theft alert, what was the process ID and the full command line used by the attacker''s mimikatz execution?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID 5176 (created 2024-06-27T14:33:32.4282796Z), command line: `"mimikatz.exe" privilege::debug "kerberos::ptt c:\m365dattack\admin-tickets" exit` — a pass-the-ticket operation importing Kerberos admin tickets.'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID 5176 (created 2024-06-27T14:33:32.4282796Z), command line: `"mimikatz.exe" privilege::debug "kerberos::ptt c:\m365dattack\admin-tickets" exit` — a pass-the-ticket operation importing Kerberos admin tickets.'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A known credential theft tool execution was detected under the user account with SID `S-5-7-21-1843151660-3234030288-105586167-1422`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'That account executed the credential theft tool Mimikatz with the command line `"mimikatz.exe" privilege::debug "kerberos::ptt c:\m365dattack\admin-tickets" exit`, Process ID `5176`, created at `2024-06-27t14:33:32.4282796z`, to dump credentials and pass-the-ticket with stolen admin Kerberos tickets.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_71
+  title: incident_5_latest_cleaned_test_set_task_71
+  description: 'In the alert about potentially compromised assets exhibiting ransomware-like behavior, what was the name of the file involved?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a ransomware incident, suspicious file system changes indicating mass file encryption were detected on host `vnevado-win11u` (AAD Device ID `bc00e484-d0e5-4da4-9472-95568cccc07e`). Shortly afterwards, an alert showed that all file snapshots and shadow copies were deleted via WMI or VSSAdmin, and a related alert flagged potentially compromised assets exhibiting ransomware-like behavior across several devices, where an attacker may be using a specific user account, IP, or device to move laterally and infect as many devices as possible.'
+    question: 'In the alert about potentially compromised assets exhibiting ransomware-like behavior, what was the name of the file involved?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'characterical.zip'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'characterical.zip'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Ransomware behavior was detected in the file system on the host with AadDeviceId `bc00e484-d0e5-4da4-9472-95568cccc07e`, indicating mass encryption of files.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'File backups, snapshots, and shadow copies were deleted via WMI or VSSAdmin by the user account with AadUserId `731adb71-b11c-4bbf-850b-57989b350e96`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The potentially compromised assets exhibited ransomware-like behavior involving the file `characterical.zip`, which was used to spread the ransomware across several devices.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

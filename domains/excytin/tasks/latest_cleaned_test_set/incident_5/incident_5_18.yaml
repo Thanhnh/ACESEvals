@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_18
+  title: incident_5_latest_cleaned_test_set_task_18
+  description: 'Shortly after these credential-theft attempts, a related alert reported that a Windows Sysinternals tool had been renamed and then launched. What was the process ID, creation time, and full command line of that renamed tool''s process?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage intrusion, Windows Defender flagged "Unknown malware was detected and was active" on an affected machine. The associated activity showed repeated executions of `mimikatz.exe` (for example, PID 3932 at 2024-06-20T09:00:16Z running `privilege::debug sekurlsa::logonpasswords exit`, and PID 6600 at 2024-06-20T09:05:15Z running a `sekurlsa::pth` pass-the-hash command targeting user fk8mq in the vnevado.alpineskihouse.co domain), along with the dropped file `mimilib.dll`.'
+    question: 'Shortly after these credential-theft attempts, a related alert reported that a Windows Sysinternals tool had been renamed and then launched. What was the process ID, creation time, and full command line of that renamed tool''s process?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID: 6428, Created Time (UTC): 2024-06-20T09:07:40.2264462Z, Command line: `notepad.exe \\vnevado-jump cmd.ee`'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID: 6428, Created Time (UTC): 2024-06-20T09:07:40.2264462Z, Command line: `notepad.exe \\vnevado-jump cmd.ee`'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'An unknown malware was detected and was active under the user account `tgs2z`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On that account, a renamed Windows Sysinternals tool was launched — process ID `6428` created at `2024-06-20t09:07:40.2264462z` with command line `notepad.exe \\vnevado-jump cmd.ee`, indicating a covert attempt to run PsExec-like tooling under the guise of notepad.exe.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

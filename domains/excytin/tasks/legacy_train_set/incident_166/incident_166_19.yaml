@@ -6,7 +6,7 @@ tasks:
   initial_context:
     incident_context: 'A security incident involving business email compromise (BEC) financial fraud was identified where
       a suspicious inbox rule that hides incoming email messages was created in a risky Azure Active Directory session. The
-      involved account is Jordan P, with the email address Jordan P@vnevado.alpineskihouse.co and IP address 255.246.85.58.'
+      involved account is Jordan P, with the email address laylaw@vnevado.alpineskihouse.co and IP address 255.246.85.58.'
     question: 'What was the anonymous IP address that was flagged in connection with this security incident?'
     # Main task submission evaluation - uses LLM-as-a-judge by default
     # To use static matching instead, change strategy to "static" and set:

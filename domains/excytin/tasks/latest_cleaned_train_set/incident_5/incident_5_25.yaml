@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_25
+  title: incident_5_latest_cleaned_train_set_task_25
+  description: 'This remote activity is linked to another alert in the same incident where PsExec was used to launch a command on a remote device for lateral movement. What is the IP address associated with that PsExec alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage intrusion, an alert for "Suspicious remote activity" was raised on host `vnevado-win10s`, where activity initiated from a remote machine was observed. On that host, several suspicious processes were executed under the account with SID `S-1-5-21-1840191660-8534830288-125585561-1522`, including `bcdedit /set bootstatuspolicy ignoreallfailures` (PID 1868), `vssblatemp.exe delete shadows /all` (PID 5512), `curl http://vectorsandarrows.com` (PID 6460), and `powershell -file c:\scripts\get-userprttoken.ps1` (PID 6168), all around 2024-06-20 09:10 UTC.'
+    question: 'This remote activity is linked to another alert in the same incident where PsExec was used to launch a command on a remote device for lateral movement. What is the IP address associated with that PsExec alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '107.224.99.179'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '107.224.99.179'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Suspicious remote activity was observed originating from the remote IP address `99.83.111.100`, indicating an attacker attempting to initiate remote sessions or commands on the machine.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The account with SID `S-5-7-21-1843151660-3234030288-105586167-1422` was used to perform PSExec lateral movement to the jump server Vnevado-jump.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'PsExec was then used to launch a command on a remote device from the IP address `107.224.99.179`, enabling the attacker to move laterally within the organization.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

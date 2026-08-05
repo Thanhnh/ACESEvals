@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_134_latest_cleaned_test_set_task_46
+  title: incident_134_latest_cleaned_test_set_task_46
+  description: 'For the Password Spray alert associated with this same compromised account, what source IP address was the attack launched from?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'In a multi-stage incident, a ''Suspicious inbox manipulation rule'' alert was raised for user Nina Park (`raphaelt@vnevado.alpineskihouse.co`, SID `S-1-5-21-1874151667-3554330288-105586563-1715`), where inbox rules were manipulated in a suspicious manner from IP address `237.7.81.122` involving cloud application with AppId `20893`. An attacker might have gained access to the user''s mailbox to delete or move messages and exfiltrate data. A day later, on 2024-07-18, a related alert in the same incident detected a password spray attack against the same identity.'
+    question: 'For the Password Spray alert associated with this same compromised account, what source IP address was the attack launched from?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '170.54.121.63'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '170.54.121.63'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A user account with AadUserId `e036dee7-fa23-42ef-a019-468c8d3401f1` had its inbox rules manipulated in a suspicious manner, indicating the attacker gained access to the mailbox and set rules to delete or move messages for data exfiltration.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the mailbox compromise, a password spray attack was detected originating from the IP address `170.54.121.63`, which attempted to authenticate against many accounts in the organization.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

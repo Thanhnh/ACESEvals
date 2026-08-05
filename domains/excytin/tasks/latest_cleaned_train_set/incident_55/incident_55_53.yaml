@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_53
+  title: incident_55_latest_cleaned_train_set_task_53
+  description: 'Seconds after that discovery activity, a ''Sensitive credential memory read'' alert fired on the same device, indicating that the memory of the Local Security Authority Subsystem Service was scanned or dumped. What were the process ID and the creation time (UTC) of the targeted Local Security Authority Subsystem Service process?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, a ''Suspicious System Hardware Discovery'' alert was raised on a device where a known reconnaissance tool or technique was used to gather information about the target device or network. The activity was associated with the account `pwilson` (SID `S-1-5-21-551436448-9871687716-9837441745-1903`, AAD user ID `2de70991-2799-4a95-b734-8e3df3a50118`) and involved the processes `svchost.exe` (PID 2880, command line `svchost.exe -k netsvcs -p -s winmgmt`) and `powershell.exe` (PID 13968) executing the script `c:\script\contosoadfsblatempcreds.ps1`.'
+    question: 'Seconds after that discovery activity, a ''Sensitive credential memory read'' alert fired on the same device, indicating that the memory of the Local Security Authority Subsystem Service was scanned or dumped. What were the process ID and the creation time (UTC) of the targeted Local Security Authority Subsystem Service process?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'The targeted process was lsass.exe with Process ID 760, created at 2024-07-02T07:28:35.8580921Z.'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'The targeted process was lsass.exe with Process ID 760, created at 2024-07-02T07:28:35.8580921Z.'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious system hardware discovery activity was detected: PowerShell was launched with command line `"powershell.exe" -noexit -command set-location -literalpath ''c:\users\bjenkins\downloads\midnight14''`, Process ID `12412`, created at `2024-07-02t09:47:16.330794z`, gathering information about the device.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the discovery activity, a sensitive credential memory read was detected against the Local Security Authority Subsystem Service process `lsass.exe`, Process ID `760`, created at `2024-07-02t07:28:35.8580921z`, where the attacker scanned/dumped its memory to extract authentication hashes or passwords.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

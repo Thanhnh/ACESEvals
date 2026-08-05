@@ -1,0 +1,64 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_4
+  title: incident_55_latest_cleaned_test_set_task_4
+  description: 'For the related alert about the suspicious service creation on MB-ADFS, what is the email address of the account that created that service?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert was raised indicating that the domain controller host `MB-DC1` read the DKM key of an AD FS object (id 4cac49d3-29d3-407e-8c9b-b7ebb21541b2), a technique often associated with AD FS token-signing certificate theft. Following the chain of related alerts, the activity leads to a suspicious service named DDLOXJDSQSNGMUKKFUXQ being created on the host MB-ADFS to execute potentially malicious commands.'
+    question: 'For the related alert about the suspicious service creation on MB-ADFS, what is the email address of the account that created that service?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'gsmith@niseko.alpineskihouse.co'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'gsmith@niseko.alpineskihouse.co'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The host `MB-DC1` was observed reading the AD FS DKM key of ADFS object id 4cac49d3-29d3-407e-8c9b-b7ebb21541b2, indicating a suspected AD FS DKM key read.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The user account with AadUserId `2de70991-2799-4a95-b734-8e3df3a50118` (Luciano Herrera, CIO) on MB-WINCLIENT sent a replication request to MB-DC1, indicating a suspected DCSync attack.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'A process `powershell.exe` executed a suspicious sequence of exploration commands used to identify assets of value and coordinate lateral movement.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'The account `gsmith` was used to execute commands via the Impacket toolkit, indicating an ongoing hands-on-keyboard lateral movement attack.'
+      checkpoint_5:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 5
+        description: 'The account with email `gsmith@niseko.alpineskihouse.co` created the suspicious service `DDLOXJDSQSNGMUKKFUXQ` to execute potentially malicious commands on MB-ADFS.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4
+        - checkpoint_5

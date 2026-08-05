@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_75
+  title: incident_5_latest_cleaned_test_set_task_75
+  description: 'A related alert in this incident reports a possibly compromised user account that dropped ransomware-related files on several devices. What is the security identifier (SID) of that account?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert for ''LSASS process memory modified'' was raised — the Local Security Authority Subsystem Service (LSASS) enforces security policy by verifying user logons and password changes, and attackers may modify its memory to bypass security mechanisms. In this case `mimikatz.exe` was executed from IP `107.224.99.179` with the command line `"mimikatz.exe" privilege::debug "sekurlsa::pth /user:fk8mq /ntlm:96def1a633fc6790124d5f8fe21cc72b /domain:vnevado.alpineskihouse.co /run:..\notepad.exe //vnevado-jump cmd.exe"` (process IDs 3008 and 2020), spawning `notepad.exe` and `cmd.exe`. This credential theft activity was followed by PSExec lateral movement to the jump server.'
+    question: 'A related alert in this incident reports a possibly compromised user account that dropped ransomware-related files on several devices. What is the security identifier (SID) of that account?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'S-0-6-5'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'S-0-6-5'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account `tgs2z` was involved in a modification of the LSASS process memory, likely to bypass security mechanisms or dump credentials.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using the stolen credentials, lateral movement via PSExec was performed to the jump server from the IP address `99.83.111.100`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The compromised user account with SID `S-0-6-5` was then observed dropping ransomware-related files on several devices across the network.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

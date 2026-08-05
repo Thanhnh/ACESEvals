@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_test_set_task_37
+  title: incident_39_latest_cleaned_test_set_task_37
+  description: 'For the SID history injection alert in this incident, what is the name of the file involved?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a sequence of alerts indicative of potential human-operated malicious activity — the kind of activity that often precedes ransomware or other payload deployment — was observed on the device `vnevado-win10b` (AAD Device ID `fafdcd65-46c6-45a6-aa85-ec9b77ca0bcb`). The activity involved the accounts `fk8mq` (SID `S-1-5-21-1540151660-3530000288-105586595-1517`, AAD User ID `97e6a954-b6bd-48a5-808c-bd8464cce677`) and `kyleg`. Pivoting from this activity through a shared IP address, an associated alert shows that a remote session dropped a file and executed it, suggesting lateral movement or malware propagation, and this in turn ties back to a device where a Security IDentifier (SID) history injection was detected — a technique attackers use to grant an existing domain account elevated privileges for persistence and access to sensitive resources.'
+    question: 'For the SID history injection alert in this incident, what is the name of the file involved?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'dkwj.mze'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'dkwj.mze'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A sequence of alerts indicative of human-operated malicious activity was observed originating from the IP address `141.216.110.153`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'From that remote session, a file was dropped and launched on the host `vnevado-dc`, suggesting lateral movement.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The dropped file `dkwj.mze` was involved in a SID history injection attempt to gain elevated privileges and persistence.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

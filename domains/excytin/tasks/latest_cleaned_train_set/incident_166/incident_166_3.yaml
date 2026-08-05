@@ -1,0 +1,36 @@
+tasks:
+- task_id: incident_166_latest_cleaned_train_set_task_3
+  title: incident_166_latest_cleaned_train_set_task_3
+  description: 'Following this alert chain, the suspicious mailbox rule activity was reported against a specific SaaS/cloud service monitored by Defender for Cloud Apps. What is the cloud application ID (AppId) associated with that related alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation in our organization, an alert titled "Suspicious inbox manipulation rule" was raised on 2024-07-22 10:00 UTC. The alert indicates that a user''s inbox rules were manipulated in a suspicious manner — an attacker might have gained access to the mailbox and is creating rules to delete or move messages or folders in order to exfiltrate data. The activity was tied to the account `Jordan P` (`laylaw@vnevado.alpineskihouse.co`, AAD User ID `89e933b9-5b2e-4bd6-bcdf-033db707ef82`, SID `S-1-5-21-1740051960-3534030288-108486866-1602`) and originated from the IP address `255.246.85.58`.'
+    question: 'Following this alert chain, the suspicious mailbox rule activity was reported against a specific SaaS/cloud service monitored by Defender for Cloud Apps. What is the cloud application ID (AppId) associated with that related alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '20893'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '20893'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 1.0
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious inbox manipulation rule was created, indicating an attacker may have gained access to the user''s mailbox and is moving or deleting messages to exfiltrate data; the activity was performed through the cloud application with AppId `20893` (Microsoft Exchange Online).'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1

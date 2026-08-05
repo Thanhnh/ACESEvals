@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_84
+  title: incident_55_latest_cleaned_train_set_task_84
+  description: 'For the later occurrence of this ''Attempt to hide use of dual-purpose tool'' alert on 2024-07-06, what was the process ID and the exact process creation time (UTC) of the disguised executable?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert titled ''Attempt to hide use of dual-purpose tool'' was raised on 2024-07-04, where a known public tool was observed running under an unexpected filename `iy2orr1e.rrg.exe` with the command line `-windowstyle hidden -encodedcommand qwa6afwauwbjahiaaqbwahqacwbcaeuaeabwag8acgb0aeearabgafmavabvagsazqbuafmaaqbnag4aaqbuaemazqbyahqalgbwahmamqa=` and Process ID 3116. The same masqueraded tool, linked through a shared user account, triggered another identical alert about two days later on 2024-07-06.'
+    question: 'For the later occurrence of this ''Attempt to hide use of dual-purpose tool'' alert on 2024-07-06, what was the process ID and the exact process creation time (UTC) of the disguised executable?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID: 5752, Created Time (UTC): 2024-07-06T00:00:01.7155092Z (running the same `iy2orr1e.rrg.exe` hidden encoded-command line)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID: 5752, Created Time (UTC): 2024-07-06T00:00:01.7155092Z (running the same `iy2orr1e.rrg.exe` hidden encoded-command line)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account with AadUserId `ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5` was observed attempting to hide the use of a dual-purpose tool by running it under an unexpected filename.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'From that account''s activity, a renamed tool was executed as the process with Process ID `5752` at `2024-07-06t00:00:01.7155092z`, using the command line `"iy2orr1e.rrg.exe" -windowstyle hidden -encodedcommand qwa6afwauwbjahiaaqbwahqacwbcaeuaeabwag8acgb0aeearabgafmavabvagsazqbuafmaaqbnag4aaqbuaemazqbyahqalgbwahmamqa=`, hiding its window and running an encoded PowerShell command.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_10
+  title: incident_55_latest_cleaned_train_set_task_10
+  description: 'Following the internal phishing activity, an alert was raised for emails containing a malicious URL that were delivered and later removed. Which mailbox primary address was the recipient impacted by that removal alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, a Suspicious Task Scheduler activity alert was raised on host `mb-adfs`. A PowerShell process (PID 6808) launched with an encoded command, and a renamed binary `iy2orr1e.rrg.exe` was registered via `schtasks.exe` (PID 4304) as the daily task `run-exportadfstokensignincert.2024-07-02_09_48_23` using the account niseko\adfsadmin, and the task was then immediately executed (PID 6892). The attack chain later progressed to a malicious PowerShell cmdlet execution and an internal phishing campaign sent from this device to recipients inside the organization.'
+    question: 'Following the internal phishing activity, an alert was raised for emails containing a malicious URL that were delivered and later removed. Which mailbox primary address was the recipient impacted by that removal alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'santiago@vnevado.alpineskihouse.co'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'santiago@vnevado.alpineskihouse.co'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A process used Task Scheduler via `powershell.exe` to create, modify, or delete a scheduled task in an attempt to establish persistence.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A malicious PowerShell Cmdlet was invoked on the machine by the user with AadUserId `a2d0f7c2-b0a0-43bd-bce0-27d8ae3be4d0`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The compromised account with SID `S-1-5-11-7842151660-4834030208-105586563-1139` was observed sending internal phishing emails to recipients inside the organization.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'The phishing emails containing a malicious URL were delivered to the mailbox `santiago@vnevado.alpineskihouse.co` and later removed.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

@@ -1,0 +1,36 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_12
+  title: incident_55_latest_cleaned_train_set_task_12
+  description: 'As part of this same exploration sequence, a small built-in Windows utility was spawned twice (Process IDs 1120 and 3468) to enumerate the identity of the currently logged-on user. What is the file name of that executable?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a security incident, an alert titled "Suspicious sequence of exploration activities" was raised on 2024-07-04. A process called a set of Windows commands that attackers commonly use to identify assets of value and coordinate lateral movement after compromising a machine. The activity was tied to the account with SID `S-2-5-21-571436798-3864380397-1837441745-3206` (AAD User ID `ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5`), and involved a renamed binary `iy2orr1e.rrg.exe` launched with `-windowstyle hidden -encodedcommand qwa6afwauwbjahiaaqbwahqacwbcaeuaeabwag8acgb0aeearabgafmavabvagsazqbuafmaaqbnag4aaqbuaemazqbyahqalgbwahmamqa=` (Process IDs 3116 and 8764), as well as `powershell.exe` executing an encoded command (Process ID 6808).'
+    question: 'As part of this same exploration sequence, a small built-in Windows utility was spawned twice (Process IDs 1120 and 3468) to enumerate the identity of the currently logged-on user. What is the file name of that executable?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'whoami.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'whoami.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 1.0
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A process executed a suspicious sequence of exploration commands, including launching the discovery tool with extracted file name `whoami.exe`, which attackers commonly use to identify valuable assets and plan lateral movement after compromising a machine.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1

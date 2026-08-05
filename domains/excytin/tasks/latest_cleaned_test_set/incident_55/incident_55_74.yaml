@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_74
+  title: incident_55_latest_cleaned_test_set_task_74
+  description: 'Seconds after this event, a related alert fired for an attempt to hide the use of a dual-purpose tool running under an unexpected filename on the same machine. What is the Microsoft Entra ID (Azure AD) user ID of the account associated with that alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, an alert titled "System executable renamed and launched" fired when a renamed Windows executable was launched under the `SYSTEM` account (SID `S-2-2-78`). The activity involved `powershell.exe` running with the command line `6808__2024-07-02t09:48:12.7628138z__powershell.exe -encodedcommand qwa6afwauwbjahiaaqbwahqacwbcafiazqbuageabqblafaabwb3aguacgbzaggazqbsagwalgbwahmamqa=`. Attackers often rename system executables to evade behavior-based detections that rely on default paths and file names.'
+    question: 'Seconds after this event, a related alert fired for an attempt to hide the use of a dual-purpose tool running under an unexpected filename on the same machine. What is the Microsoft Entra ID (Azure AD) user ID of the account associated with that alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A renamed Windows system executable was launched on the host `mb-adfs`, indicating an attempt to evade path/filename-based detections.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The activity was performed by the user account with AadUserId `ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5`, who attempted to hide the use of a dual-purpose tool by running it under an unexpected filename.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

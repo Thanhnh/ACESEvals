@@ -5,7 +5,7 @@ tasks:
     Brooks’s malicious URL click, what is the name of the account associated with the credential-theft activity?'
   inherit_shared: true
   initial_context:
-    incident_context: 'A security investigation was initiated after user Ethan Brooks (Ethan Brooks@vnevado.alpineskihouse.co)
+    incident_context: 'A security investigation was initiated after user Ethan Brooks (tgs2z@vnevado.alpineskihouse.co)
       clicked a suspicious link hosted at https://ac27145722.livelygrass-8d4c4013.eastus2.azurecontainerapps.io/. This action
       generated the alert titled "A potentially malicious URL click was detected." During triage, analysts discovered that
       this alert is connected—through a shared user account SID—to an earlier alert dated 2024-07-04, which reported the execution

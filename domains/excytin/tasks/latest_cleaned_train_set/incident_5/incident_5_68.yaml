@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_68
+  title: incident_5_latest_cleaned_train_set_task_68
+  description: 'Almost simultaneously, a separate alert titled "File backups were deleted" reported that all file snapshots and shadow copies were removed via WMI or VSSAdmin, a behavior typical of ransomware. Which device (host name) was affected by that particular alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, a "Suspicious remote activity" alert fired on host `vnevado-win11u` (AAD device ID `bc00e484-d0e5-4da4-9472-95568cccc07e`, remote IP `99.83.111.100`). On that machine several destructive and credential-related commands were executed, including `bcdedit /set recoveryenabled no` (PID 4828), `bcdedit /set bootstatuspolicy ignoreallfailures` (PID 7332), `vssblatemp.exe delete shadows /all` (PID 1900), `curl http://vectorsandarrows.com` (PID 5572) and `powershell -file c:\scripts\get-userprttoken.ps1` (PID 5708).'
+    question: 'Almost simultaneously, a separate alert titled "File backups were deleted" reported that all file snapshots and shadow copies were removed via WMI or VSSAdmin, a behavior typical of ransomware. Which device (host name) was affected by that particular alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'vnevado-win10r'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'vnevado-win10r'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account `dp5hn` initiated suspicious remote activity on the machine, indicating attempts to run commands or interactive sessions from a remote machine.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the remote activity, all file backups, snapshots, and shadow copies were deleted via WMI or VSSAdmin on the host `vnevado-win10r`, which is behavior commonly associated with ransomware infection.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

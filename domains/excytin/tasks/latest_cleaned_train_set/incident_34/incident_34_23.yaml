@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_train_set_task_23
+  title: incident_34_latest_cleaned_train_set_task_23
+  description: 'For that follow-on persistence alert about the uncommon file being added to a Run Key, which IP address was recorded as an involved entity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, an alert titled "Suspicious process executed PowerShell command" was triggered when `powershell.exe` (Process ID 8604, created 2024-06-26T12:00:39.2886108Z) ran with `-w movedn -exec bypass` and a long command that assembled a base64 blob into `winatp-intro-backdoor.exe`, dropped it on the user''s Desktop, and then registered and ran a scheduled task named ''yrei'' for persistence. Moments later, a related alert fired on the same machine reporting that an uncommon file was created and added to a Run Key so it would execute after reboot.'
+    question: 'For that follow-on persistence alert about the uncommon file being added to a Run Key, which IP address was recorded as an involved entity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '72.5.72.208'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '72.5.72.208'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious process executed a PowerShell command on the host with HostName `vnevado-win10e`, potentially running a payload in memory to evade detection.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On that host, an uncommon file was created and registered in a Run Key for persistence, with related network activity involving the IP address `72.5.72.208`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -5,7 +5,7 @@ tasks:
     IP address earlier. What was the anonymous IP address identified?'
   inherit_shared: true
   initial_context:
-    incident_context: 'As part of investigating the BEC financial fraud case involving Jordan P (Email: Jordan P@vnevado.alpineskihouse.co)
+    incident_context: 'As part of investigating the BEC financial fraud case involving Jordan P (Email: laylaw@vnevado.alpineskihouse.co)
       using IP address 255.246.85.58, a connection to a sign-in from an anonymous IP address was observed on 2024-07-22 09:11:31.290020+00:00.'
     question: 'During the investigation of this BEC financial fraud, it was found that there was a sign-in from an anonymous
       IP address earlier. What was the anonymous IP address identified?'

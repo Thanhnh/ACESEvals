@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_test_set_task_39
+  title: incident_39_latest_cleaned_test_set_task_39
+  description: 'For the alert about the sign-in attempt with a deceptive user account, what is the name of the account used in that sign-in attempt?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident on the domain controller `vnevado-dc`, a SID history injection was detected involving account `lucasb`, where a PowerShell process (PID 3780) ran a command stopping NTDS, invoking Add-ADDBSidHistory to add the SID `S-1-5-32-544` to a specified account, and restarting NTDS. Related alerts in the same incident include a suspicious account creation and a sign-in attempt using a deceptive (fake or decoy) user account on this device.'
+    question: 'For the alert about the sign-in attempt with a deceptive user account, what is the name of the account used in that sign-in attempt?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'kyleg'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'kyleg'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A SID history injection was detected on the device, carried out through the process `net.exe`, where the SID history attribute of an existing user was modified to include an SID with elevated privileges.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using those elevated privileges, a new suspicious user account with SID `S-5-7-21-1843151660-3234030288-105586167-1422` was created on the device to establish backup/persistent access.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'A sign-in attempt was then detected with the deceptive user account named `kyleg`, which the attacker used as a decoy account for lateral movement and access to sensitive data.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

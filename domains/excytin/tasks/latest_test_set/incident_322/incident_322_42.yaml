@@ -33,7 +33,7 @@ tasks:
         max_score: 0.5
         weight: 1.0
         title: Checkpoint 1
-        description: A user with account email `Hailey Johnson@vnevado.alpineskihouse.co` accessed a link in an email 
+        description: A user with account email `alyssat@vnevado.alpineskihouse.co` accessed a link in an email 
           that was later quarantined by Zero-hour Auto Purge (ZAP).
       checkpoint_2:
         target: trajectory

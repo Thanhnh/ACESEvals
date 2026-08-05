@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_90
+  title: incident_55_latest_cleaned_train_set_task_90
+  description: 'A few days later, on 2024-07-10, a related alert reported that one of your users clicked on a link found to be malicious. What is the primary email address of the mailbox associated with that potentially malicious URL click?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, an alert fired on host `mb-winclient` (AAD device ID `7661dfd4-218f-4016-8a87-66d68a7f098e`) indicating that a malicious PowerShell Cmdlet was invoked, potentially associated with credential theft, exploitation, network reconnaissance or code injection. The activity involved process ID 13968 created at 2024-07-02T09:47:59Z running `"powershell.exe" c:\script\contosoadfsblatempcreds.ps1`, executed under the account `pwilson` (SID `S-1-5-21-551436448-9871687716-9837441745-1903`), with the remote IP address `72.5.72.208` observed.'
+    question: 'A few days later, on 2024-07-10, a related alert reported that one of your users clicked on a link found to be malicious. What is the primary email address of the mailbox associated with that potentially malicious URL click?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'bjenkins@niseko.alpineskihouse.co'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'bjenkins@niseko.alpineskihouse.co'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A malicious PowerShell Cmdlet associated with credential theft, exploitation, network reconnaissance or code injection was invoked on the machine by the account with AadUserId `a2d0f7c2-b0a0-43bd-bce0-27d8ae3be4d0`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following that activity, a potentially malicious URL click was detected for the mailbox with MailboxPrimaryAddress `bjenkins@niseko.alpineskihouse.co`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

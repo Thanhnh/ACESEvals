@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_17
+  title: incident_5_latest_cleaned_train_set_task_17
+  description: 'In the ''Suspicious hands on keyboard user behavior'' alert on the same device, an earlier execution of the same curl command to vectorsandarrows.com was observed. What was the process ID and creation time (UTC) of that earlier process?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident, ''CommandAndControl'' malware was detected on host `vnevado-win11u` (AAD device ID `bc00e484-d0e5-4da4-9472-95568cccc07e`) during lateral movement, where a process with ID 5572 was created at 2024-06-20T09:32:04.8002759Z running the command line `curl http://vectorsandarrows.com`. This device was also flagged by an alert for suspicious hands-on-keyboard user behavior, indicating anomalous activity possibly tied to a human-operated attack.'
+    question: 'In the ''Suspicious hands on keyboard user behavior'' alert on the same device, an earlier execution of the same curl command to vectorsandarrows.com was observed. What was the process ID and creation time (UTC) of that earlier process?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID: 88, Created Time UTC: 2024-06-20T09:29:42.3927529Z (command line: curl http://vectorsandarrows.com)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID: 88, Created Time UTC: 2024-06-20T09:29:42.3927529Z (command line: curl http://vectorsandarrows.com)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with SID `S-1-5-21-1840191660-8534830288-125585561-1522` was associated with ''CommandAndControl'' malware detected on the device during lateral movement.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Suspicious hands on keyboard user behavior was observed, where the process with Process ID `88` ran the command line `curl http://vectorsandarrows.com` at `2024-06-20t09:29:42.3927529z`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

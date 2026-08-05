@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_77
+  title: incident_39_latest_cleaned_train_set_task_77
+  description: 'For the related ''Kekeo'' malware detection that occurred on the same device, which user account name was associated with that malware activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a security incident, an alert was raised for a sign-in attempt with a deceptive user account. The sign-in involved the account `kyleg` (SID `S-0-6-5`) from IP address `141.216.110.153`, suggesting a potential attacker might be using a fake or decoy user account on the device to perform lateral movement or access sensitive data. Roughly one second later, on the same device, ''Kekeo'' malware was detected and found to be active.'
+    question: 'For the related ''Kekeo'' malware detection that occurred on the same device, which user account name was associated with that malware activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'fk8mq'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'fk8mq'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A sign-in attempt with a deceptive (decoy) user account was detected on the device with AadDeviceId `fafdcd65-46c6-45a6-aa85-ec9b77ca0bcb` at 2024-07-04 22:35:02 UTC, indicating a potential attacker using a fake account for lateral movement.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On that same device, the ''Kekeo'' malware was detected and found active at 2024-07-04 22:35:03 UTC, associated with the compromised user account with Name `fk8mq`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

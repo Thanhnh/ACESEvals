@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_322_latest_cleaned_test_set_task_14
+  title: incident_322_latest_cleaned_test_set_task_14
+  description: 'For the earlier alert about emails containing a malicious URL that were removed after delivery, what was the malicious URL contained in those email messages?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident, a malicious URL was clicked on the device `vnevado-win11h` (AAD Device ID `76707c40-3343-490e-9205-88fdb51aefe0`, IP `172.33.118.200`). The click occurred in Microsoft Edge, with process details `4256__2024-08-01t13:42:52.04__"msedge.exe" --type=utility --utility-sub-type=network.mojom.networkservice --lang=en-us --service-sandbox-type=none --field-trial-handle=1912,i,9358546549091360037,1317674413260171076,262144 --variations-seed-version --mojo-platform-channel-handle=3124 /prefetch:11`. About an hour before this click, an earlier alert reported that email messages containing a malicious URL were delivered to the mailbox of the same user and later removed.'
+    question: 'For the earlier alert about emails containing a malicious URL that were removed after delivery, what was the malicious URL contained in those email messages?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account `Hailey Johnson` clicked on a malicious URL on that device.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The malicious URL `dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io` was contained in email messages that were delivered and later removed.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

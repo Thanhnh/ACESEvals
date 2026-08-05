@@ -132,7 +132,7 @@ tasks:
         max_score: 0.25
         weight: 1.0
         title: Checkpoint 1
-        description: The email account `Jordan P@vnevado.alpineskihouse.co` signed in to SAP in a suspicious manner, 
+        description: The email account `laylaw@vnevado.alpineskihouse.co` signed in to SAP in a suspicious manner, 
           possibly as part of a business email compromise attack.
       checkpoint_2:
         target: trajectory
@@ -153,7 +153,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: There was a suspicious sign-in to SAP from a user account involved in a business email compromise 
-      (BEC) incident. The user account named Jordan P with email Jordan P@vnevado.alpineskihouse.co might have been 
+      (BEC) incident. The user account named Jordan P with email laylaw@vnevado.alpineskihouse.co might have been 
       taken control of by an attacker to potentially search through SAP to record or modify sensitive financial 
       information. The sign-in came from the IP address 107.253.5.27.
     question: What is the anonymous IP address associated with the suspicious sign-in on 2024-07-22?
@@ -208,7 +208,7 @@ tasks:
     # To use static matching instead, change strategy to "static" and set:
     #   criteria:
     #     expected_answers:
-    #       - 'Jordan P@vnevado.alpineskihouse.co'
+    #       - 'laylaw@vnevado.alpineskihouse.co'
   scoring:
     llm_judge:
       model: "{judge_llm}"
@@ -219,14 +219,14 @@ tasks:
         target: submission
         judge_system_template: judge/submission_judge_system.md
         judge_user_template: judge/submission_judge_user.md
-        description: 'Jordan P@vnevado.alpineskihouse.co'
+        description: 'laylaw@vnevado.alpineskihouse.co'
         max_score: 1.0
       checkpoint_1:
         target: trajectory
         max_score: 0.5
         weight: 1.0
         title: Checkpoint 1
-        description: The user account with email `Jordan P@vnevado.alpineskihouse.co` sent suspicious emails which might
+        description: The user account with email `laylaw@vnevado.alpineskihouse.co` sent suspicious emails which might
           indicate that the account has been compromised as part of a business email compromise (BEC) fraud attempt.
   scoring_aggregation:
     max:
@@ -316,7 +316,7 @@ tasks:
         max_score: 0.25
         weight: 1.0
         title: Checkpoint 1
-        description: The user account with email `Jordan P@vnevado.alpineskihouse.co` signed in to SAP with a risky 
+        description: The user account with email `laylaw@vnevado.alpineskihouse.co` signed in to SAP with a risky 
           sign-in alert detected by Microsoft Entra ID, indicating potential compromise and intentions to record or 
           modify sensitive financial information.
       checkpoint_2:

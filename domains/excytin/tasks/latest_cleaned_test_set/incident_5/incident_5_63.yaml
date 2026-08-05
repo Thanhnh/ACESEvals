@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_63
+  title: incident_5_latest_cleaned_test_set_task_63
+  description: 'Moments after this ransomware activity, a related alert was raised for suspicious WMI process creation on a machine tied to the same compromised user account. What is the name of the script file that was executed in that suspicious WMI process creation?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'A high-impact security incident was flagged where potentially compromised assets exhibited ransomware-like behavior across several devices. The alert included multiple files that appear to have been encrypted with a LockBit extension (for example `unstreaming.xlsx.lockbit`, `syncretic.7z.lockbit`, `kiters.7z.lockbit`, `ponceau.7z.lockbit` and `earlap.doc.lockbit`, alongside their original versions such as `kiters.7z`, `syncretic.7z` and `earlap.doc`), as well as the IP address `99.83.111.100` and an account with SID `S-0-6-5`. An attacker may have been using this account, IP, or device to move laterally across the network and infect as many devices as possible with ransomware.'
+    question: 'Moments after this ransomware activity, a related alert was raised for suspicious WMI process creation on a machine tied to the same compromised user account. What is the name of the script file that was executed in that suspicious WMI process creation?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'get-userprttoken.ps1'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'get-userprttoken.ps1'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Potentially compromised assets exhibiting ransomware-like behavior were detected, involving the user account `dp5hn`, which an attacker may be using to move laterally across the network and infect devices with ransomware.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A suspicious WMI process creation was observed on the machine, spawning the script file `get-userprttoken.ps1` to break the process tree and further infect the machine.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

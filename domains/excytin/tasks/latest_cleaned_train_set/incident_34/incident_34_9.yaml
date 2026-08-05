@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_train_set_task_9
+  title: incident_34_latest_cleaned_train_set_task_9
+  description: 'On the same device, another alert was raised for suspicious PowerShell download or encoded command execution. What was the parent process command line (including its process ID and creation time) that initiated this suspicious PowerShell activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident involving execution and discovery activity on an endpoint, an alert fired for an uncommon file being created and then registered for persistence. The observed process command line was `reg add hkcu\software\microsoft\windows\currentversion\runonce /f /v yrei /t reg_expand_sz /d %userprofile%\desktop\winatp-intro-backdoor.exe` (Process ID 10208), and the activity was associated with the IP address `72.5.72.208`.'
+    question: 'On the same device, another alert was raised for suspicious PowerShell download or encoded command execution. What was the parent process command line (including its process ID and creation time) that initiated this suspicious PowerShell activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID 9780, created 2024-06-26T11:57:20.2959493Z, command line: `"winword.exe" c:\scripts\rs4_winatp-intro-invoice.docm`'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID 9780, created 2024-06-26T11:57:20.2959493Z, command line: `"winword.exe" c:\scripts\rs4_winatp-intro-invoice.docm`'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'On the host with AadDeviceId `02b8f519-1123-4228-b32a-ccb78af3449f`, an uncommon file was created and added to a Run Key for persistence.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On that same host, the process `winword.exe` with Process ID `9780` was executed at `2024-06-26t11:57:20.2959493z` with the command line `"winword.exe" c:\scripts\rs4_winatp-intro-invoice.docm`, which spawned PowerShell to download a file or run an encoded command.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

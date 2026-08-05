@@ -4,7 +4,7 @@ tasks:
   description: 'According to the Password Spray alert raised on 2024-07-23, what was the source IP address used in that attack?'
   inherit_shared: true
   initial_context:
-    incident_context: 'During the investigation, we observed that user "Jordan P" (Jordan P@vnevado.alpineskihouse.co, SID
+    incident_context: 'During the investigation, we observed that user "Jordan P" (laylaw@vnevado.alpineskihouse.co, SID
       S-1-5-21-1740051960-3534030288-108486866-1602) was flagged for a Business Email Compromise-related sign-in to the SAP
       cloud application (AppId 100) on 2024-07-22 from the external IP address 107.253.5.27. The following day, a separate
       alert reported that a Password Spray attack had been detected in the environment, possibly linked to the same threat

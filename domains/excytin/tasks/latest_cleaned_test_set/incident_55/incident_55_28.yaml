@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_28
+  title: incident_55_latest_cleaned_test_set_task_28
+  description: 'Later in this same incident, an unusual addition of a credential of type Password was made to the OAuth application ''SimulandApp''. What is the email address of the user account that performed this credential addition?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a multi-stage intrusion in the niseko.alpineskihouse.co environment, an alert was raised for a suspicious service creation: the account `gsmith@niseko.alpineskihouse.co` created a service named DDLOXJDSQSNGMUKKFUXQ in order to execute potentially malicious commands on the host `MB-ADFS`. Follow-on activity in the same incident included Impacket-based lateral movement, suspicious LDAP reconnaissance queries, and cloud identity abuse.'
+    question: 'Later in this same incident, an unusual addition of a credential of type Password was made to the OAuth application ''SimulandApp''. What is the email address of the user account that performed this credential addition?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'pwilson@niseko.alpineskihouse.co (displayed as user Luciano Herrera)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'pwilson@niseko.alpineskihouse.co (displayed as user Luciano Herrera)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account `gsmith` created a suspicious service named `DDLOXJDSQSNGMUKKFUXQ` on host MB-ADFS in order to execute potentially malicious commands.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'An ongoing hands-on-keyboard attack via the Impacket toolkit was observed, executing the process `powershell.exe` to move laterally and run commands on remote hosts.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The account with AadUserId `2de70991-2799-4a95-b734-8e3df3a50118` executed a suspicious LDAP query against the domain controller, indicating reconnaissance of users, groups and assets.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'The compromised user account with email `pwilson@niseko.alpineskihouse.co` (Luciano Herrera) performed an unusual addition of a Password credential to the OAuth application `SimulandApp`, which may be used to persist, spread phishing, or exfiltrate data.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

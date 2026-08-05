@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_31
+  title: incident_55_latest_cleaned_test_set_task_31
+  description: 'Earlier in this same incident, a suspicious LDAP query was executed indicating potential reconnaissance of the organization''s directory structure. Which account name was associated with that suspicious LDAP query activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this incident, an alert was raised for a suspected AD FS DKM key read, where the domain controller `MB-DC1` read the DKM key of the AD FS object with id 4cac49d3-29d3-407e-8c9b-b7ebb21541b2. This activity was closely related to other domain-level credential and directory abuse alerts, including a suspected DCSync (directory services replication) attack against `MB-DC1` originating from the workstation `MB-WINCLIENT`.'
+    question: 'Earlier in this same incident, a suspicious LDAP query was executed indicating potential reconnaissance of the organization''s directory structure. Which account name was associated with that suspicious LDAP query activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'pwilson'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'pwilson'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The domain controller host `MB-DC1` was involved in a suspected AD FS DKM key read, where the DKM key of the ADFS object id `4cac49d3-29d3-407e-8c9b-b7ebb21541b2` was read.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The account with SID `S-1-5-21-551436448-9871687716-9837441745-1903` (Luciano Herrera, CIO) on MB-WINCLIENT sent a replication request to `MB-DC1`, indicating a suspected DCSync attack (replication of directory services).'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The account with Name `pwilson` executed a suspicious LDAP query against the domain controller, indicating reconnaissance activity to enumerate administrative users, groups, and assets in the organization.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

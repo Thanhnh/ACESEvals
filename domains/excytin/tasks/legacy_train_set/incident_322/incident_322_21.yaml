@@ -5,7 +5,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'A security incident was flagged involving suspicious Azure Resource Management (ARM) activities by
-      the user `Hailey Johnson` with the email `Hailey Johnson@vnevado.alpineskihouse.co`, during a potentially risky session.
+      the user `Hailey Johnson` with the email `alyssat@vnevado.alpineskihouse.co`, during a potentially risky session.
       Shortly before this, there was also an alert about a resource management operation from a proxy IP address associated
       with malicious activities. Another linked alert indicates a suspicious credential dump from NTDS.dit, which suggests
       attackers attempted to obtain user''s credentials stored in the domain controller.'

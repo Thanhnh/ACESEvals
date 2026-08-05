@@ -15,7 +15,7 @@ tasks:
     # To use static matching instead, change strategy to "static" and set:
     #   criteria:
     #     expected_answers:
-    #       - 'Ethan Brooks@vnevado.alpineskihouse.co'
+    #       - 'tgs2z@vnevado.alpineskihouse.co'
   scoring:
     llm_judge:
       model: "{judge_llm}"
@@ -26,7 +26,7 @@ tasks:
         target: submission
         judge_system_template: judge/submission_judge_system.md
         judge_user_template: judge/submission_judge_user.md
-        description: 'Ethan Brooks@vnevado.alpineskihouse.co'
+        description: 'tgs2z@vnevado.alpineskihouse.co'
         max_score: 1.0
       checkpoint_1:
         target: trajectory
@@ -40,7 +40,7 @@ tasks:
         max_score: 0.5
         weight: 1.0
         title: Checkpoint 2
-        description: Ethan Brooks (Account Executive) with the email `Ethan Brooks@vnevado.alpineskihouse.co` on 
+        description: Ethan Brooks (Account Executive) with the email `tgs2z@vnevado.alpineskihouse.co` on 
           VNEVADO-Win10V enumerated SMB sessions on VNEVADO-DC, retrieving recent IP addresses of 2 accounts.
   scoring_aggregation:
     max:

@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_test_set_task_21
+  title: incident_34_latest_cleaned_test_set_task_21
+  description: 'A closely related alert raised moments later flagged a process that downloaded a file or ran an encoded command in memory to evade detection. What is the name of the executable file involved in that alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident involving Execution & Discovery on an endpoint, an anomaly was detected in the ASEP registry: a process (Process ID 10208, created 2024-06-26T13:17:18.8268389Z) ran the command `reg add hkcu\software\microsoft\windows\currentversion\runonce /f /v yrei /t reg_expand_sz /d %userprofile%\desktop\winatp-intro-backdoor.exe`, establishing persistence so the payload would run after a reboot. The activity was associated with the IP address 72.5.72.208, and was tied to a specific user account SID that also appears in a related alert.'
+    question: 'A closely related alert raised moments later flagged a process that downloaded a file or ran an encoded command in memory to evade detection. What is the name of the executable file involved in that alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'powershell.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'powershell.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with SID `S-1-5-21-1870156660-7534030218-135086563-1193` was used by a process that registered a suspicious command in an ASEP registry key for persistence after reboot.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using the same compromised account, a suspicious PowerShell download or encoded command execution was detected, carried out by the process with file name `powershell.exe`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

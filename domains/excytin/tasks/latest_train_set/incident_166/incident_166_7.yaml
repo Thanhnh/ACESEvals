@@ -33,7 +33,7 @@ tasks:
         max_score: 0.5
         weight: 1.0
         title: Checkpoint 1
-        description: A suspicious SAP sign-in was detected for account Email `Jordan P@vnevado.alpineskihouse.co`.
+        description: A suspicious SAP sign-in was detected for account Email `laylaw@vnevado.alpineskihouse.co`.
       checkpoint_2:
         target: trajectory
         max_score: 0.5

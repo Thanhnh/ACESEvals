@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_48
+  title: incident_55_latest_cleaned_test_set_task_48
+  description: 'For that later alert about the potentially malicious link click, what was the full URL that the user clicked on?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, an alert titled ''System executable renamed and launched'' was raised on host `mb-adfs`. A renamed Windows executable `iy2orr1e.rrg.exe` was launched under the SYSTEM account (SID S-2-2-78) with a hidden window and a base64 encoded PowerShell command, following an earlier encoded PowerShell process (PID 6808). Renaming system executables is a common defense evasion technique used to bypass detections based on default file names and paths. Later in the same incident chain, an alert fired indicating that one of the users clicked on a link that was found to be malicious.'
+    question: 'For that later alert about the potentially malicious link click, what was the full URL that the user clicked on?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'http://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'http://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A renamed Windows system executable, `powershell.exe`, was launched on the device to evade path/file-name based detections.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using that process, the account with SID `S-1-5-21-561436748-3867387497-1732241745-3701` ran a known tool/technique to perform suspicious system hardware discovery on the device.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The same compromised user then clicked a potentially malicious URL `http://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

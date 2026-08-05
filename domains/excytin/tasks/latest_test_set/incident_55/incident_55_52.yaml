@@ -5,7 +5,7 @@ tasks:
     IP address is associated with the memory-dump activity?'
   inherit_shared: true
   initial_context:
-    incident_context: 'During an ongoing investigation, we observed that user "Lucas Grey" (email: Lucas Grey@niseko.alpineskihouse.co)
+    incident_context: 'During an ongoing investigation, we observed that user "Lucas Grey" (email: bjenkins@niseko.alpineskihouse.co)
       clicked on a suspicious link hosted at http://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/ after
       receiving an email sent to bjenkins@niseko.alpineskihouse.co. Subsequent telemetry reveals a separate alert titled "Sensitive
       credential memory read," indicating that a process accessed LSASS memory to harvest credentials, and the activity is

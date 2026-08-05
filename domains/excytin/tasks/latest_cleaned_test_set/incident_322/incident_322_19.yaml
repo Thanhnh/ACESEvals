@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_322_latest_cleaned_test_set_task_19
+  title: incident_322_latest_cleaned_test_set_task_19
+  description: 'For the alert where the user accessed a link in an email that was subsequently quarantined by ZAP, what was the URL the user clicked on?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a multi-stage incident, an alert titled ''Suspicious credential dump from NTDS.dit'' was raised on a domain controller. The activity involved `powershell.exe` (PID 2556) running a long base64 encoded command, followed by `ntdsutil.exe` (PID 6748) executed with the command line `"ntdsutil.exe" "ac i ntds" ifm "create full c:\temp" q q`, indicating an attacker attempting to dump credentials stored in the domain controller. Pivoting from the affected host and the compromised user account, further alerts in the same incident point back to the initial access vector, where a user clicked a link in an email that was later quarantined by zero-hour auto purge (ZAP).'
+    question: 'For the alert where the user accessed a link in an email that was subsequently quarantined by ZAP, what was the URL the user clicked on?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'https://dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io/'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'https://dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io/'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious credential dump from NTDS.dit was detected on the domain controller host `vnevado-dc`, where the attacker extracted stored domain user credentials.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using the stolen credentials, the account with SID `S-1-5-21-1840151686-3534835288-156286563-1127` performed an Azure Resource Manager operation from a suspicious proxy (TOR) IP address.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The same user accessed a link in an email that was subsequently quarantined by zero-hour auto purge (ZAP), clicking the malicious URL `https://dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io/`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

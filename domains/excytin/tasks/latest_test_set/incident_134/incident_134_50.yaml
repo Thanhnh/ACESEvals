@@ -5,7 +5,7 @@ tasks:
     user account?'
   inherit_shared: true
   initial_context:
-    incident_context: 'An alert was raised for user Nina Park (`Nina Park@vnevado.alpineskihouse.co`) after a suspicious inbox
+    incident_context: 'An alert was raised for user Nina Park (`raphaelt@vnevado.alpineskihouse.co`) after a suspicious inbox
       rule was created from the source IP address 237.7.81.122 on 2024-07-17 at 11:34 UTC. This activity suggests a potential
       compromise where an attacker may have gained access to the mailbox and is manipulating email flow. While reviewing related
       events, you discover that the same user’s account was also associated with an earlier “Anonymous IP address” sign-in

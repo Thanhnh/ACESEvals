@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_53
+  title: incident_55_latest_cleaned_test_set_task_53
+  description: 'For the alert reporting the ongoing hands-on-keyboard attack via the Impacket toolkit, what is the Microsoft Entra (AAD) user ID of the account associated with that activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert was raised indicating that the domain controller `MB-DC1` read the DKM key of an AD FS object (id 4cac49d3-29d3-407e-8c9b-b7ebb21541b2), a technique often associated with credential theft and token forging. Tracing the related activity backwards leads to earlier alerts on another device in the environment, including reconnaissance activity and an alert for an ongoing hands-on-keyboard attack in which commands were executed via the Impacket toolkit to move laterally across the network.'
+    question: 'For the alert reporting the ongoing hands-on-keyboard attack via the Impacket toolkit, what is the Microsoft Entra (AAD) user ID of the account associated with that activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The host `MB-DC1` was observed reading the DKM key of the AD FS object id 4cac49d3-29d3-407e-8c9b-b7ebb21541b2, indicating a suspected AD FS DKM key read.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The account with SID `S-1-5-21-551436448-9871687716-9837441745-1903` (Luciano Herrera, CIO) on MB-WINCLIENT sent a replication request to MB-DC1, indicating a suspected DCSync attack.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The process `powershell.exe` was used on the device to perform suspicious system hardware discovery, gathering information about the target device or network.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'The user account with AadUserId `ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5` executed commands via the Impacket toolkit, indicating an ongoing hands-on-keyboard attack and lateral movement across the network.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

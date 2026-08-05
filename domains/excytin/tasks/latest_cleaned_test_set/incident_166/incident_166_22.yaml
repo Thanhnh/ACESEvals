@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_test_set_task_22
+  title: incident_166_latest_cleaned_test_set_task_22
+  description: 'For the suspicious inbox manipulation rule alert, what is the display name of the user account whose mailbox the `ITCleanup` rule was created on?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a multi-stage identity compromise incident, an alert was raised for a sign-in from an anonymous IP address (e.g., Tor browser or anonymizer VPN). The sign-in came from IP `192.238.237.190` and was associated with the Entra ID (AAD) user ID `89e933b9-5b2e-4bd6-bcdf-033db707ef82`. Shortly afterwards, at 2024-07-22 09:49:55 UTC, a related alert fired for a suspicious inbox manipulation rule: a MoveToFolder rule named `ITCleanup` was created on a mailbox to silently move incoming messages into the `RSS Feeds` folder, a common technique used to hide phishing activity from a compromised account.'
+    question: 'For the suspicious inbox manipulation rule alert, what is the display name of the user account whose mailbox the `ITCleanup` rule was created on?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Jordan P (mailbox laylaw@vnevado.alpineskihouse.co)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Jordan P (mailbox laylaw@vnevado.alpineskihouse.co)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A sign-in was detected from an anonymous IP address (e.g., Tor browser or anonymizer VPN) for the user account with AadUserId `89e933b9-5b2e-4bd6-bcdf-033db707ef82` at 2024-07-22 09:11:31 UTC.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the suspicious sign-in, a suspicious inbox manipulation rule named `ITCleanup` (MoveToFolder rule moving messages to the `RSS Feeds` folder) was created on the mailbox of the account `Jordan P` (laylaw@vnevado.alpineskihouse.co) at 2024-07-22 09:49:55 UTC, indicating the account is likely compromised.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

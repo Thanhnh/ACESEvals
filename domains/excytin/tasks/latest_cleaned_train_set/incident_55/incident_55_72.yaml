@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_72
+  title: incident_55_latest_cleaned_train_set_task_72
+  description: 'A closely related alert, "Attempt to hide use of dual-purpose tool", was raised at nearly the same time because a known public tool was seen running under an unexpected filename. What is the Microsoft Entra (AAD) user ID of the account tied to that alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident, an alert titled "Suspicious sequence of exploration activities" fired after a process called a set of Windows discovery commands that attackers commonly use to identify valuable assets and plan lateral movement. The observed activity included `powershell.exe` running encoded commands (e.g., PID 6808 at 2024-07-02T09:48:12.76Z with `-encodedcommand qwa6afwauwbjahiaaqbwahqacwbcafiazqbuageabqblafaabwb3aguacgbzaggazqbsagwalgbwahmamqa=`) followed by multiple executions of `whoami.exe` (PIDs 1120, 8056 and 3468).'
+    question: 'A closely related alert, "Attempt to hide use of dual-purpose tool", was raised at nearly the same time because a known public tool was seen running under an unexpected filename. What is the Microsoft Entra (AAD) user ID of the account tied to that alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A process with Process ID `3116` created at `2024-07-02t09:48:23.9439954z` ran the command line `"iy2orr1e.rrg.exe" -windowstyle hidden -encodedcommand qwa6afwauwbjahiaaqbwahqacwbcaeuaeabwag8acgb0aeearabgafmavabvagsazqbuafmaaqbnag4aaqbuaemazqbyahqalgbwahmamqa=`, executing a suspicious sequence of Windows exploration commands used to identify valuable assets and coordinate lateral movement.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'This activity was performed under the user account with AadUserId `ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5`, which was observed renaming a known dual-purpose public tool to an unexpected filename in an attempt to hide its malicious use.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

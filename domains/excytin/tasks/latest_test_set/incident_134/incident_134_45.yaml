@@ -35,7 +35,7 @@ tasks:
         weight: 1.0
         title: Checkpoint 1
         description: 'On 2024-07-18 14:54:18.741032+00:00 an attacker successfully signed in using the compromised account
-          (Email: `Nina Park@vnevado.alpineskihouse.co`) following a password-spray attack.'
+          (Email: `raphaelt@vnevado.alpineskihouse.co`) following a password-spray attack.'
       checkpoint_2:
         target: trajectory
         max_score: 0.5

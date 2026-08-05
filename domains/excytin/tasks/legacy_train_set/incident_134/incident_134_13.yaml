@@ -7,7 +7,7 @@ tasks:
   initial_context:
     incident_context: 'There was a security incident involving suspicious emails sent by a possibly compromised user account
       as part of a BEC (business email compromise) fraud attempt. One of the associated users was `Nina Park` with the email
-      `Nina Park@vnevado.alpineskihouse.co`. Suspicious emails were sent from this account using the IP address `237.7.81.122`.
+      `raphaelt@vnevado.alpineskihouse.co`. Suspicious emails were sent from this account using the IP address `237.7.81.122`.
       An alert was triggered based on a previous BEC-related alert.'
     question: 'Shortly after the emails were sent, there was a sign-in from a known malicious IP address. What is the address
       of this malicious IP?'

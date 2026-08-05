@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_18
+  title: incident_5_latest_cleaned_train_set_task_18
+  description: 'For that suspicious WMI process creation alert, what was the full command line executed, along with its process ID and creation time?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a possible attempt to access a Primary Refresh Token (PRT) was detected on host `vnevado-win10r` (AAD device ID `9d4887ba-0b69-47d6-89bc-9b32787f379e`), where the process `browsercore.exe` was launched with process ID 1792 at 2024-06-20T09:11:00.6379159Z. A Primary Refresh Token is a key artifact of Azure AD authentication that attackers may attempt to steal for lateral movement or credential theft. A related alert on the same host flagged a suspicious WMI process creation, since malware frequently uses WMI to spawn new processes and break process trees.'
+    question: 'For that suspicious WMI process creation alert, what was the full command line executed, along with its process ID and creation time?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Command line: `vssblatemp.exe delete shadows /all`, Process ID: 5512, Created Time (UTC): 2024-06-20T09:10:50.2899021Z'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Command line: `vssblatemp.exe delete shadows /all`, Process ID: 5512, Created Time (UTC): 2024-06-20T09:10:50.2899021Z'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with SID `S-1-5-21-1840191660-8534830288-125585561-1522` was involved in a possible attempt to access the Primary Refresh Token (PRT), indicating credential theft or lateral movement activity.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the credential access attempt, a suspicious WMI process creation was observed on the machine, where the attacker spawned the process with Process ID `5512` at `2024-06-20t09:10:50.2899021z` using the command line `vssblatemp.exe delete shadows /all` to delete all volume shadow copies.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

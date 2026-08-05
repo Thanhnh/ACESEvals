@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'On July 17 2024 at 11:34 UTC a “Suspicious inbox manipulation rule” alert was raised for user Nina
-      Park (email: nina park@vnevado.alpineskihouse.co, SID S-1-5-21-1874151667-3554330288-105586563-1715). The activity originated
+      Park (email: raphaelt@vnevado.alpineskihouse.co, SID S-1-5-21-1874151667-3554330288-105586563-1715). The activity originated
       from IP 237.7.81.122 and involved cloud application ID 20893. This behavior suggests a possible attacker gaining access
       to the mailbox and creating rules to hide or divert messages.'
     question: 'The next day, the investigation showed that a separate “Password Spray” alert was triggered against the same

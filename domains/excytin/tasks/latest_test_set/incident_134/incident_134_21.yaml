@@ -5,7 +5,7 @@ tasks:
     associated with the sign-in from the known malicious IP?'
   inherit_shared: true
   initial_context:
-    incident_context: 'Security monitoring detected that the user account "Nina Park" (email: Nina Park@vnevado.alpineskihouse.co,
+    incident_context: 'Security monitoring detected that the user account "Nina Park" (email: raphaelt@vnevado.alpineskihouse.co,
       SID: S-1-5-21-1874151667-3554330288-105586563-1715) was likely compromised following a password-spray attack. The alert
       indicates the attacker signed in from an unusual location and browser, and the sign-in originated from an IP address
       later reported as malicious. A separate alert titled "Malicious IP address" was raised for the same timeframe, linking

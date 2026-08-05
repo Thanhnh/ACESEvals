@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_322_latest_cleaned_test_set_task_21
+  title: incident_322_latest_cleaned_test_set_task_21
+  description: 'For the Azure Resource Manager operation performed from the suspicious proxy IP address, which Azure resource was targeted? Provide its full resource ID.'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a multi-stage incident, a proxy log alert flagged a connection from `231.60.52.209` (device vnevado-win11h.vnevado.alpineskihouse.co) to the malicious URL `login.micro.demo.antoinetest.ovh`; a second source IP `228.3.31.94` was also observed in the same alert. Following this activity, the same compromised user later clicked a malicious URL on the device, and Microsoft Defender for Resource Manager subsequently detected a resource management operation originating from an IP address associated with anonymizing proxy services such as TOR — behavior often used by threat actors to hide their source IP.'
+    question: 'For the Azure Resource Manager operation performed from the suspicious proxy IP address, which Azure resource was targeted? Provide its full resource ID.'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '/subscriptions/7e838342-601f-4552-9baf-0dfb300cf555/resourcegroups/ctfcat/providers/microsoft.compute/virtualmachines/vnevado-dc'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '/subscriptions/7e838342-601f-4552-9baf-0dfb300cf555/resourcegroups/ctfcat/providers/microsoft.compute/virtualmachines/vnevado-dc'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Proxy logs detected a connection from host `vnevado-win11h` (IP 231.60.52.209) to the malicious URL `login.micro.demo.antoinetest.ovh`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On that device, the user account with email `alyssat@vnevado.alpineskihouse.co` clicked on the malicious URL.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'Following the compromise, an Azure Resource Manager operation was performed from a suspicious proxy (TOR) IP address against the Azure resource `/subscriptions/7e838342-601f-4552-9baf-0dfb300cf555/resourcegroups/ctfcat/providers/microsoft.compute/virtualmachines/vnevado-dc`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

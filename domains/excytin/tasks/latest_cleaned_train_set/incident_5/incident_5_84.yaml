@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_84
+  title: incident_5_latest_cleaned_train_set_task_84
+  description: 'In the related ''Suspicious WMI process creation'' alert, one of the spawned processes was used to tamper with the system''s boot recovery settings. What was the full command line of that process, its process ID, and its creation time?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a human-operated ransomware incident, a ransomware payload was remotely launched on the device `vnevado-win11u` (AAD Device ID `bc00e484-d0e5-4da4-9472-95568cccc07e`), with associated network activity from IP address `99.83.111.100`. Attackers appeared to be attempting to encrypt content on the device, and the compromised user account involved was also seen in a related alert for suspicious WMI process creation, where malware used WMI to spawn new processes and break process trees.'
+    question: 'In the related ''Suspicious WMI process creation'' alert, one of the spawned processes was used to tamper with the system''s boot recovery settings. What was the full command line of that process, its process ID, and its creation time?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Command line: `bcdedit /set bootstatuspolicy ignoreallfailures`, Process ID: 1868, Created Time (UTC): 2024-06-20T09:10:49.1654106Z'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Command line: `bcdedit /set bootstatuspolicy ignoreallfailures`, Process ID: 1868, Created Time (UTC): 2024-06-20T09:10:49.1654106Z'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A ransomware payload was remotely launched on the device under the compromised account with AadUserId `731adb71-b11c-4bbf-850b-57989b350e96`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'From that account''s activity, a suspicious WMI-spawned process was observed on the machine, with Process ID `1868`, created at `2024-06-20t09:10:49.1654106z`, running the command line `bcdedit /set bootstatuspolicy ignoreallfailures` to disable Windows recovery options.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

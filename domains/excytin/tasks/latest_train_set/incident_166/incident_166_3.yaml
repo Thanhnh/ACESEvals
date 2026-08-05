@@ -5,7 +5,7 @@ tasks:
     rule?'
   inherit_shared: true
   initial_context:
-    incident_context: 'On 2024-07-22 a suspicious inbox-manipulation rule was created in Jordan P’s mailbox (Jordan P@vnevado.alpineskihouse.co)
+    incident_context: 'On 2024-07-22 a suspicious inbox-manipulation rule was created in Jordan P’s mailbox (laylaw@vnevado.alpineskihouse.co)
       from IP address 255.246.85.58. This behavior suggests a possible takeover of the user’s account. During triage, analysts
       noticed that an OAuth / cloud application was tied to the same activity path, indicating it may have been authorized
       to help perform or automate the rule changes.'

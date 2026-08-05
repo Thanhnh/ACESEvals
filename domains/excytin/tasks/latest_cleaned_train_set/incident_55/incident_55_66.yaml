@@ -1,0 +1,64 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_66
+  title: incident_55_latest_cleaned_train_set_task_66
+  description: 'One of the related alerts in this incident concerns email messages containing a malicious URL that were delivered and then removed after delivery. What was the sender IP address recorded for those email messages?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident, an alert titled "Attempt to hide use of dual-purpose tool" fired on host `mb-adfs` for account `gsmith` (SID `S-2-5-21-571436798-3864380397-1837441745-3206`, AAD user ID `ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5`). The process `iy2orr1e.rrg.exe` (PID 3116, created 2024-07-02T09:48:23Z) was launched with a hidden window and an encoded PowerShell command, suggesting a known public tool was renamed to conceal its malicious use. The activity chain later led to credential theft from LSASS and internal phishing emails sent from this compromised account.'
+    question: 'One of the related alerts in this incident concerns email messages containing a malicious URL that were delivered and then removed after delivery. What was the sender IP address recorded for those email messages?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '106.214.87.198'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '106.214.87.198'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A known dual-purpose tool was launched under an unexpected filename `iy2orr1e.rrg.exe`, indicating an attempt to hide its malicious use.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A renamed Windows system executable `powershell.exe` was launched to evade path/name based detections.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The account with AadUserId `a2d0f7c2-b0a0-43bd-bce0-27d8ae3be4d0` was involved in suspicious access to the LSASS service to dump clear-text credentials.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'The compromised account with SID `S-1-5-11-7842151660-4834030208-105586563-1139` was then used to send an internal phishing campaign to recipients inside the organization.'
+      checkpoint_5:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 5
+        description: 'The phishing emails containing a malicious URL were delivered and later removed, and were sent from the sender IP `106.214.87.198`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4
+        - checkpoint_5

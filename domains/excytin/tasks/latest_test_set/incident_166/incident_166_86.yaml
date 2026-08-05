@@ -34,7 +34,7 @@ tasks:
         max_score: 0.5
         weight: 1.0
         title: Checkpoint 1
-        description: A risky sign-in alert indicates that the account with Email `Jordan P@vnevado.alpineskihouse.co` 
+        description: A risky sign-in alert indicates that the account with Email `laylaw@vnevado.alpineskihouse.co` 
           accessed the SAP application.
       checkpoint_2:
         target: trajectory

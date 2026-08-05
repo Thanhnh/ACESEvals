@@ -356,7 +356,7 @@ tasks:
   description: What is the IP address associated with the remote session that dropped and executed a file?
   inherit_shared: true
   initial_context:
-    incident_context: 'A security incident occurred where user Ethan Brooks (Email: Ethan Brooks@vnevado.alpineskihouse.co)
+    incident_context: 'A security incident occurred where user Ethan Brooks (Email: tgs2z@vnevado.alpineskihouse.co)
       accessed a link in an email that was quarantined by zero-hour auto purge (ZAP). This incident was flagged by Microsoft
       Defender for Office 365. Additionally, there is a related event where PsExec was used to launch a command on a remote
       device, suggesting potential lateral movement. This series of activities culminated in a remote session dropping and

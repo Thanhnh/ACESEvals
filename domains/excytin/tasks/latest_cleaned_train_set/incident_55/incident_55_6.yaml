@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_6
+  title: incident_55_latest_cleaned_train_set_task_6
+  description: 'Just before this injection alert, a related alert flagged that a known tool or technique was used to gather information about the device''s system hardware. What is the name of the process file associated with that suspicious system hardware discovery activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert was raised that a process was injected with potentially malicious code, involving the file `contosoadfsblatempcreds.ps1`. Code injection is often used to hide malicious code execution within a trusted process, and the target process may then exhibit abnormal behaviors such as opening a listening port or connecting to a command and control server.'
+    question: 'Just before this injection alert, a related alert flagged that a known tool or technique was used to gather information about the device''s system hardware. What is the name of the process file associated with that suspicious system hardware discovery activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'svchost.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'svchost.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A process `powershell.exe` was injected with potentially malicious code, indicating suspicious code running within a trusted process memory.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the injection, the process `svchost.exe` was used to perform suspicious system hardware discovery, gathering information about the target device or network for later attacks.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

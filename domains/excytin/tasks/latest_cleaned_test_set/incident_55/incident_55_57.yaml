@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_57
+  title: incident_55_latest_cleaned_test_set_task_57
+  description: 'For the sensitive credential memory read alert that followed the LDAP reconnaissance, what is the Microsoft Entra (AAD) user ID of the account associated with that activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a suspicious LDAP query was detected when the account `pwilson` (SID `S-1-5-21-551436448-9871687716-9837441745-1903`, Entra ID `2de70991-2799-4a95-b734-8e3df3a50118`) ran `powershell.exe c:\script\ldaprequest.ps1` (Process ID 11116) — potential reconnaissance against the domain controller. Moments later, on the same device, another alert fired for a sensitive credential memory read, where a process scanned or dumped memory from the Local Security Authority Subsystem Service (lsass.exe) to extract authentication hashes or passwords.'
+    question: 'For the sensitive credential memory read alert that followed the LDAP reconnaissance, what is the Microsoft Entra (AAD) user ID of the account associated with that activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'a2d0f7c2-b0a0-43bd-bce0-27d8ae3be4d0'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'a2d0f7c2-b0a0-43bd-bce0-27d8ae3be4d0'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious LDAP query indicating reconnaissance activity was executed on the host with AadDeviceId `7661dfd4-218f-4016-8a87-66d68a7f098e`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On that same host, a process scanned or dumped memory from lsass.exe to steal credentials, performed under the user account with AadUserId `a2d0f7c2-b0a0-43bd-bce0-27d8ae3be4d0`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

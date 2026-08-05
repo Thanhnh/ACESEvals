@@ -1,0 +1,64 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_1
+  title: incident_55_latest_cleaned_train_set_task_1
+  description: 'Continuing along this attack chain, an alert was raised for a suspected AD FS DKM key read of the ADFS object id 4cac49d3-29d3-407e-8c9b-b7ebb21541b2. Which host performed that DKM key read?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a multi-stage intrusion, an alert showed that the account `gsmith@niseko.alpineskihouse.co` created a suspicious service named DDLOXJDSQSNGMUKKFUXQ in order to execute potentially malicious commands on the host `MB-ADFS`. Following the attack chain, related alerts revealed Impacket-based lateral movement, system hardware discovery, and a suspected DCSync attack (directory replication request) sent from MB-WINCLIENT.'
+    question: 'Continuing along this attack chain, an alert was raised for a suspected AD FS DKM key read of the ADFS object id 4cac49d3-29d3-407e-8c9b-b7ebb21541b2. Which host performed that DKM key read?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'MB-DC1'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'MB-DC1'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account with AadUserId `ec3ec68b-fdeb-4fe4-9a29-acd445e1ccc5` (gsmith) created a suspicious service named DDLOXJDSQSNGMUKKFUXQ to execute potentially malicious commands on MB-ADFS.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'An ongoing hands-on-keyboard attack via the Impacket toolkit was observed, executing the process `powershell.exe` to move laterally and run commands on remote hosts.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The account with SID `S-1-5-21-551436448-9871687716-9837441745-1903` performed suspicious system hardware discovery to gather information about the target device or network.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'A suspected DCSync attack was detected, where Luciano Herrera (CIO) on MB-WINCLIENT sent a directory services replication request to the domain controller host `MB-DC1`.'
+      checkpoint_5:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 5
+        description: 'A suspected AD FS DKM key read was detected on the host `MB-DC1`, which read the DKM key of the ADFS object id 4cac49d3-29d3-407e-8c9b-b7ebb21541b2.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4
+        - checkpoint_5

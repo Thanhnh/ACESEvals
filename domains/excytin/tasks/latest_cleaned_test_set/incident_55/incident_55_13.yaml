@@ -1,0 +1,64 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_13
+  title: incident_55_latest_cleaned_test_set_task_13
+  description: 'For the suspected AD FS DKM key read activity in this incident, which device (host name) performed the read of the AD FS DKM key?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage intrusion, an alert for "Suspicious service registration" was raised when a system program was registered as a service — a technique often used to establish persistence or gain SYSTEM privileges. The process involved was `services.exe` with ProcessId__CreatedTimeUtc__CommandLine `764__2024-06-20t08:30:13.7925191z__services.exe`. Further investigation of this chain revealed follow-on activity including Impacket-based lateral movement, hardware/system discovery, a suspected DCSync (directory services replication) attempt, and finally an alert for a suspected AD FS DKM key read of the AD FS object id 4cac49d3-29d3-407e-8c9b-b7ebb21541b2.'
+    question: 'For the suspected AD FS DKM key read activity in this incident, which device (host name) performed the read of the AD FS DKM key?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'MB-DC1'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'MB-DC1'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A system program was registered as a service on host `mb-adfs`, indicating an attempt to establish persistence or gain system privileges.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'An ongoing hands-on-keyboard attack via the Impacket toolkit was observed, executing the process `powershell.exe` for lateral movement.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'Suspicious system hardware discovery was performed by the account with SID `S-1-5-21-551436448-9871687716-9837441745-1903`, gathering information about the target device or network.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'A suspected DCSync attack (replication of directory services) was detected, where a replication request was sent from MB-WINCLIENT to the domain controller host `MB-DC1`.'
+      checkpoint_5:
+        target: trajectory
+        max_score: 0.2
+        weight: 1.0
+        title: Checkpoint 5
+        description: 'A suspected AD FS DKM key read was detected on host `MB-DC1`, which read the DKM key of the ADFS object id 4cac49d3-29d3-407e-8c9b-b7ebb21541b2.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4
+        - checkpoint_5

@@ -5,7 +5,7 @@ tasks:
     the anonymized sign-in attempt?'
   inherit_shared: true
   initial_context:
-    incident_context: 'During the BEC investigation, we noted that the user account "Jordan P" (Jordan P@vnevado.alpineskihouse.co,
+    incident_context: 'During the BEC investigation, we noted that the user account "Jordan P" (laylaw@vnevado.alpineskihouse.co,
       SID S-1-5-21-1740051960-3534030288-108486866-1602) sent suspicious emails from the source IP 255.246.85.58 to tony@avoriaz.alpineskihouse.co,
       triggering the alert "Suspicious emails sent by BEC-related user" on 2024-07-22. In the same incident, a separate alert
       titled "Anonymous IP address" reported that someone had signed in using an anonymizing service shortly before the suspicious

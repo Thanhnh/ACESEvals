@@ -5,7 +5,7 @@ tasks:
     anonymizing service. What was the source IP address associated with that anonymous sign-in?'
   inherit_shared: true
   initial_context:
-    incident_context: 'During the investigation, we observed that user "Jordan P" (email: Jordan P@vnevado.alpineskihouse.co,
+    incident_context: 'During the investigation, we observed that user "Jordan P" (email: laylaw@vnevado.alpineskihouse.co,
       SID: S-1-5-21-1740051960-3534030288-108486866-1602) successfully authenticated to the SAP enterprise application (App
       ID 100) from the external IP address 107.253.5.27 on 2024-07-22 12:59:26 UTC. This activity generated a "Suspicious
       SAP authentication" alert because the account had already been flagged as risky in Microsoft Entra ID.'

@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_test_set_task_37
+  title: incident_34_latest_cleaned_test_set_task_37
+  description: 'For the related alert about the anomaly detected in the ASEP registry key, what IP address was recorded as an entity in that alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'In a multi-stage incident involving Execution & Discovery on one endpoint, `powershell.exe` (Process ID 8604) was executed with a heavily obfuscated command line that built a base64-encoded payload, wrote it to the desktop as `winatp-intro-backdoor.exe`, and then created and ran a scheduled task named ''yrei'' to launch it. This activity is consistent with an attacker downloading or executing an encoded payload to bypass security protections. A related alert in the same incident flagged an anomaly in an ASEP (Auto-Start Extensibility Point) registry key, where a suspicious command or file was registered so it would run after a reboot, providing persistence.'
+    question: 'For the related alert about the anomaly detected in the ASEP registry key, what IP address was recorded as an entity in that alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '72.5.72.208'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '72.5.72.208'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account with AadUserId `16320fec-8d90-403b-b7fe-78f715d4728d` executed a suspicious PowerShell command to download a file or run an encoded command.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the PowerShell activity, a process registered a suspicious command in an ASEP registry key for persistence, associated with the IP address `72.5.72.208`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

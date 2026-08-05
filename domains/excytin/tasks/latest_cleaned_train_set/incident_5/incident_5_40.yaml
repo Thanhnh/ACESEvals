@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_40
+  title: incident_5_latest_cleaned_train_set_task_40
+  description: 'In the related alert where PsExec was used to launch a command on a remote device, what was the command line of the launched process, along with its process ID and creation time?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, ''CommandAndControl'' malware was detected on host `vnevado-win11t` (AAD device ID `e5799261-6720-4297-961e-bd9ca4275033`) in relation to lateral movement activity. The account `dp5hn` (SID `S-1-5-21-1840191660-8534830288-125585561-1522`) was observed running the process `curl http://vectorsandarrows.com` with process ID 88 at 2024-06-20T09:29:42Z. This chain of activity is also linked to possible ransomware activity based on a known malicious file extension, and to lateral movement to a jump server using PSExec.'
+    question: 'In the related alert where PsExec was used to launch a command on a remote device, what was the command line of the launched process, along with its process ID and creation time?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Command line: `cmd.exe`, Process ID: 8656, Created time (UTC): 2024-06-20T09:07:09.5458894Z'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Command line: `cmd.exe`, Process ID: 8656, Created time (UTC): 2024-06-20T09:07:09.5458894Z'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The compromised account with SID `S-1-5-21-1840191660-8534830288-125585561-1522` was used in ''CommandAndControl'' malware activity detected during lateral movement.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Possible ransomware activity based on a known malicious file extension was observed, associated with the IP address `99.83.111.100`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The attacker moved laterally with PSExec to the jump server host with AadDeviceId `4d8d23e9-a77d-4e33-9435-b8c457e57ca1`.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'PsExec launched a command on the remote device, spawning the process `cmd.exe` with Process ID `8656` at `2024-06-20t09:07:09.5458894z`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

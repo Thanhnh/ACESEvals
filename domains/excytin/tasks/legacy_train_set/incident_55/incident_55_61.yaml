@@ -5,7 +5,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'A security incident was detected where a potentially malicious URL was clicked by a user named `Lucas
-      Grey` (Email: Lucas Grey@niseko.alpineskihouse.co). Following this event, there were suspicious sequences of exploration
+      Grey` (Email: bjenkins@niseko.alpineskihouse.co). Following this event, there were suspicious sequences of exploration
       activities observed that involved a process executing a set of windows commands, which can be used by attackers to identify
       valuable assets and coordinate lateral movement after system compromise. Another part of this incident indicates the
       use of a known public tool with an unusual filename, suggesting an attempt to hide its malicious usage.'

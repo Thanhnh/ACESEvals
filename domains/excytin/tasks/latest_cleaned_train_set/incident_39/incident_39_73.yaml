@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_73
+  title: incident_39_latest_cleaned_train_set_task_73
+  description: 'For the Microsoft Defender Antivirus tampering alert, what was the exact command line executed and the process ID of the process that attempted to disable the antivirus protection?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a lateral movement stage of an incident, ''Kekeo'' malware was detected on a device. The alert included the process `psexesvc.exe` (Process ID 5512, created 2024-06-27T14:33:27.3525354Z), the file `rubeus.exe`, and remote IP address `141.216.110.153`. Shortly before this, an attempt to disable the Microsoft Defender Antivirus service was detected on the same device, likely as a defense evasion technique.'
+    question: 'For the Microsoft Defender Antivirus tampering alert, what was the exact command line executed and the process ID of the process that attempted to disable the antivirus protection?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Command line: `powershell -command set-mppreference -disablerealtimemonitoring 1`, Process ID: 6968 (created 2024-06-27T14:33:05.7932439Z)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Command line: `powershell -command set-mppreference -disablerealtimemonitoring 1`, Process ID: 6968 (created 2024-06-27T14:33:05.7932439Z)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with SID `S-1-5-21-1540151660-3530000288-105586595-1517` was involved in a ''Kekeo'' malware detection during lateral movement to this device.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The attacker then attempted to disable Microsoft Defender Antivirus by running the process with Process ID `6968` at `2024-06-27t14:33:05.7932439z` with command line `powershell -command set-mppreference -disablerealtimemonitoring 1`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

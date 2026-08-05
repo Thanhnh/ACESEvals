@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'On July 17 2024, the security team observed a Business Email Compromise (BEC)–related alert. The alert
-      indicated that user “Nina Park” (email: Nina Park@vnevado.alpineskihouse.co, SID: S-1-5-21-1874151667-3554330288-105586563-1715)
+      indicated that user “Nina Park” (email: raphaelt@vnevado.alpineskihouse.co, SID: S-1-5-21-1874151667-3554330288-105586563-1715)
       created a suspicious inbox-hiding rule during a risky Azure AD session. The sign-in that triggered this alert originated
       from IP address 237.7.81.122. Investigators later noted a related alert the following day that reported a sign-in from
       a known malicious IP address, potentially linked to the same threat activity.'

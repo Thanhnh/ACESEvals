@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_92
+  title: incident_39_latest_cleaned_train_set_task_92
+  description: 'What is the name of the deceptive user account that was used in the sign-in attempt on this device?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident, ''Kekeo'' malware was detected on host `vnevado-win10b` (AAD device ID `fafdcd65-46c6-45a6-aa85-ec9b77ca0bcb`) as part of lateral movement activity. Related activity included the account `fk8mq` (SID `S-1-5-21-1540151660-3530000288-105586595-1517`), the tool `rubeus.exe`, the process `psexesvc.exe` (PID 5512, created 2024-06-27T14:33:27Z), and the IP address `141.216.110.153`. Shortly before this detection, multiple known public dual-purpose tools were dropped on the same device, and a sign-in attempt was also detected using a deceptive (fake or decoy) user account on the device.'
+    question: 'What is the name of the deceptive user account that was used in the sign-in attempt on this device?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'kyleg'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'kyleg'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The ''Kekeo'' malware file `rubeus.exe` was detected on the device during lateral movement.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Multiple dual-purpose tools were dropped on the device under the account `tgs2z`, potentially for credential theft, privilege escalation, and lateral movement.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'A sign-in attempt with the deceptive user account `kyleg` was detected on the device, indicating the attacker used a fake or decoy account for lateral movement and access to sensitive data.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

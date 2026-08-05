@@ -5,7 +5,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'A suspicious business email compromise (BEC) was reported on 2024-07-23, with an observed account belonging
-      to `Jordan P` (email: Jordan P@vnevado.alpineskihouse.co, AadUserId: 89e933b9-5b2e-4bd6-bcdf-033db707ef82, Sid: S-1-5-21-1740051960-3534030288-108486866-1602).
+      to `Jordan P` (email: laylaw@vnevado.alpineskihouse.co, AadUserId: 89e933b9-5b2e-4bd6-bcdf-033db707ef82, Sid: S-1-5-21-1740051960-3534030288-108486866-1602).
       The attacker might be attempting financial fraud against the organization. Following this, there was also a suspicious
       SAP authentication attempt on 2024-07-22. A user account with a risky sign-in alert in Microsoft Entra ID signed in
       to SAP, suggesting an attacker might have taken control of a user account to search through SAP with the intention of

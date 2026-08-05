@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_97
+  title: incident_39_latest_cleaned_train_set_task_97
+  description: 'In the overpass-the-hash logon alert connected to this activity, which file was flagged as the entity associated with the credential theft (i.e., the process memory the password hash was likely harvested from)?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, an alert titled "Suspicious process stopping services" fired when a PowerShell process (PID 3780) ran the command `powershell.exe -command "net.exe stop ntds /y; add-addbsidhistory -samaccountname bdadmin -sidhistory \"s-1-5-32-544\" -databasepath (get-itemproperty -path registry::hklm\system\currentcontrolset\services\ntds\parameters).\"dsa database file\" -force; net.exe start ntds"`, spawning `net.exe` (PID 6428) to stop the NTDS service. Attackers often stop services to evade detection or hinder recovery. This activity is linked, through the affected device and a remote source address that dropped and launched a file, to another alert reporting a successful logon using overpass-the-hash with potentially stolen credentials.'
+    question: 'In the overpass-the-hash logon alert connected to this activity, which file was flagged as the entity associated with the credential theft (i.e., the process memory the password hash was likely harvested from)?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'lsass.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'lsass.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious process stopped services running on the host `vnevado-dc`, likely to avoid detection and prevent recovery.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A remote session from the IP address `141.216.110.153` dropped a file and executed it, indicating lateral movement or malware propagation.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The attacker performed a successful logon using overpass-the-hash with credentials likely stolen from the process memory of the file `lsass.exe`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

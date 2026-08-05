@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_66
+  title: incident_55_latest_cleaned_test_set_task_66
+  description: 'Moments later, a related alert fired for an attempt to hide the use of a dual-purpose tool, where a known public tool was observed running under an unexpected filename. What is the security identifier (SID) of the user account associated with that alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation on the device `mb-winclient` (Azure AD device ID `7661dfd4-218f-4016-8a87-66d68a7f098e`), an alert for "Suspicious System Hardware Discovery" was raised, indicating a known tool or technique was used to gather information about the device or network for later attacks. The activity involved accounts such as `bjenkins` and `pwilson`, the process `svchost.exe`, and PowerShell executions including `"powershell.exe" -noexit -command set-location -literalpath ''c:\users\bjenkins\downloads\midnight14''` (PID 12412) and `"powershell.exe" c:\script\contosoadfsblatempcreds.ps1` (PID 13968).'
+    question: 'Moments later, a related alert fired for an attempt to hide the use of a dual-purpose tool, where a known public tool was observed running under an unexpected filename. What is the security identifier (SID) of the user account associated with that alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'S-2-5-21-571436798-3864380397-1837441745-3206'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'S-2-5-21-571436798-3864380397-1837441745-3206'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The attacker used `powershell.exe` to perform suspicious system hardware discovery on the device.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'A renamed process `iy2orr1e.rrg.exe` (Process ID `3116`, created at `2024-07-02t09:48:23.9439954z`) was executed with the command line `-windowstyle hidden -encodedcommand qwa6afwauwbjahiaaqbwahqacwbcaeuaeabwag8acgb0aeearabgafmavabvagsazqbuafmaaqbnag4aaqbuaemazqbyahqalgbwahmamqa=`, running a suspicious sequence of exploration commands.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The account with SID `S-2-5-21-571436798-3864380397-1837441745-3206` attempted to hide the use of a dual-purpose tool by running it under an unexpected filename.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

@@ -34,7 +34,7 @@ tasks:
         max_score: 0.5
         weight: 1.0
         title: Checkpoint 1
-        description: 'At 2024-07-22 09:49:55.558204+00:00, the account (Email: `Jordan P@vnevado.alpineskihouse.co`) created
+        description: 'At 2024-07-22 09:49:55.558204+00:00, the account (Email: `laylaw@vnevado.alpineskihouse.co`) created
           a suspicious inbox rule named “ITCleanup” that moves messages to the folder “RSS Feeds,” indicating possible mailbox
           compromise.'
       checkpoint_2:

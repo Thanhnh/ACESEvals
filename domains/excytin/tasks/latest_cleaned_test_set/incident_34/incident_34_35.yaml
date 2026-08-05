@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_34_latest_cleaned_test_set_task_35
+  title: incident_34_latest_cleaned_test_set_task_35
+  description: 'For the related alert about the suspicious process executing a PowerShell command, which user account was this activity associated with?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert fired indicating that PowerShell dropped a suspicious file named `winatp-intro-backdoor.exe` on a machine and then executed it. Just moments before this, a related alert was raised showing that a suspicious process had executed a PowerShell command, a technique attackers often use to run payloads in memory without touching disk and leaving traces.'
+    question: 'For the related alert about the suspicious process executing a PowerShell command, which user account was this activity associated with?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'samuelf'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'samuelf'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A PowerShell process (Process ID `8604`, created at `2024-06-26t12:00:39.2886108z`) was launched with a hidden window and bypassed execution policy, using a command line that reconstructed a base64-encoded PE payload (`tvqqaam...`) and wrote it to disk as `winatp-intro-backdoor.exe` on the user''s Desktop.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The same PowerShell command created and ran a scheduled task named `yrei` (via `schtasks /create /sc once /tn yrei /tr $fullpath`, `set-scheduledtask -taskname ''yrei''`, and `schtasks /run /tn yrei`) to execute the dropped suspicious file for persistence.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'This suspicious PowerShell command execution was traced back to the user account `samuelf`, which is the account under which the suspicious process executed the PowerShell command.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

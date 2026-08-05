@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'On July 22 2024, an alert titled “Suspicious inbox manipulation rule” was raised for the user account
-      Jordan P (email: Jordan P@vnevado.alpineskihouse.co). The alert noted that the user created a rule named “ITCleanup”
+      Jordan P (email: laylaw@vnevado.alpineskihouse.co). The alert noted that the user created a rule named “ITCleanup”
       moving messages to the “RSS Feeds” folder, a behavior often associated with mailbox compromise. Several IP addresses
       (e.g., 255.246.85.58, 192.238.237.190, 180.144.153.174) were observed, and activity involved cloud applications such
       as Microsoft Exchange Online (AppId 11161) and Microsoft 365 (AppId 20893). While investigating, you notice a related

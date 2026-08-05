@@ -7,7 +7,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During an ongoing investigation, we observed that on 2024-07-07 at 09:54 UTC the user Luciano Herrera
-      (luciano herrera@niseko.alpineskihouse.co) performed an unusual addition of a password-type credential to an OAuth application
+      (pwilson@niseko.alpineskihouse.co) performed an unusual addition of a password-type credential to an OAuth application
       in Microsoft 365. Such activity can indicate initial steps of account compromise that might later be leveraged for further
       malicious actions such as phishing inside the organization.'
     question: 'A few minutes after the credential addition, Microsoft Defender triggered an alert titled "Internal phishing
@@ -17,7 +17,7 @@ tasks:
     # To use static matching instead, change strategy to "static" and set:
     #   criteria:
     #     expected_answers:
-    #       - 'Nina Sullivan@vnevado.alpineskihouse.co'
+    #       - 'santiago@vnevado.alpineskihouse.co'
   scoring:
     llm_judge:
       model: "{judge_llm}"
@@ -28,7 +28,7 @@ tasks:
         target: submission
         judge_system_template: judge/submission_judge_system.md
         judge_user_template: judge/submission_judge_user.md
-        description: 'Nina Sullivan@vnevado.alpineskihouse.co'
+        description: 'santiago@vnevado.alpineskihouse.co'
         max_score: 1.0
       checkpoint_1:
         target: trajectory
@@ -49,7 +49,7 @@ tasks:
         max_score: 0.333
         weight: 1.0
         title: Checkpoint 3
-        description: The account with Email `Nina Sullivan@vnevado.alpineskihouse.co` subsequently sent phishing 
+        description: The account with Email `santiago@vnevado.alpineskihouse.co` subsequently sent phishing 
           messages to internal recipients.
   scoring_aggregation:
     max:

@@ -129,7 +129,7 @@ tasks:
         max_score: 0.25
         weight: 1.0
         title: Checkpoint 1
-        description: The email account `Nina Park@vnevado.alpineskihouse.co` received emails containing a malicious URL 
+        description: The email account `raphaelt@vnevado.alpineskihouse.co` received emails containing a malicious URL 
           which were removed after delivery.
       checkpoint_2:
         target: trajectory
@@ -248,7 +248,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: A user's account was compromised following a password-spray attack. The account belonged to Nina 
-      Park, whose email is Nina Park@vnevado.alpineskihouse.co, and the security incident occurred on 2024-07-18 
+      Park, whose email is raphaelt@vnevado.alpineskihouse.co, and the security incident occurred on 2024-07-18 
       14:54:18.741032+00:00. The attacker possibly gained unauthorized access to the network by signing in from an 
       unusual location and browser.
     question: Can you identify the AadUserId associated with the account that signed in from an anonymous IP address on 
@@ -297,7 +297,7 @@ tasks:
   initial_context:
     incident_context: On 2024-07-17, email messages containing a malicious URL 
       (`https://ms175052280.orangecliff-f53f26fd.eastus.azurecontainerapps.io/`) were delivered and later removed. The 
-      email was sent by `alyssat@vnevado.alpineskihouse.co` to Nina Park (`Nina Park@vnevado.alpineskihouse.co`). The 
+      email was sent by `alyssat@vnevado.alpineskihouse.co` to Nina Park (`raphaelt@vnevado.alpineskihouse.co`). The 
       sender's IP address was `254.241.243.229`.
     question: What is the mailbox primary address related to this incident?
     # Main task submission evaluation - uses LLM-as-a-judge by default

@@ -6,7 +6,7 @@ tasks:
   initial_context:
     incident_context: 'A security incident was discovered involving suspicious inbox manipulation where Nina Park''s inbox
       rules were altered, likely indicating an attacker had gained access to her inbox to manipulate rules for potential data
-      exfiltration. Her user details are associated with email `Nina Park@vnevado.alpineskihouse.co`, AppId `20893`, and IP
+      exfiltration. Her user details are associated with email `raphaelt@vnevado.alpineskihouse.co`, AppId `20893`, and IP
       address `237.7.81.122`.'
     question: 'During a password spray attack detected on 2024-07-18, which IP address was recognized in the end alert?'
     # Main task submission evaluation - uses LLM-as-a-judge by default

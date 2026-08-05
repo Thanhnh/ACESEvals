@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_322_latest_cleaned_test_set_task_52
+  title: incident_322_latest_cleaned_test_set_task_52
+  description: 'For the later alert in this incident where a malicious URL was clicked on a device, what was the full URL that was clicked?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a multi-stage security incident, an alert for ''Suspicious credential dump from NTDS.dit'' was raised on 2024-08-01. The activity involved `powershell.exe` (Process ID 2556) running an encoded command that referenced writing NTDS output to `c:\temp` and uploading data to Azure storage, followed by `ntdsutil.exe` (Process ID 6748) executing `"ac i ntds" ifm "create full c:\temp" q q`. This chain of activity was later followed by an Azure Resource Manager operation from a suspicious proxy IP address, and eventually an alert indicating a malicious URL was clicked on a device in the same incident.'
+    question: 'For the later alert in this incident where a malicious URL was clicked on a device, what was the full URL that was clicked?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'https://dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io/'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'https://dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io/'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Credentials were dumped from the NTDS.dit database on the domain controller host `vnevado-dc`, exposing domain user credentials.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using the stolen credentials, the account with SID `S-1-5-21-1840151686-3534835288-156286563-1127` performed Azure Resource Manager operations from a suspicious proxy (TOR) IP address.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'A malicious URL `https://dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io/` was clicked on the device, continuing the attack chain.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_10
+  title: incident_55_latest_cleaned_test_set_task_10
+  description: 'For the alert reporting the suspicious sequence of exploration activities, what is the Microsoft Entra (Azure AD) user ID of the account associated with it?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert titled "Attempt to hide use of dual-purpose tool" was raised, where a known public tool that could also be used for malicious purposes was observed running under an unexpected filename. The process details were: ProcessId 5752, CreatedTimeUtc 2024-07-06T00:00:01.7155092Z, CommandLine `"iy2orr1e.rrg.exe" -windowstyle hidden -encodedcommand qwa6afwauwbjahiaaqbwahqacwbcaeuaeabwag8acgb0aeearabgafmavabvagsazqbuafmaaqbnag4aaqbuaemazqbyahqalgbwahmamqa=`. This activity is linked, through a shared user account, to earlier alerts on the same machine, including suspicious remote activity and a process that ran a sequence of Windows exploration commands typically used to identify valuable assets and plan lateral movement.'
+    question: 'For the alert reporting the suspicious sequence of exploration activities, what is the Microsoft Entra (Azure AD) user ID of the account associated with it?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'a2d0f7c2-b0a0-43bd-bce0-27d8ae3be4d0'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'a2d0f7c2-b0a0-43bd-bce0-27d8ae3be4d0'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with SID `S-2-5-21-571436798-3864380397-1837441745-3206` attempted to hide the use of a dual-purpose tool by running a known public tool under an unexpected filename.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Suspicious remote activity was observed on the machine, involving the process `powershell.exe` initiated remotely.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'The same session ran a suspicious sequence of exploration commands, attributed to the user with AadUserId `a2d0f7c2-b0a0-43bd-bce0-27d8ae3be4d0`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

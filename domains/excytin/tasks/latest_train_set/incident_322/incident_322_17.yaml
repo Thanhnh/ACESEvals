@@ -33,7 +33,7 @@ tasks:
         max_score: 0.5
         weight: 1.0
         title: Checkpoint 1
-        description: 'account.Email: `Hailey Johnson@vnevado.alpineskihouse.co` – An email containing a malicious URL was
+        description: 'account.Email: `alyssat@vnevado.alpineskihouse.co` – An email containing a malicious URL was
           delivered to (and later removed from) this mailbox.'
       checkpoint_2:
         target: trajectory

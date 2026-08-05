@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_46
+  title: incident_5_latest_cleaned_test_set_task_46
+  description: 'A related alert about a possible attempt to access the Primary Refresh Token (PRT) was raised at nearly the same time. On which device (host name) was that PRT access attempt detected?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a ransomware-related incident, a possibly compromised user account was observed dropping ransomware-related files (such as `ponceau.7z`, `syncretic.7z`, `kiters.7z`, `unstreaming.xlsx`, `earlap.doc`, and encrypted variants like `ponceau.7z.lockbit`) on several devices, including host `vnevado-win11u`, with associated IP address `99.83.111.100`. A script named `get-userprttoken.ps1` was also seen among the involved files, suggesting an attempt to access the Azure AD Primary Refresh Token (PRT).'
+    question: 'A related alert about a possible attempt to access the Primary Refresh Token (PRT) was raised at nearly the same time. On which device (host name) was that PRT access attempt detected?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'vnevado-win11t'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'vnevado-win11t'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A possibly compromised user account with AadUserId `731adb71-b11c-4bbf-850b-57989b350e96` was observed dropping ransomware-related files on several devices, indicating lateral movement across the network.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using that compromised account, a possible attempt to access the Primary Refresh Token (PRT) for credential theft and further lateral movement was detected on the host `vnevado-win11t`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

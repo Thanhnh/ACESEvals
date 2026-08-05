@@ -5,7 +5,7 @@ tasks:
     dropped and launched from the remote location?
   inherit_shared: true
   initial_context:
-    incident_context: 'A potentially malicious URL click was detected involving user Ethan Brooks (Email: Ethan Brooks@vnevado.alpineskihouse.co)
+    incident_context: 'A potentially malicious URL click was detected involving user Ethan Brooks (Email: tgs2z@vnevado.alpineskihouse.co)
       with a URL `https://ac27145722.livelygrass-8d4c4013.eastus2.azurecontainerapps.io/`. Following this, activity indicating
       the use of the Rubeus kerberoasting tool was observed, which can perform various attacks taking advantage of Kerberos
       authentication. The next alert observed a file being dropped and launched from a remote location, suggesting a possible
@@ -72,7 +72,7 @@ tasks:
     # To use static matching instead, change strategy to "static" and set:
     #   criteria:
     #     expected_answers:
-    #       - 'Julian Burke@vnevado.alpineskihouse.co'
+    #       - 'lucasb@vnevado.alpineskihouse.co'
   scoring:
     llm_judge:
       model: "{judge_llm}"
@@ -83,7 +83,7 @@ tasks:
         target: submission
         judge_system_template: judge/submission_judge_system.md
         judge_user_template: judge/submission_judge_user.md
-        description: 'Julian Burke@vnevado.alpineskihouse.co'
+        description: 'lucasb@vnevado.alpineskihouse.co'
         max_score: 1.0
       checkpoint_1:
         target: trajectory
@@ -105,7 +105,7 @@ tasks:
         weight: 1.0
         title: Checkpoint 3
         description: On 2024-07-10, a suspected DCSync attack was observed with Julian Burke (IT director) at email 
-          `Julian Burke@vnevado.alpineskihouse.co`, who sent a replication request from VNEVADO-Win10V to VNEVADO-DC.
+          `lucasb@vnevado.alpineskihouse.co`, who sent a replication request from VNEVADO-Win10V to VNEVADO-DC.
   scoring_aggregation:
     max:
       scores:

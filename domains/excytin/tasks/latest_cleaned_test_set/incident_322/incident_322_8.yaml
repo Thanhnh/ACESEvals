@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_322_latest_cleaned_test_set_task_8
+  title: incident_322_latest_cleaned_test_set_task_8
+  description: 'According to the proxy log alert for the connection to `login.micro.demo.antoinetest.ovh`, what is the IP address associated with the source device?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, we found that a user named `Hailey Johnson` (email `alyssat@vnevado.alpineskihouse.co`, SID `S-1-5-21-1840151686-3534835288-156286563-1127`, Entra ID `5e5dd0bd-f7ed-4583-8e9e-52f91e31a360`) clicked on a link `https://dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io/` contained in an email that was later quarantined by zero-hour auto purge (ZAP). Following the click, the same malicious URL activity was traced to the user''s device, and proxy logs subsequently flagged a connection from that device (`vnevado-win11h.vnevado.alpineskihouse.co`) to the suspicious domain `login.micro.demo.antoinetest.ovh`.'
+    question: 'According to the proxy log alert for the connection to `login.micro.demo.antoinetest.ovh`, what is the IP address associated with the source device?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '231.60.52.209'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '231.60.52.209'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A user clicked on a link in an email that was later quarantined by zero-hour auto purge (ZAP); the malicious URL was `https://dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io/`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The malicious URL was clicked on the device with HostName `vnevado-win11h`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'Proxy logs detected a malicious URL connection from that device''s IP address `231.60.52.209` to `login.micro.demo.antoinetest.ovh`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

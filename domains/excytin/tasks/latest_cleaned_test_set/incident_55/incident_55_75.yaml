@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_55_latest_cleaned_test_set_task_75
+  title: incident_55_latest_cleaned_test_set_task_75
+  description: 'For the Impacket-related hands-on-keyboard attack alert, which file name was referenced as being used to execute the commands on the device?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this incident, an alert titled "Attempt to hide use of dual-purpose tool" was raised, where a known public tool was observed running under an unexpected filename `iy2orr1e.rrg.exe` (Process ID 3116, created 2024-07-02T09:48:23.9439954Z) with the command line `-windowstyle hidden -encodedcommand QwA6AFwAUwBjAHIAaQBwAHQAcwBcAEUAeABwAG8AcgB0AEQARgBTAFQAbwBrAGUAbgBTAGkAZwBuAGkAbgBDAGUAcgB0AC4AcABzADEA`. This appeared to be an attempt to conceal malicious tool usage. On the same device, another alert flagged an ongoing hands-on-keyboard attack in which commands were executed remotely via the Impacket toolkit, a technique commonly used for lateral movement and payload deployment.'
+    question: 'For the Impacket-related hands-on-keyboard attack alert, which file name was referenced as being used to execute the commands on the device?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '%comspec%'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '%comspec%'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'On host `mb-adfs`, a known public dual-purpose tool was observed running under an unexpected filename, indicating an attempt to hide its malicious use.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'From that same host, an ongoing hands-on-keyboard attack was detected where commands were executed remotely via the Impacket toolkit, using the file `%comspec%` to launch the commands.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

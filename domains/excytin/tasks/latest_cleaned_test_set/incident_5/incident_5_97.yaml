@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_97
+  title: incident_5_latest_cleaned_test_set_task_97
+  description: 'A related alert flagged possible lateral movement, where activity on another device occurred in close time proximity to a suspicious network event on this device. What is the IP address associated with that lateral movement alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, the Mimikatz credential theft tool was detected on a device, with files such as `mimikatz.exe`, `mimidrv.sys`, and `mimilove.exe` observed. Processes were launched with command lines like `"mimikatz.exe" privilege::debug sekurlsa::logonpasswords exit` and pass-the-hash commands targeting user `fk8mq` in domain `vnevado.alpineskihouse.co` to spawn `notepad.exe` and `cmd.exe` on the jump server. This activity chain is also linked to PSExec lateral movement to Vnevado-jump and possible ransomware activity based on a known malicious file extension.'
+    question: 'A related alert flagged possible lateral movement, where activity on another device occurred in close time proximity to a suspicious network event on this device. What is the IP address associated with that lateral movement alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '38.142.109.10'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '38.142.109.10'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The Mimikatz credential theft tool was detected on the device with AadDeviceId `4d8d23e9-a77d-4e33-9435-b8c457e57ca1`, indicating the attacker harvested credentials from this host.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using the stolen credentials, the attacker performed lateral movement via PSExec to the jump server from the IP address `99.83.111.100`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'Ransomware activity based on a known malicious file extension was observed on the device with AadDeviceId `bc00e484-d0e5-4da4-9472-95568cccc07e`, indicating mass encryption of files.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'Further possible lateral movement was observed in close time proximity to a suspicious network event involving the IP address `38.142.109.10`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

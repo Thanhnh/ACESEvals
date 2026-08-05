@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_test_set_task_78
+  title: incident_166_latest_cleaned_test_set_task_78
+  description: 'Earlier that same day, the same compromised user account was flagged for signing in from an anonymous IP address (e.g., Tor browser or anonymizer VPN). What was the IP address used in that anonymous sign-in?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During the investigation of an incident involving SAP financial process manipulation, an alert for ''Suspicious SAP authentication'' was raised on 2024-07-22. The alert involved the user account `Jordan P` (`laylaw@vnevado.alpineskihouse.co`, SID `S-1-5-21-1740051960-3534030288-108486866-1602`) signing in to the SAP enterprise application (AppId 100) from IP address `107.253.5.27`, after being flagged with a risky sign-in in Microsoft Entra ID.'
+    question: 'Earlier that same day, the same compromised user account was flagged for signing in from an anonymous IP address (e.g., Tor browser or anonymizer VPN). What was the IP address used in that anonymous sign-in?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '95.202.65.202'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '95.202.65.202'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A user account with AadUserId `89e933b9-5b2e-4bd6-bcdf-033db707ef82` was flagged for a risky sign-in and used to authenticate to the SAP enterprise application, suggesting the account was compromised to search for or modify sensitive financial information.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The same compromised user account signed in from an anonymous IP address `95.202.65.202` (e.g., Tor browser or anonymizer VPN), indicating the attacker was hiding their true source location.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

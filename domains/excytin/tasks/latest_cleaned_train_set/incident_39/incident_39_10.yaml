@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_10
+  title: incident_39_latest_cleaned_train_set_task_10
+  description: 'A few days later, a related reconnaissance alert was triggered from this same endpoint, where SMB sessions were enumerated on the domain controller VNEVADO-DC to retrieve the recent IP addresses of two accounts. What is the display name of the user account that performed this SMB reconnaissance?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident, an alert for "Anomalous account lookups" was raised on host `vnevado-win10v` (AAD Device ID `4d8d23e9-a77d-4e33-9435-b8c457e57ca1`) under account `tgs2z`. A script named `domaindominance27.ps1` repeatedly launched `net.exe` with discovery commands such as `"net.exe" user /domain`, `"net.exe" group /domain`, `"net.exe" group "domain admins" /domain`, `"net.exe" group "enterprise admins" /domain`, and `"net.exe" user fk8mq /domain`, suggesting an attacker was gathering information about potential targets.'
+    question: 'A few days later, a related reconnaissance alert was triggered from this same endpoint, where SMB sessions were enumerated on the domain controller VNEVADO-DC to retrieve the recent IP addresses of two accounts. What is the display name of the user account that performed this SMB reconnaissance?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Ethan Brooks (Account Executive)'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Ethan Brooks (Account Executive)'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'An anomalous chain of user account lookups was observed from the account with AadUserId `1d94aaf6-efe6-4e76-ad56-ffd7d1257bc1`, indicating the attacker was gathering information about potential targets.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The account `Ethan Brooks` (Account Executive) on VNEVADO-Win10V then performed user and IP address reconnaissance by enumerating SMB sessions on VNEVADO-DC, retrieving recent IP addresses of 2 accounts.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

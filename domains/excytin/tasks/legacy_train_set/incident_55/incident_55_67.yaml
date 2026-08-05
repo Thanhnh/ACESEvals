@@ -5,7 +5,7 @@ tasks:
     to hide the use of a dual-purpose tool?'
   inherit_shared: true
   initial_context:
-    incident_context: 'The investigation into a security incident revealed that Luciano Herrera with the email `Luciano Herrera@niseko.alpineskihouse.co`
+    incident_context: 'The investigation into a security incident revealed that Luciano Herrera with the email `pwilson@niseko.alpineskihouse.co`
       performed an unusual addition of credentials to the application SimulandApp. This activity might indicate a possible
       app compromise. Further investigation shows that a malicious PowerShell Cmdlet was invoked on the machine, followed
       by suspicious Task Scheduler activity which modified or deleted a task.'

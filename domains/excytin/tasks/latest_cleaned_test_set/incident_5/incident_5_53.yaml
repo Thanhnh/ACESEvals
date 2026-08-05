@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_53
+  title: incident_5_latest_cleaned_test_set_task_53
+  description: 'Earlier in this same incident chain, an alert reported possible ransomware activity based on a known malicious file extension, where numerous file system changes suggested mass encryption. What is the name of the file recorded in that ransomware-related alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation of a multi-stage intrusion, an alert titled "PSExec to Vnevado-jump" flagged lateral movement to the jump server. The activity was associated with the user account `tgs2z` (`tgs2z@vnevado.alpineskihouse.co`, SID `S-5-7-21-1843151660-3234030288-105586167-1422`) operating from the host `vnevado-win10v` at IP address `141.216.110.153`, with `notepad.exe` observed among the involved files.'
+    question: 'Earlier in this same incident chain, an alert reported possible ransomware activity based on a known malicious file extension, where numerous file system changes suggested mass encryption. What is the name of the file recorded in that ransomware-related alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'unstreaming.xlsx'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'unstreaming.xlsx'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'An attacker used PSExec to move laterally to the jump server `Vnevado-jump` from the IP address `99.83.111.100`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the lateral movement, ransomware activity was detected on the device, where numerous files were modified with a known malicious ransomware extension, including the file `unstreaming.xlsx`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_21
+  title: incident_39_latest_cleaned_train_set_task_21
+  description: 'In the related PsExec lateral movement alert, what was the name of the script file that was launched on the remote device?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a known credential theft tool `mimikatz.exe` was executed with the command line `"mimikatz.exe" privilege::debug "kerberos::ptt c:\m365dattack\admin-tickets" exit` (Process ID 5176, created 2024-06-27T14:33:32.4282796Z), indicating an intent to dump or reuse users'' credentials and Kerberos tickets. Shortly after, a related alert showed PsExec being used to launch a command on a remote device, a technique attackers use to move laterally within an organization.'
+    question: 'In the related PsExec lateral movement alert, what was the name of the script file that was launched on the remote device?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'get-krbticket.ps1'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'get-krbticket.ps1'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account with AadUserId `1d94aaf6-efe6-4e76-ad56-ffd7d1257bc1` executed a known malicious credential theft tool, indicating an attempt to dump credentials, keys, and plain-text passwords.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Using the stolen credentials, the attacker leveraged PsExec to launch a command on a remote device, executing the file `get-krbticket.ps1` to obtain Kerberos tickets and move laterally in the organization.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

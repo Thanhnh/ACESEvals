@@ -1,0 +1,57 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_52
+  title: incident_5_latest_cleaned_test_set_task_52
+  description: 'For the ''System recovery setting tampering'' alert, which account was responsible for the activity? Provide the account''s security identifier (SID).'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage attack, PsExec was used to launch commands on a remote device — processes observed included `cmd.exe` (PID 8656) and `notepad.exe` (PID 6428, command line `notepad.exe \\vnevado-jump cmd.ee`), suggesting an attacker was moving laterally to the jump server. Shortly afterwards, a ransomware payload was remotely launched, and on the same device an alert fired for System recovery setting tampering, where adversaries attempt to delete volume shadow copies, the Windows Backup Catalog, or disable automatic repair features so that a corrupted or encrypted system cannot be restored.'
+    question: 'For the ''System recovery setting tampering'' alert, which account was responsible for the activity? Provide the account''s security identifier (SID).'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'S-1-5-21-1840191660-8534830288-125585561-1522'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'S-1-5-21-1840191660-8534830288-125585561-1522'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'PsExec was used to launch a command remotely on host `vnevado-win10v`, indicating lateral movement in the organization.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The lateral movement continued with PSExec to the jump server from the IP address `99.83.111.100`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'A ransomware payload was remotely launched by the user account with AadUserId `731adb71-b11c-4bbf-850b-57989b350e96`.'
+      checkpoint_4:
+        target: trajectory
+        max_score: 0.25
+        weight: 1.0
+        title: Checkpoint 4
+        description: 'The account with SID `S-1-5-21-1840191660-8534830288-125585561-1522` tampered with system recovery settings (e.g., deleting volume shadow copies and disabling recovery) to prevent restoring the encrypted system.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
+        - checkpoint_4

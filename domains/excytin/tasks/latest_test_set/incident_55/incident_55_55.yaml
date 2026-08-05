@@ -17,7 +17,7 @@ tasks:
     # To use static matching instead, change strategy to "static" and set:
     #   criteria:
     #     expected_answers:
-    #       - 'Lucas Grey@niseko.alpineskihouse.co'
+    #       - 'bjenkins@niseko.alpineskihouse.co'
   scoring:
     llm_judge:
       model: "{judge_llm}"
@@ -28,7 +28,7 @@ tasks:
         target: submission
         judge_system_template: judge/submission_judge_system.md
         judge_user_template: judge/submission_judge_user.md
-        description: 'Lucas Grey@niseko.alpineskihouse.co'
+        description: 'bjenkins@niseko.alpineskihouse.co'
         max_score: 1.0
       checkpoint_1:
         target: trajectory
@@ -50,7 +50,7 @@ tasks:
         weight: 1.0
         title: Checkpoint 3
         description: 2024-07-09T11:49:57Z – Malicious-URL emails were delivered and subsequently removed from the 
-          mailbox of the account whose Email is "Lucas Grey@niseko.alpineskihouse.co", showing the threat’s continued 
+          mailbox of the account whose Email is "bjenkins@niseko.alpineskihouse.co", showing the threat’s continued 
           activity against this user.
   scoring_aggregation:
     max:

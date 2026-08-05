@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_322_latest_cleaned_test_set_task_53
+  title: incident_322_latest_cleaned_test_set_task_53
+  description: 'For the alert about the suspicious credential dump from NTDS.dit, what was the name of the executable file (process) identified in that alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, a user clicked on a link in an email (`https://dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io/`) that was later quarantined by zero-hour auto purge (ZAP), as reported by Microsoft Defender for Office 365. The same compromised account was then tied to an Azure Resource Manager operation coming from a suspicious proxy IP address, and further activity on the affected domain controller host led to an alert for a suspicious credential dump from NTDS.dit, where attackers dump the NTDS.dit file to obtain domain user credentials.'
+    question: 'For the alert about the suspicious credential dump from NTDS.dit, what was the name of the executable file (process) identified in that alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'powershell.exe'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'powershell.exe'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The user account `Hailey Johnson` clicked on a link in an email that was later quarantined by zero-hour auto purge (ZAP).'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'An Azure Resource Manager operation was performed from a suspicious proxy IP address on the host with HostName `vnevado-dc`.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'On that host, a suspicious credential dump from NTDS.dit was performed by the process with ExtractedFileName `powershell.exe` to obtain domain user credentials.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_134_latest_cleaned_test_set_task_3
+  title: incident_134_latest_cleaned_test_set_task_3
+  description: 'A related alert, "BEC financial fraud", was triggered moments later for a suspicious inbox rule that hides incoming email messages, created during a risky Azure Active Directory session. What is the display name of the user account associated with that BEC financial fraud alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, an alert titled "Suspicious inbox manipulation rule" was raised on 2024-07-17, indicating that a user''s inbox rules were manipulated in a suspicious manner, possibly by an attacker who gained access to the mailbox in order to delete or move messages and exfiltrate data. The activity was associated with the cloud application with AppId `20893` and originated from a specific source IP address.'
+    question: 'A related alert, "BEC financial fraud", was triggered moments later for a suspicious inbox rule that hides incoming email messages, created during a risky Azure Active Directory session. What is the display name of the user account associated with that BEC financial fraud alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Nina Park'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Nina Park'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious inbox manipulation rule was created from the IP address `237.7.81.122`, indicating an attacker may have gained access to a user''s mailbox.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The suspicious inbox rule hiding incoming email messages was created in a risky Azure Active Directory session belonging to the account `Nina Park`, suggesting an attempted business email compromise (BEC) financial fraud.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

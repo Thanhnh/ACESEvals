@@ -7,7 +7,7 @@ tasks:
   initial_context:
     incident_context: 'During a recent security incident on 2024-08-01, a malicious URL `https://dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io/`
       was clicked on a device securely identified with the ID `76707c40-3343-490e-9205-88fdb51aefe0` from the user account
-      Hailey Johnson (Email: Hailey Johnson@vnevado.alpineskihouse.co) using the `msedge.exe` process. This incident is being
+      Hailey Johnson (Email: alyssat@vnevado.alpineskihouse.co) using the `msedge.exe` process. This incident is being
       investigated as it relates to a series of malicious activities.'
     question: We need to understand more details about the connected activities. Can you identify the IP address 
       involved in the connection to `login.micro.demo.antoinetest.ovh` observed in the proxy logs?
@@ -88,7 +88,7 @@ tasks:
         max_score: 0.167
         weight: 1.0
         title: Checkpoint 2
-        description: The email account `Hailey Johnson@vnevado.alpineskihouse.co` clicked on the malicious URL on the 
+        description: The email account `alyssat@vnevado.alpineskihouse.co` clicked on the malicious URL on the 
           device `vnevado-win11h`.
       checkpoint_3:
         target: trajectory
@@ -202,7 +202,7 @@ tasks:
         max_score: 0.25
         weight: 1.0
         title: Checkpoint 1
-        description: The email account `Hailey Johnson@vnevado.alpineskihouse.co` accessed a link in an email that was 
+        description: The email account `alyssat@vnevado.alpineskihouse.co` accessed a link in an email that was 
           subsequently quarantined by ZAP.
       checkpoint_2:
         target: trajectory
@@ -505,7 +505,7 @@ tasks:
   initial_context:
     incident_context: This alert involves an email security incident where a message containing a malicious URL was 
       delivered to `alyssat@vnevado.alpineskihouse.co` and later removed. The email originated from IP address 
-      `202.205.215.225` and was sent by `Hailey Johnson@vnevado.alpineskihouse.co`.
+      `202.205.215.225` and was sent by `alyssat@vnevado.alpineskihouse.co`.
     question: Who is the email sender related to this security incident?
     # Main task submission evaluation - uses LLM-as-a-judge by default
     # To use static matching instead, change strategy to "static" and set:

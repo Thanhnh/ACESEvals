@@ -298,7 +298,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: A business email compromise-related alert indicated that a user account 'Jordan P' with the email 
-      `Jordan P@vnevado.alpineskihouse.co` signed in to SAP in a suspicious manner. This action suggests that an 
+      `laylaw@vnevado.alpineskihouse.co` signed in to SAP in a suspicious manner. This action suggests that an 
       attacker might have taken control of the user account to search through SAP to record or modify sensitive 
       financial information. The signed-in activity was flagged by Microsoft Defender XDR and might be used for later 
       stages in the attack, such as phishing or social engineering.
@@ -433,7 +433,7 @@ tasks:
     IP address?
   inherit_shared: true
   initial_context:
-    incident_context: A user named Jordan P, with the email address `Jordan P@vnevado.alpineskihouse.co`, and IP address
+    incident_context: A user named Jordan P, with the email address `laylaw@vnevado.alpineskihouse.co`, and IP address
       `107.253.5.27` was involved in a business email compromise-related alert after signing in to SAP suspiciously. 
       This sign-in might indicate that an attacker has taken control of the account to modify or record sensitive 
       financial information, which could be used in further attacks such as phishing or social engineering. The incident

@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_26
+  title: incident_5_latest_cleaned_train_set_task_26
+  description: 'For the suspicious WMI process creation alert, what was the process ID, creation time, and full command line of the process that was spawned?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a ''Command and Control behavior was blocked'' alert was raised after activity to the malicious URL `http://vectorsandarrows.com/` was detected on an affected machine. Around the same time, on the same machine, another alert fired for a suspicious WMI process creation, since malware frequently uses WMI to spawn new processes, breaking process trees and further infecting a machine.'
+    question: 'For the suspicious WMI process creation alert, what was the process ID, creation time, and full command line of the process that was spawned?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'Process ID: 6280, Created Time (UTC): 2024-06-20T09:29:43.9198085Z, Command line: `powershell -file c:\scripts\get-userprttoken.ps1`'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'Process ID: 6280, Created Time (UTC): 2024-06-20T09:29:43.9198085Z, Command line: `powershell -file c:\scripts\get-userprttoken.ps1`'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Command and Control behavior was blocked on host `vnevado-win11t`, indicating active malware attempting to communicate with a remote attacker.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'On that host, a suspicious WMI process creation was observed: the process with Process ID `6280` was created at `2024-06-20t09:29:43.9198085z` with the command line `powershell -file c:\scripts\get-userprttoken.ps1`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

@@ -5,7 +5,7 @@ tasks:
     of the account tied to that service launch?'
   inherit_shared: true
   initial_context:
-    incident_context: 'During the investigation we saw that user Ethan Brooks (Ethan Brooks@vnevado.alpineskihouse.co) performed
+    incident_context: 'During the investigation we saw that user Ethan Brooks (tgs2z@vnevado.alpineskihouse.co) performed
       SMB-based reconnaissance from host VNEVADO-Win10V against the domain controller VNEVADO-DC on 2024-07-10. This activity
       is linked—through several intermediate entities—to an earlier alert raised on 2024-07-04 for a suspicious service being
       launched on a device. That service start is associated with a separate user account.'

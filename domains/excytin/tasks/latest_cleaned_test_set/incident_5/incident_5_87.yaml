@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_test_set_task_87
+  title: incident_5_latest_cleaned_test_set_task_87
+  description: 'For the alert reporting the remotely launched ransomware payload, which user account was involved? Provide the account''s security identifier (SID).'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a ''Possible lateral movement'' alert was raised from Microsoft Defender for Endpoint, associated with the IP address `83.162.58.168`. This suggested an attacker was moving laterally across devices to gather data or elevate privileges. Roughly a second later, a related alert fired indicating that a ransomware payload was remotely launched on a device, potentially encrypting its content and rendering it unusable.'
+    question: 'For the alert reporting the remotely launched ransomware payload, which user account was involved? Provide the account''s security identifier (SID).'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'S-1-5-21-1840191660-8534830288-125585561-1522'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'S-1-5-21-1840191660-8534830288-125585561-1522'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Possible lateral movement was detected on the device with HostName `vnevado-win11t`, where a suspicious network event occurred in close time proximity to lateral movement activity on another device.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the lateral movement, a ransomware payload was remotely launched on the device by the account with Sid `S-1-5-21-1840191660-8534830288-125585561-1522`, attempting to encrypt content and render it unusable.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

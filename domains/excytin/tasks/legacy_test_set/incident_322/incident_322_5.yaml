@@ -5,7 +5,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'A security incident involving the clicking of a malicious URL `https://dj01161621.bravesand-e1ccd718.eastus.azurecontainerapps.io/`
-      by the user Hailey Johnson (email: Hailey Johnson@vnevado.alpineskihouse.co) using Microsoft Edge (msedge.exe) was detected.
+      by the user Hailey Johnson (email: alyssat@vnevado.alpineskihouse.co) using Microsoft Edge (msedge.exe) was detected.
       The event was recorded with the Process ID 4256 at the time 2024-08-01T13:42:52.04. The device had the IP address 172.33.118.200.'
     question: Can you identify the hostname of the device that was used to click the malicious URL?
     # Main task submission evaluation - uses LLM-as-a-judge by default
@@ -228,7 +228,7 @@ tasks:
         weight: 1.0
         title: Checkpoint 1
         description: Suspicious Azure Resource Management activities were performed by a risky user with the email 
-          `Hailey Johnson@vnevado.alpineskihouse.co`.
+          `alyssat@vnevado.alpineskihouse.co`.
       checkpoint_2:
         target: trajectory
         max_score: 0.167

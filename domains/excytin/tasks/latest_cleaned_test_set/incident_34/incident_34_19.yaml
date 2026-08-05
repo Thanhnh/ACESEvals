@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_34_latest_cleaned_test_set_task_19
+  title: incident_34_latest_cleaned_test_set_task_19
+  description: 'Seconds after this activity, a related alert fired on the same device for a process executing PowerShell to download a file or run an encoded command. Which user account name was associated with that follow-up alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a multi-stage incident involving Execution & Discovery on a single endpoint, a suspicious PowerShell activity was observed. The alert involved the file `winatp-intro-backdoor.exe` and the process `schtasks.exe` (Process ID 1616) launched with the command line `"schtasks.exe" /run /tn yrei`. This behavior may indicate PowerShell was used during installation, exploration, or lateral movement to invoke modules, download external payloads, or gather system information.'
+    question: 'Seconds after this activity, a related alert fired on the same device for a process executing PowerShell to download a file or run an encoded command. Which user account name was associated with that follow-up alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'samuelf'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'samuelf'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A suspicious PowerShell command line was observed on host `vnevado-win10e`, indicating possible in-memory payload execution or discovery activity.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The same PowerShell activity escalated to a suspicious PowerShell download or encoded command execution, performed by the user account `samuelf`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

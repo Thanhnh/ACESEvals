@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_134_latest_cleaned_train_set_task_21
+  title: incident_134_latest_cleaned_train_set_task_21
+  description: 'Following the alert chain from this malicious sign-in, which compromised user account was involved? Please provide the account''s Microsoft Entra ID (AAD) user object ID.'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'A security incident was flagged in our environment beginning with a ''Malicious IP address'' alert on 2024-07-18 13:48:02 UTC, which triggers when a sign-in originates from an IP address known to be malicious during or around the time of sign-in. In this case, the sign-in was observed coming from the IP address `170.54.121.63`.'
+    question: 'Following the alert chain from this malicious sign-in, which compromised user account was involved? Please provide the account''s Microsoft Entra ID (AAD) user object ID.'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'e036dee7-fa23-42ef-a019-468c8d3401f1'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'e036dee7-fa23-42ef-a019-468c8d3401f1'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A sign-in was detected originating from an IP address known to be malicious, triggering the "Malicious IP address" alert at 2024-07-18 13:48:02 UTC.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The sign-in attempt from this malicious IP address was associated with the user account having AadUserId `e036dee7-fa23-42ef-a019-468c8d3401f1`, indicating this account was potentially compromised.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

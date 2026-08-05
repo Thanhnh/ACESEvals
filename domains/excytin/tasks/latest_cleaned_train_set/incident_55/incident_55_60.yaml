@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_55_latest_cleaned_train_set_task_60
+  title: incident_55_latest_cleaned_train_set_task_60
+  description: 'For the later alert in this incident where a malicious URL was clicked on that device, what was the full URL that was clicked?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, a renamed Windows system executable `iy2orr1e.rrg.exe` was launched on host `mb-adfs` under the SYSTEM account (SID S-2-2-78), using hidden window style and base64 encoded PowerShell commands (e.g., process 6808 at 2024-07-02T09:48:12Z and process 3116 at 2024-07-02T09:48:23Z). This activity was followed by a suspicious LDAP query indicating reconnaissance against the domain controller, and later by a malicious URL click detected on the same device.'
+    question: 'For the later alert in this incident where a malicious URL was clicked on that device, what was the full URL that was clicked?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'https://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'https://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A renamed Windows system executable with the original file name `powershell.exe` was launched on the device, indicating an attempt to evade path/name-based detections.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'From the same compromised host, identified by AadDeviceId `7661dfd4-218f-4016-8a87-66d68a7f098e`, a suspicious LDAP query was executed against the domain controller for reconnaissance of privileged users, groups, and assets.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'On that same device, a malicious URL `https://ym018491661.wittytree-b6f239d6.northeurope.azurecontainerapps.io/` was clicked, connecting the host to attacker-controlled infrastructure.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_train_set_task_24
+  title: incident_166_latest_cleaned_train_set_task_24
+  description: 'Following this BEC activity, the same compromised identity was linked to a "Password Spray" alert on 2024-07-23. What source IP address was associated with that password spray attack?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a business email compromise (BEC) investigation, an alert titled "Suspicious emails sent by BEC-related user" fired on 2024-07-22, showing that suspicious emails were sent from the possibly compromised account `laylaw@vnevado.alpineskihouse.co` (display name `Jordan P`, SID `S-1-5-21-1740051960-3534030288-108486866-1602`) to the mailbox `tony@avoriaz.alpineskihouse.co`, originating from sender IP `255.246.85.58`.'
+    question: 'Following this BEC activity, the same compromised identity was linked to a "Password Spray" alert on 2024-07-23. What source IP address was associated with that password spray attack?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '95.202.65.202'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '95.202.65.202'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A possibly compromised user account with AadUserId `89e933b9-5b2e-4bd6-bcdf-033db707ef82` sent suspicious emails as part of an ongoing BEC (business email compromise) fraud attempt.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Following the BEC activity, a password spray attack was detected originating from the IP address `95.202.65.202`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

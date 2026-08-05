@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_166_latest_cleaned_test_set_task_57
+  title: incident_166_latest_cleaned_test_set_task_57
+  description: 'Approximately two hours before the BEC financial fraud activity, a password spray attack was detected targeting this account. What was the source IP address used in that password spray attack?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a business email compromise (BEC) investigation, suspicious financial fraud events were observed involving the account `Jordan P` (email `laylaw@vnevado.alpineskihouse.co`, SID `S-1-5-21-1740051960-3534030288-108486866-1602`), suggesting an attacker might be attempting to conduct a fraud attack against the organization. Earlier in the same incident, an identity-based attack was detected against the same user account.'
+    question: 'Approximately two hours before the BEC financial fraud activity, a password spray attack was detected targeting this account. What was the source IP address used in that password spray attack?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '95.202.65.202'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '95.202.65.202'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'Suspicious events with business email compromise (BEC) characteristics were observed for the account with AadUserId `89e933b9-5b2e-4bd6-bcdf-033db707ef82`, indicating a possible financial fraud attempt.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Investigation of the compromised account''s sign-in activity revealed that the account was targeted by a password spray attack originating from the IP address `95.202.65.202`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

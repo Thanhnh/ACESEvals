@@ -54,9 +54,18 @@ STEP_EVALUATIONS:
 [step_number: checkpoint_id] - Brief reason
 ```
 
-If no checkpoints were completed during the trajectory: `[NO_COMPLETIONS]`
+For any checkpoints that were **not** completed, explain why:
+
+```
+NOT_COMPLETED:
+[checkpoint_id] - Brief explanation of what evidence was missing or why the checkpoint was not achieved
+[checkpoint_id] - Brief explanation
+```
+
+If no checkpoints were completed during the trajectory, output `[NO_COMPLETIONS]` instead of the `STEP_EVALUATIONS` block, but still provide the `NOT_COMPLETED` block.
 
 **Important:**
 - Use exact checkpoint IDs from above (e.g., checkpoint_1, checkpoint_2)
 - Only list steps where checkpoint objectives were actually achieved through discovery
 - A checkpoint can only be completed once - list the first step where it was discovered
+- For NOT_COMPLETED entries, explain what specific evidence was missing (e.g., specific artifact not found, required table not queried, key timestamp absent)

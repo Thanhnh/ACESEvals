@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_25
+  title: incident_39_latest_cleaned_train_set_task_25
+  description: 'A related alert on this same device flagged suspicious activity that was initiated remotely (such as interactive sessions, file modifications, WMI commands, or scheduled task creation). Which account name was associated with that suspicious remote activity alert?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an investigation, the Mimikatz credential theft tool was detected on a device, with the process command line `4748__2024-06-27t14:33:38.0249949z__"mimikatz.exe" "lsadump::dcsync /domain:vnevado.alpineskihouse.co /user:xfbzkp" exit`. This activity is linked to another alert on the same device where multiple known dual-purpose tools were dropped, which attackers may use for credential theft, privilege escalation, and lateral movement.'
+    question: 'A related alert on this same device flagged suspicious activity that was initiated remotely (such as interactive sessions, file modifications, WMI commands, or scheduled task creation). Which account name was associated with that suspicious remote activity alert?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'fk8mq'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'fk8mq'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The credential theft tool `mimikatz.exe` was detected running on the device, indicating an attempt to harvest plaintext passwords, hashes, and Kerberos tickets.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'Multiple dual-purpose tools were dropped on the same device, including the file `psexesvc.exe`, which enables remote command execution and lateral movement.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'Using the stolen credentials and remote execution tooling, suspicious remotely initiated activity was observed on the machine, performed by the account with Name `fk8mq`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

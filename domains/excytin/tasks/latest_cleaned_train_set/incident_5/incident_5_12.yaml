@@ -1,0 +1,43 @@
+tasks:
+- task_id: incident_5_latest_cleaned_train_set_task_12
+  title: incident_5_latest_cleaned_train_set_task_12
+  description: 'A nearly identical "File backups were deleted" alert was triggered about a second earlier on a different endpoint, linked to the same user account SID. What is the Microsoft Entra (AAD) device ID of that other endpoint?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During a ransomware-related investigation, an alert titled "File backups were deleted" was raised at 2024-07-04 22:35:02 UTC, indicating that all file snapshots and shadow copies were deleted via WMI or VSSAdmin. On the host `vnevado-win11t` (Microsoft Entra device ID `e5799261-6720-4297-961e-bd9ca4275033`), the process with ID 1900 executed the command line `vssblatemp.exe delete shadows /all` at 2024-06-20T09:29:40 UTC.'
+    question: 'A nearly identical "File backups were deleted" alert was triggered about a second earlier on a different endpoint, linked to the same user account SID. What is the Microsoft Entra (AAD) device ID of that other endpoint?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'f5b847aa-8712-4bf6-b4f7-ed6cd89e1505'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'f5b847aa-8712-4bf6-b4f7-ed6cd89e1505'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A user account with SID `S-1-5-21-1840191660-8534830288-125585561-1522` deleted all file snapshots and shadow copies via WMI or VSSAdmin, behavior commonly seen during ransomware infection.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.5
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'This backup deletion activity was observed on the host with AadDeviceId `f5b847aa-8712-4bf6-b4f7-ed6cd89e1505`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2

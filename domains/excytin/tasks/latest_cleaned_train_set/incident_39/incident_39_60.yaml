@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_39_latest_cleaned_train_set_task_60
+  title: incident_39_latest_cleaned_train_set_task_60
+  description: 'For the earlier alert reporting the suspicious service being launched, which user account was involved in starting that service?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During this multi-stage incident, an alert titled "User and IP address reconnaissance (SMB)" was raised on 2024-07-10, indicating that the account `Ethan Brooks` (email: `tgs2z@vnevado.alpineskihouse.co`), an Account Executive working from VNEVADO-Win10V, enumerated SMB sessions on VNEVADO-DC and retrieved recent IP addresses of 2 accounts. This reconnaissance activity is linked, through shared entities, to earlier activity on 2024-07-04 that included an anomalous chain of user account lookups and, just before it, an alert reporting that a suspicious service was started on a device — a technique attackers commonly use to launch malicious commands, maintain persistence, or elevate privileges.'
+    question: 'For the earlier alert reporting the suspicious service being launched, which user account was involved in starting that service?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - 'lucasb'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: 'lucasb'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'The account with SID `S-5-7-21-1843151660-3234030288-105586167-1422` (Ethan Brooks) performed user and IP address reconnaissance (SMB) from VNEVADO-Win10V against VNEVADO-DC at 2024-07-10 11:24:45 UTC.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'An anomalous chain of account lookups was observed, carried out by the process `net.exe` at 2024-07-04 22:35:03 UTC, indicating the attacker was gathering information about potential targets.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'A suspicious service was launched on the device under the account named `lucasb` at 2024-07-04 22:35:00 UTC, likely used to maintain persistence or elevate privileges.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3

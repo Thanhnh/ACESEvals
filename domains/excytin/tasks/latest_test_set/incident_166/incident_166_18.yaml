@@ -6,7 +6,7 @@ tasks:
   inherit_shared: true
   initial_context:
     incident_context: 'During the investigation of a potential Business Email Compromise (BEC) financial-fraud attempt involving
-      the user account "Jordan P" (email: Jordan P@vnevado.alpineskihouse.co, SID S-1-5-21-1740051960-3534030288-108486866-1602),
+      the user account "Jordan P" (email: laylaw@vnevado.alpineskihouse.co, SID S-1-5-21-1740051960-3534030288-108486866-1602),
       analysts noticed that this activity is connected to an earlier alert that reported a sign-in from an anonymous IP address
       (for example via Tor or an anonymizing VPN). Identifying that source IP is critical to determine the origin of the suspicious
       access.'

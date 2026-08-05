@@ -1,0 +1,50 @@
+tasks:
+- task_id: incident_322_latest_cleaned_test_set_task_9
+  title: incident_322_latest_cleaned_test_set_task_9
+  description: 'For the alert about suspicious Azure Resource Management activities performed by the risky user, what source IP address was associated with that activity?'
+  inherit_shared: true
+  initial_context:
+    incident_context: 'During an incident investigation, a proxy log alert flagged a connection from 231.60.52.209 (host vnevado-win11h.vnevado.alpineskihouse.co) and 228.3.31.94 to the malicious URL `login.micro.demo.antoinetest.ovh`. Pivoting from this host, a malicious URL was later clicked on that device by a user account, and the same compromised identity was subsequently seen performing suspicious Azure Resource Management (ARM) activities from a risky sign-in session, as flagged by Microsoft Defender for Cloud and Microsoft Entra ID Protection risk scores.'
+    question: 'For the alert about suspicious Azure Resource Management activities performed by the risky user, what source IP address was associated with that activity?'
+    # Main task submission evaluation - uses LLM-as-a-judge by default
+    # To use static matching instead, change strategy to "static" and set:
+    #   criteria:
+    #     expected_answers:
+    #       - '253.1.244.215'
+  scoring:
+    llm_judge:
+      model: "{judge_llm}"
+      steps_per_message: 50
+      judge_system_template: judge/checkpoint_judge_system.md
+      judge_user_template: judge/checkpoint_judge_user.md
+      submission:
+        target: submission
+        judge_system_template: judge/submission_judge_system.md
+        judge_user_template: judge/submission_judge_user.md
+        description: '253.1.244.215'
+        max_score: 1.0
+      checkpoint_1:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 1
+        description: 'A malicious URL connection to `login.micro.demo.antoinetest.ovh` was detected in proxy logs from the host with HostName `vnevado-win11h`.'
+      checkpoint_2:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 2
+        description: 'The user account with Sid `S-1-5-21-1840151686-3534835288-156286563-1127` clicked on the malicious URL on that device.'
+      checkpoint_3:
+        target: trajectory
+        max_score: 0.333
+        weight: 1.0
+        title: Checkpoint 3
+        description: 'Suspicious Azure Resource Management activities were then performed by that risky user from the IP address `253.1.244.215`.'
+  scoring_aggregation:
+    max:
+      scores:
+      - submission
+      - - checkpoint_1
+        - checkpoint_2
+        - checkpoint_3
