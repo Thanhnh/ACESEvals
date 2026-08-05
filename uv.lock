@@ -1210,7 +1210,7 @@ wheels = [
 [[package]]
 name = "inspect-ai"
 version = "0.1.dev4754+g4922948c6"
-source = { git = "https://github.com/microsoft/ACESEvals.git?branch=inspect-ai%2Fdev%2Faces_integration#4922948c6c626ad8fb1724bafaec019c4fbedff8" }
+source = { git = "https://github.com/microsoft/ACESEvals?branch=inspect-ai%2Fdev%2Faces_integration#4922948c6c626ad8fb1724bafaec019c4fbedff8" }
 dependencies = [
     { name = "aioboto3" },
     { name = "aiohttp" },
@@ -2982,7 +2982,7 @@ wheels = [
 [[package]]
 name = "saber"
 version = "0.2.0"
-source = { git = "https://github.com/microsoft/ACES.git?branch=main#194f02937403f1e1d715b5326a4d9d05bb9b950e" }
+source = { git = "https://github.com/microsoft/ACES.git?branch=main#f30f7877b342bdb432525e93d0dcef2b15b33092" }
 dependencies = [
     { name = "aiohttp" },
     { name = "anthropic" },
