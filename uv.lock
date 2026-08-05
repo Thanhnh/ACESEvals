@@ -54,7 +54,7 @@ requires-dist = [
     { name = "openai", specifier = ">=2.26.0" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.0.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
-    { name = "saber", git = "https://dev.azure.com/MSECAIModels/Benchmarking/_git/SABER?branch=main" },
+    { name = "saber", git = "https://github.com/microsoft/ACES.git?branch=main" },
     { name = "scipy", marker = "extra == 'analysis'", specifier = ">=1.11.0" },
     { name = "seaborn", marker = "extra == 'analysis'", specifier = ">=0.13.0" },
 ]
@@ -1210,7 +1210,7 @@ wheels = [
 [[package]]
 name = "inspect-ai"
 version = "0.1.dev4754+g4922948c6"
-source = { git = "https://github.com/microsoft/ACESEvals?branch=inspect-ai%2Fdev%2Faces_integration#4922948c6c626ad8fb1724bafaec019c4fbedff8" }
+source = { git = "https://github.com/microsoft/ACESEvals.git?branch=inspect-ai%2Fdev%2Faces_integration#4922948c6c626ad8fb1724bafaec019c4fbedff8" }
 dependencies = [
     { name = "aioboto3" },
     { name = "aiohttp" },
@@ -2982,7 +2982,7 @@ wheels = [
 [[package]]
 name = "saber"
 version = "0.2.0"
-source = { git = "https://dev.azure.com/MSECAIModels/Benchmarking/_git/SABER?branch=main#ca13b22dfb8aa2650ae3b483d29b54327d2fec35" }
+source = { git = "https://github.com/microsoft/ACES.git?branch=main#194f02937403f1e1d715b5326a4d9d05bb9b950e" }
 dependencies = [
     { name = "aiohttp" },
     { name = "anthropic" },
