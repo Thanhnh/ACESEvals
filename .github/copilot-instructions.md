@@ -3,9 +3,9 @@
 
 > **Naming:** The external name for this project is **ACES** (Agent Capability Evaluation Suite). **SABER** (Security Agent Benchmarking and Evaluation Research) is the internal Microsoft codename. The Python package, CLI commands, and code all use the name `saber`. Both names refer to the same system.
 >
-> **Dual repositories:**
-> - **GitHub (external):** [ACESEvals](https://github.com/microsoft/ACESEvals) + [ACES](https://github.com/microsoft/ACES)
-> - **Azure DevOps (internal):** [oss_saber](https://dev.azure.com/MSECAIModels/Benchmarking/_git/oss_saber) + [SABER](https://dev.azure.com/MSECAIModels/Benchmarking/_git/SABER)
+> **Repositories (GitHub is the permanent home):**
+> - **GitHub (permanent home):** [ACESEvals](https://github.com/microsoft/ACESEvals) (benchmarks) + [ACES](https://github.com/microsoft/ACES) (library)
+> - **Azure DevOps (deprecated — read-only after 2026-09-30):** [oss_saber](https://dev.azure.com/MSECAIModels/Benchmarking/_git/oss_saber) + [SABER](https://dev.azure.com/MSECAIModels/Benchmarking/_git/SABER). Being retired; do new work on GitHub.
 
 **SABER** is a distributed system for benchmarking agentic workflows in cybersecurity domains using **inspect_ai** integration with **Model Context Protocol (MCP)**.
 
@@ -69,6 +69,22 @@ using `branch = "main"`, but `uv.lock` pins the **exact commit hash**. This mean
 - **If evals produce unexpected errors** (missing features, broken scoring), the first
   thing to check is whether `uv.lock` is pointing at a stale saber commit.
 - Use `uv pip show saber` to see the currently installed commit hash.
+
+> **`inspect-ai` is a REQUIRED fork — do not replace with upstream.** `pyproject.toml`
+> pins `inspect-ai` to the GitHub `ACESEvals` branch `inspect-ai/dev/aces_integration`.
+> This fork powers the agent harnesses (`-T agent=copilot`, `-T agent=claude_code`) and
+> tool_call limits, which are **not** in upstream inspect_ai. Switching to upstream breaks
+> the harness / agent-architecture evals (see `notebooks/*agent_architecture_analysis.ipynb`).
+> This branch must keep being maintained on GitHub; it is not retired by the ADO deprecation.
+
+> **Agent harnesses run their CLIs inside the sandbox, not on the host.** `-T agent=copilot`
+> and `-T agent=claude_code` use inspect_ai's `sandbox_agent_bridge()` to run the GitHub
+> Copilot / Claude Code CLIs **inside the Docker sandbox** — the base `saber/sandbox` image
+> ships Node 22 + the `claude` CLI + the Copilot SDK — with model calls proxied back to
+> inspect_ai's `--model` (BYOK). The **host** only needs the Python SDKs (`uv sync
+> --all-extras` installs `github-copilot-sdk` + `claude-code-sdk`); host-side Node is **not**
+> required. If a harness fails with a missing `claude`/`copilot` runtime, rebuild the sandbox
+> image rather than installing anything on the host.
 
 ## Code Quality
 
@@ -141,6 +157,13 @@ uv run inspect eval domains/excytin_demo --model openai/gpt-4 -T rebuild_all=tru
 # Concurrency control
 uv run inspect eval domains/excytin_demo --model openai/gpt-4 --max-samples 4 --max-connections 20
 ```
+
+> **Reasoning models — always set `--reasoning-effort`.** gpt-5.x / o1 / o3 / Claude Opus
+> do **no reasoning by default** here (`reasoning_effort` unset ⇒ 0 reasoning tokens ⇒
+> lower scores). Pass it explicitly, e.g. `--reasoning-effort high`. Verified: excytin
+> gpt-5.4 `latest_test_set` scored 0.813 (unset) vs 0.886 (high) — a +0.073 swing driven
+> entirely by reasoning. Always fix reasoning effort before comparing runs, and suspect it
+> first if scores drift.
 
 ## Key Task Parameters (-T flags)
 

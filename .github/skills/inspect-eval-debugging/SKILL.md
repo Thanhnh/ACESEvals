@@ -145,6 +145,7 @@ for f in sorted(os.listdir(log_dir)):
 - **gpt-5.2 trailing `}`**: Sporadically appends `}` to bash commands in tool call arguments. This is model-generated garbage — it appears in the raw API response from the OpenAI SDK, before any inspect_ai processing. Frequency varies: 0-26% of tool calls per run.
 - **gpt-5 series uses Responses API**: `openai.responses.create()` instead of `client.chat.completions.create()`. The code path in inspect_ai is completely different — see §5.
 - **Reasoning tokens**: Models like o1/o3 and gpt-5 produce reasoning tokens that don't appear in visible content but consume output token budget.
+- **Unset `reasoning_effort` silently disables reasoning** (check this FIRST for score drops): if the same model/dataset scores differently between runs, compare `model_generate_config.reasoning_effort` and `stats.model_usage.*.reasoning_tokens` in each `.eval` header. Unset ⇒ 0 reasoning tokens ⇒ lower scores. Verified: excytin `gpt-5.4` `latest_test_set` scored **0.813** (unset) vs **0.886** (`--reasoning-effort high`), a **+0.073** swing — larger than most scoring/judge changes. Rule this out before blaming data, scoring, or judge-prompt changes.
 
 ## 5. Debug inspect_ai Code Path Issues
 

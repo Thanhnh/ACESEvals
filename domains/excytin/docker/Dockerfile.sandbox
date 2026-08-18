@@ -1,6 +1,8 @@
 # SABER Sandbox for Excytin Demo Domain
 # Extends the minimal SABER sandbox base with MySQL client for database testing
-FROM saber/sandbox:latest
+# saber passes the selected base variant (react-only vs agent-CLI image).
+ARG SABER_BASE_IMAGE=saber/sandbox:latest
+FROM ${SABER_BASE_IMAGE}
 
 # Switch to root to install packages
 USER root
@@ -11,10 +13,19 @@ RUN apt-get update && \
         default-mysql-client \
         && rm -rf /var/lib/apt/lists/*
 
-# Install Python packages needed for MySQL connectivity
-RUN pip install --no-cache-dir \
-    pymysql \
-    sqlalchemy
+# Install Python packages needed for MySQL connectivity.
+# Installs from PyPI so builds always pick up the latest versions. Where container
+# egress to files.pythonhosted.org (PyPI's CDN) is blocked, run
+# docker/fetch_wheels.sh on the host first and the build falls back to those
+# wheels (not committed - they go stale and bloat the repo).
+# saber builds domain images with the domain root as context, so this path
+# is relative to the domain directory, not to docker/.
+COPY docker/wheels/ /tmp/wheels/
+RUN PKGS='pymysql sqlalchemy'; \
+    uv pip install --system --no-cache $PKGS \
+    || { echo "PyPI unreachable - falling back to docker/wheels/ (populate it on a host with PyPI access via docker/fetch_wheels.sh)"; \
+         uv pip install --system --no-cache --no-index --find-links=/tmp/wheels $PKGS; } \
+    && rm -rf /tmp/wheels
 
 # Domain-specific environment variables
 ENV MYSQL_HOST=saber-excytin-incident-5

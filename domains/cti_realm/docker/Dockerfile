@@ -1,6 +1,8 @@
 # CTI Realm base environment
 # Extends base SABER sandbox with CTI analysis tools (no domain data COPYs)
-FROM saber/sandbox:latest
+# saber passes the selected base variant (react-only vs agent-CLI image).
+ARG SABER_BASE_IMAGE=saber/sandbox:latest
+FROM ${SABER_BASE_IMAGE}
 
 # Switch to root to install domain-specific packages
 USER root
