@@ -2,6 +2,20 @@
 
 > **Naming:** The external name for this project is **ACES** (Agent Capability Evaluation Suite). **SABER** (Security Agent Benchmarking and Evaluation Research) is the internal Microsoft codename. Both names refer to the same system. You may see "SABER" in code, package names (`saber`), CLI commands (`uv run saber build`), and logs — this is expected.
 
+<!-- ADO-ONLY:START — strip this banner when syncing to GitHub (ACESEvals is the permanent home, not deprecated) -->
+> ## ⚠️ Repository migration — this Azure DevOps repo is being retired
+>
+> **`oss_saber` (Azure DevOps) and its library `SABER` are being discontinued.** Development is
+> moving to GitHub, which is now the **permanent home**:
+>
+> - Benchmarks: **[github.com/microsoft/ACESEvals](https://github.com/microsoft/ACESEvals)** — replaces `oss_saber`
+> - Library: **[github.com/microsoft/ACES](https://github.com/microsoft/ACES)** — replaces `SABER`
+>
+> **Please migrate your clones and remotes to GitHub by September 30, 2026.** After that date the
+> Azure DevOps `oss_saber` and `SABER` repos will be frozen (read-only) and then removed. All new
+> work, issues, and pull requests should go to the GitHub repos.
+<!-- ADO-ONLY:END -->
+
 A thin Python library for benchmarking AI security agents using YAML-driven task definitions and the [inspect_ai](https://inspect.ai-safety-institute.org.uk/) evaluation framework. No server, no client — just `inspect eval`.
 
 ## Architecture
@@ -42,35 +56,18 @@ SABER loads YAML task definitions, renders Jinja2 prompts, and produces native i
 
 ---
 
-## Dual Repository Setup
+## Repositories
 
-This project is maintained in two repositories. Use whichever you have access to — the content is the same:
+GitHub is the **permanent home** for this project. The Azure DevOps mirrors are deprecated and
+will be frozen (read-only) after **September 30, 2026**.
 
-| | GitHub (external) | Azure DevOps (Microsoft internal) |
+| | GitHub (permanent home) | Azure DevOps (deprecated) |
 |---|---|---|
-| **Benchmarks** (this repo) | [ACESEvals](https://github.com/microsoft/ACESEvals) | [oss_saber](https://dev.azure.com/MSECAIModels/Benchmarking/_git/oss_saber) |
-| **Library** (saber package) | [ACES](https://github.com/microsoft/ACES) | [SABER](https://dev.azure.com/MSECAIModels/Benchmarking/_git/SABER) |
+| **Benchmarks** (this repo) | [ACESEvals](https://github.com/microsoft/ACESEvals) | [oss_saber](https://dev.azure.com/MSECAIModels/Benchmarking/_git/oss_saber) *(retiring)* |
+| **Library** (saber package) | [ACES](https://github.com/microsoft/ACES) | [SABER](https://dev.azure.com/MSECAIModels/Benchmarking/_git/SABER) *(retiring)* |
 
-The `pyproject.toml` has labeled source blocks for each — uncomment the matching block for your repo. The GitHub sources are active by default.
-
-> **⚠️ Azure DevOps (Microsoft internal) users — required setup step:**
->
-> The `pyproject.toml` defaults to **GitHub** sources for `saber` and `inspect-ai`. If you cloned from Azure DevOps (`oss_saber`), you **must** switch to the ADO sources before running `uv sync`:
->
-> 1. Open `pyproject.toml` and find the `[tool.uv.sources]` section
-> 2. **For `saber`:** Comment the GitHub line, uncomment the ADO line:
->    ```toml
->    # saber = { git = "https://github.com/microsoft/ACES.git", branch = "main" }
->    saber = { git = "https://MSECAIModels@dev.azure.com/MSECAIModels/Benchmarking/_git/SABER", branch = "main" }
->    ```
-> 3. **For `inspect-ai`:** Comment the GitHub line, uncomment the ADO line:
->    ```toml
->    # inspect-ai = { git = "https://github.com/microsoft/ACESEvals.git", branch = "inspect-ai/dev/aces_integration" }
->    inspect-ai = { git = "https://MSECAIModels@dev.azure.com/MSECAIModels/Benchmarking/_git/inspect_ai", branch = "dev/aces_integration" }
->    ```
-> 4. Run `uv sync --all-extras`
->
-> **Without this step, `uv sync` will fail** because GitHub sources may not be accessible from internal networks.
+`saber` and `inspect-ai` are installed from the GitHub repos — see `[tool.uv.sources]` in
+`pyproject.toml`. No per-repository source switching is required.
 
 ---
 
@@ -83,24 +80,34 @@ The `pyproject.toml` has labeled source blocks for each — uncomment the matchi
 - **uv** package manager
 - **Azure OpenAI** or compatible LLM endpoint
 
+> **Sandbox images.** SABER builds two and picks between them automatically from
+> `-T agent=`, so there is nothing to configure:
+>
+> 1. **Default (`react`)** → `saber/sandbox:latest` (~320MB): Python only. Builds even
+>    where corporate policy blocks container access to `registry.npmjs.org`.
+> 2. **`-T agent=copilot` / `-T agent=claude_code`** → `saber/sandbox:agents` (~2.9GB):
+>    adds Node and the agent CLIs. Domain images are rebuilt automatically when the
+>    selected agent needs a different variant.
+> 3. **Restricted networks** → if container builds cannot reach npm/PyPI, vendor the
+>    artifacts from a host that can and rebuild; the build falls back to them:
+>    ```bash
+>    # only needed for mode 2 - script ships with the installed saber package
+>    "$(uv run python -c 'import saber,pathlib;print(pathlib.Path(saber.__file__).parent/"environments/_dockerfiles")')/fetch_npm.sh"
+>    domains/<domain>/docker/fetch_wheels.sh   # if PyPI's CDN is blocked too
+>    ```
+
 ### Installation
 
 ```bash
 # Clone the repository
-# GitHub (external):
 git clone https://github.com/microsoft/ACESEvals.git
 cd ACESEvals
-
-# Azure DevOps (Microsoft internal):
-# git clone https://dev.azure.com/MSECAIModels/Benchmarking/_git/oss_saber
-# cd oss_saber
 
 # Install uv (if not already installed)
 curl -LsSf https://astral.sh/uv/install.sh | sh
 source $HOME/.local/bin/env
 
-# Install all dependencies
-# (saber library is fetched from GitHub by default; see pyproject.toml to switch to ADO)
+# Install all dependencies (saber + inspect-ai are fetched from GitHub; see pyproject.toml)
 uv sync --all-extras
 
 # Configure LLM credentials
@@ -132,6 +139,16 @@ uv run inspect eval domains/excytin --model openai/azure/gpt-4.1 \
 uv run inspect eval domains/excytin --model openai/azure/gpt-4.1 \
   -T agent=copilot
 ```
+
+> **Reasoning models — pass `--reasoning-effort` explicitly.** Reasoning models (gpt-5.x,
+> o1/o3, Claude Opus) do **no reasoning by default** here — `reasoning_effort` unset means
+> 0 reasoning tokens and materially lower scores. For example, excytin `gpt-5.4` on
+> `latest_test_set` scored **0.813** with reasoning unset vs **0.886** with
+> `--reasoning-effort high` (+0.073). Always set it for reproducible, apples-to-apples runs:
+>
+> ```bash
+> uv run inspect eval domains/excytin --model openai/azure/gpt-5.4 --reasoning-effort high
+> ```
 
 ---
 
@@ -617,7 +634,7 @@ If you're using GitHub Copilot in VS Code, the repo includes an **analysis agent
 
 ### Developing Against a Local SABER/ACES Checkout
 
-By default, the `saber` library is installed from a git repository (GitHub for ACESEvals, ADO for oss_saber). If you need to iterate on the library code locally, switch to an editable local install using the git submodule:
+By default, the `saber` library is installed from the GitHub [ACES](https://github.com/microsoft/ACES) repository. If you need to iterate on the library code locally, switch to an editable local install using the git submodule:
 
 ```bash
 # 1. Initialize the saber submodule (one-time)
@@ -644,12 +661,6 @@ uv sync --all-extras
 To switch **back** to the git-installed version, reverse step 3 (uncomment the git line, comment the path line) and re-run `uv sync --all-extras`.
 
 > **Tip:** Run `git submodule status external/saber` to verify your submodule points at the expected commit. If it shows a `-` prefix, the submodule is not initialized — run `git submodule update --init external/saber`.
-
-> **ADO users:** The `.gitmodules` file points to the GitHub URL by default. If you're working from the oss_saber ADO repo and don't have GitHub access, override the submodule URL locally (this does not modify tracked files):
-> ```bash
-> git config submodule.external/saber.url https://MSECAIModels@dev.azure.com/MSECAIModels/Benchmarking/_git/SABER
-> git submodule update --init external/saber
-> ```
 
 ### Running Tests
 

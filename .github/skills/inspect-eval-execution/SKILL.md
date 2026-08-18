@@ -111,6 +111,25 @@ uv run inspect eval domains/<domain> --model <model> --display plain --max-conne
 uv run inspect eval domains/<domain> --model <model> --display plain --limit 1 --max-samples 1
 ```
 
+## 5b. Reasoning models — set `--reasoning-effort` explicitly (IMPORTANT)
+
+Reasoning models (gpt-5.x, o1/o3, Claude Opus) do **NO reasoning by default** in these
+runs: `reasoning_effort` is unset, the model emits **0 reasoning tokens**, and scores land
+noticeably lower. Always pass it explicitly — especially for cross-run / cross-model
+comparisons:
+
+```bash
+uv run inspect eval domains/<domain> --model <model> --reasoning-effort high --display plain
+```
+
+Verified impact (excytin, `gpt-5.4`, `latest_test_set`, 599 samples): `reasoning=high`
+scored **0.886** vs **0.813** with reasoning unset — a **+0.073** aggregate swing, entirely
+from reasoning, with the largest lift on intermediate checkpoints (the multi-step
+investigation). The effort used is recorded in the eval-log header
+(`model_generate_config.reasoning_effort`); `stats.model_usage.*.reasoning_tokens == 0`
+means no reasoning happened. `--max-tokens` must be large enough to cover reasoning +
+answer or completions get truncated.
+
 ## 6. Enable Verbose Logging
 
 ```bash

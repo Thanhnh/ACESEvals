@@ -2,7 +2,9 @@
 # Extends base SABER sandbox with Kusto client and CTI analysis tools
 #
 # NOTE: Referenced by eval.yaml as docker/Dockerfile.sandbox
-FROM saber/sandbox:latest
+# saber passes the selected base variant (react-only vs agent-CLI image).
+ARG SABER_BASE_IMAGE=saber/sandbox:latest
+FROM ${SABER_BASE_IMAGE}
 
 # Switch to root to install domain-specific packages
 USER root
@@ -18,17 +20,20 @@ RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 # ---------------------------------------------------------------------------
 # CTI-specific Python packages
 #   (requests already in base image)
+#
+# Installs from PyPI so builds always pick up the latest versions. Where container
+# egress to files.pythonhosted.org (PyPI's CDN) is blocked, run
+# docker/fetch_wheels.sh on the host first and the build falls back to those
+# wheels (not committed - they go stale and bloat the repo).
 # ---------------------------------------------------------------------------
-RUN uv pip install --system --no-cache \
-    azure-kusto-data \
-    azure-kusto-ingest \
-    azure-identity \
-    pysigma \
-    httpx \
-    pyyaml \
-    jsonschema \
-    pandas \
-    stix2
+# saber builds domain images with the domain root as context, so this path
+# is relative to the domain directory, not to docker/.
+COPY docker/wheels/ /tmp/wheels/
+RUN PKGS='azure-kusto-data azure-kusto-ingest azure-identity pysigma httpx pyyaml jsonschema pandas stix2'; \
+    uv pip install --system --no-cache $PKGS \
+    || { echo "PyPI unreachable - falling back to docker/wheels/ (populate it on a host with PyPI access via docker/fetch_wheels.sh)"; \
+         uv pip install --system --no-cache --no-index --find-links=/tmp/wheels $PKGS; } \
+    && rm -rf /tmp/wheels
 
 # ---------------------------------------------------------------------------
 # Data directories (populated at build time)

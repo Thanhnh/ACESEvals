@@ -82,6 +82,13 @@ wheels/
 *.egg
 MANIFEST
 
+# Exception: keep the sandbox wheels/ directories (so `COPY wheels/` resolves)
+# but not the wheels themselves — those are fetched on demand via each domain's
+# docker/fetch_wheels.sh when the container cannot reach PyPI's CDN.
+!domains/*/docker/wheels/
+!domains/*/docker/wheels/.gitkeep
+domains/*/docker/wheels/*.whl
+
 # -------------------------------------------------------------------------
 # Testing & Coverage
 # -------------------------------------------------------------------------
@@ -239,3 +246,4 @@ nohup.out
 
 # Generated insane-mode SQL files (derived from original SQL files by setup hook)
 domains/excytin/data/sql_files/*_insane.sql
+notebooks/private_notebooks/*

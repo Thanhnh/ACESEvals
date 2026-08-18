@@ -56,13 +56,8 @@ An ACES domain is a self-contained security evaluation environment consisting of
 
 ```bash
 # Clone the repository
-# GitHub (external):
 git clone https://github.com/microsoft/ACESEvals.git
 cd ACESEvals
-
-# Azure DevOps (Microsoft internal):
-# git clone https://dev.azure.com/MSECAIModels/Benchmarking/_git/oss_saber
-# cd oss_saber
 
 # Install dependencies
 uv sync --all-extras

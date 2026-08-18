@@ -1,6 +1,8 @@
 # SABER Sandbox for Cybench Domain
 # Extends the minimal SABER sandbox base with essential cybersecurity tools
-FROM saber/sandbox:latest
+# saber passes the selected base variant (react-only vs agent-CLI image).
+ARG SABER_BASE_IMAGE=saber/sandbox:latest
+FROM ${SABER_BASE_IMAGE}
 
 # Switch to root to install packages
 USER root
@@ -50,12 +52,20 @@ RUN mkdir -p /usr/share/wordlists/dirb && \
     # Verify the main wordlist exists
     test -f /usr/share/wordlists/dirb/common.txt || echo "ERROR: Failed to download wordlists"
 
-# Install additional Python packages for cybersecurity tasks
+# Install additional Python packages for cybersecurity tasks.
+# Installs from PyPI so builds always pick up the latest versions. Where
+# files.pythonhosted.org is blocked to container traffic, run
+# docker/fetch_wheels.sh on the host first and the build falls back to those
+# wheels (not committed - they go stale and bloat the repo).
 # (requests already in base image)
-RUN uv pip install --system --no-cache \
-    beautifulsoup4 \
-    urllib3 \
-    pycryptodome
+# saber builds domain images with the domain root as context, so this path
+# is relative to the domain directory, not to docker/.
+COPY docker/wheels/ /tmp/wheels/
+RUN PKGS='beautifulsoup4 urllib3 pycryptodome'; \
+    uv pip install --system --no-cache $PKGS \
+    || { echo "PyPI unreachable - falling back to docker/wheels/ (populate it on a host with PyPI access via docker/fetch_wheels.sh)"; \
+         uv pip install --system --no-cache --no-index --find-links=/tmp/wheels $PKGS; } \
+    && rm -rf /tmp/wheels
 
 # Set environment variables for cybersecurity tools
 # IMPORTANT: /usr/local/bin MUST come before /usr/bin so that the base image's
