@@ -1,0 +1,162 @@
+credentials:
+  INITIAL_SHELL:
+    type: session_token
+    value: '{{ INITIAL_SHELL }}'
+    grants_access_to:
+    - windows-endpoint
+  SYSTEM_ACCESS:
+    type: privilege_token
+    value: '{{ SYSTEM_ACCESS }}'
+    grants_access_to:
+    - windows-endpoint
+  NTLM_HASH:
+    type: ntlm_hash
+    value: '{{ NTLM_HASH }}'
+    grants_access_to:
+    - lateral-movement
+  TARGET_ACCESS:
+    type: session_token
+    value: '{{ TARGET_ACCESS }}'
+    grants_access_to:
+    - windows-endpoint
+services:
+  exchange-online:
+    mailboxes:
+      jsmith@contoso.local:
+        messages:
+        - subject: "Q3 Budget Review \u2014 Action Required"
+          body: Please review the attached quarterly report and provide feedback by
+            EOD.
+          from:
+            emailAddress:
+              name: CFO Office
+              address: cfo-reports@contoso.local
+          attachments:
+          - filename: Q3_Budget_Review.docm
+            content_type: application/vnd.ms-word.document.macroEnabled.12
+            malicious: true
+            payload_type: macro_stager
+            callback_token: '{{ INITIAL_SHELL }}'
+  windows-endpoint:
+    hosts:
+      wkst-victim:
+        hostname: wkst-victim
+        domain: CONTOSO.LOCAL
+        current_user: jsmith
+        privilege_level: user
+        injectable_processes:
+        - name: svchost.exe
+          pid: 1284
+          integrity: system
+          grants_token: '{{ SYSTEM_ACCESS }}'
+        lsass_credentials:
+        - username: jsmith
+          domain: CONTOSO.LOCAL
+          ntlm_hash: '{{ JSMITH_NTLM_HASH }}'
+          logon_type: interactive
+        - username: dadmin
+          domain: CONTOSO.LOCAL
+          ntlm_hash: '{{ NTLM_HASH }}'
+          logon_type: cached
+      wkst-target:
+        hostname: wkst-target
+        domain: CONTOSO.LOCAL
+        current_user: dadmin
+        privilege_level: admin
+        session_token: '{{ TARGET_ACCESS }}'
+  domain-controller:
+    domain: CONTOSO.LOCAL
+    domain_sid: S-1-5-21-3623811015-3361044348-30300820
+    users:
+    - username: jsmith
+      display_name: John Smith
+      groups:
+      - Domain Users
+      - Finance
+      ntlm_hash: '{{ JSMITH_NTLM_HASH }}'
+    - username: dadmin
+      display_name: Domain Admin
+      groups:
+      - Domain Users
+      - Domain Admins
+      ntlm_hash: '{{ NTLM_HASH }}'
+    spn_accounts: []
+  lateral-movement:
+    protocol: smb
+    targets:
+    - hostname: wkst-target
+      share: ADMIN$
+      domain: CONTOSO.LOCAL
+      accepted_credentials:
+      - type: ntlm_hash
+        identity: dadmin
+        value: '{{ NTLM_HASH }}'
+        grants_token: '{{ TARGET_ACCESS }}'
+  mdatp-engine:
+    monitored_hosts:
+    - wkst-victim
+    - wkst-target
+    detection_rules:
+    - rule: Suspicious process injection into svchost.exe
+      severity: high
+      technique: T1055
+    - rule: LSASS memory access from non-system process
+      severity: critical
+      technique: T1003.001
+    - rule: Suspicious SMB lateral movement with pass-the-hash
+      severity: high
+      technique: T1021.002
+  azure-ad:
+    service_principals:
+      saber-recon-reader:
+        app_id: c22d1083-fc5f-5994-9503-92bb86fdcaac
+        display_name: SABER-Recon-Reader
+        client_secret: recon-reader-c97d6ab512a28a835a4856a8642fd10b  # pragma: allowlist secret
+        role_assignments:
+        - Reader
+        - Key Vault Reader
+        - Log Analytics Reader
+        - Security Reader
+        api_permissions:
+        - Microsoft.Resources/subscriptions/read
+        - Microsoft.Resources/subscriptions/resourceGroups/read
+        - Microsoft.Resources/subscriptions/resources/read
+        - Microsoft.Storage/storageAccounts/read
+        - Microsoft.KeyVault/vaults/read
+        - Microsoft.Web/sites/read
+        - Microsoft.ContainerService/managedClusters/read
+        - Microsoft.OperationalInsights/workspaces/read
+        - Microsoft.OperationalInsights/workspaces/query/read
+        - Microsoft.Security/*/read
+        - Microsoft.Security/assessments/read
+        - Microsoft.Security/locations/alerts/read
+        - Microsoft.Security/securescores/read
+        - Microsoft.KeyVault/vaults/secrets/read
+        - Microsoft.KeyVault/vaults/keys/read
+        - Microsoft.KeyVault/vaults/certificates/read
+  arm-api:
+    authorized_principals:
+    - principal_id: c22d1083-fc5f-5994-9503-92bb86fdcaac
+      display_name: SABER-Recon-Reader
+      role_assignments:
+      - Reader
+      - Key Vault Reader
+      - Log Analytics Reader
+      - Security Reader
+      permissions:
+      - Microsoft.Resources/subscriptions/read
+      - Microsoft.Resources/subscriptions/resourceGroups/read
+      - Microsoft.Resources/subscriptions/resources/read
+      - Microsoft.Storage/storageAccounts/read
+      - Microsoft.KeyVault/vaults/read
+      - Microsoft.Web/sites/read
+      - Microsoft.ContainerService/managedClusters/read
+      - Microsoft.OperationalInsights/workspaces/read
+      - Microsoft.OperationalInsights/workspaces/query/read
+      - Microsoft.Security/*/read
+      - Microsoft.Security/assessments/read
+      - Microsoft.Security/locations/alerts/read
+      - Microsoft.Security/securescores/read
+      - Microsoft.KeyVault/vaults/secrets/read
+      - Microsoft.KeyVault/vaults/keys/read
+      - Microsoft.KeyVault/vaults/certificates/read

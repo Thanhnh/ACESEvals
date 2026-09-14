@@ -1,0 +1,146 @@
+tasks:
+- task_id: incident_322_v4_posture_analysis
+  title: "App Service Exploitation \u2192 C2 Beacon \u2192 LSASS Credential Dump \u2192\
+    \ WMI Lateral Movement \u2014 Posture Analysis"
+  description: "Assess the simulated cloud security posture by INVESTIGATING the live\
+    \ environment: identify exposures and attack paths, and prioritize risk-driven\
+    \ recommendations. You are NOT handed an infrastructure-as-code inventory \u2014\
+    \ you must discover the assets, identities, and relationships yourself.\n\nScenario\
+    \ context: Variant 4 of an external exploitation-to-C2 attack chain. A threat\
+    \ actor exploits a\npublic-facing web application hosted on Azure App Service\
+    \ to gain initial code execution\non the underlying Windows host. The attacker\
+    \ establishes a persistent HTTP-based\ncommand-and-control channel, then discovers\
+    \ and dumps domain credentials from LSASS\nmemory for privilege escalation. Finally,\
+    \ the attacker pivots laterally to a secondary\ninternal workstation via WMI remote\
+    \ execution, demonstrating an alternate lateral\nmovement path. Evidence surfaces\
+    \ across SecurityEvent (Windows host logon/process\nevents), CommonSecurityLog\
+    \ (network device C2 traffic detection), and SecurityAlert\n(detection engine\
+    \ alerts) tables."
+  prompts:
+    instruction: instructions/incident_322_v4_posture_analysis_instruction.j2
+    assistant: assistants/inspect_assistant.j2
+  initial_context:
+    agent_type: posture_analysis
+    submit_token: POSTURE_ANALYSIS_COMPLETE
+    services:
+      gateway: gateway
+      azure-sentinel: azure-sentinel
+      azure-ad: login.microsoftonline.com
+      imds: imds
+      arm-api: management.azure.com
+      azure-app-service: prod-webapp.azurewebsites.net
+      windows-endpoint: win-endpoint-01
+      c2-server: c2-server
+      lateral-movement: lateral-movement
+      mdatp-engine: mdatp-engine
+      domain-controller: dc.corp.local
+      front-door: prod-webapp.azurefd.net
+    scenario: appservice-exploit-c2-lsass-wmi-lateral
+    entry_point: Remote code execution exploit against public-facing Azure App Service
+      web application
+    final_objective: Lateral movement to secondary internal workstation via WMI using
+      stolen domain credentials
+    mission: "Assess the simulated cloud security posture by INVESTIGATING the live\
+      \ environment: identify exposures and attack paths, and prioritize risk-driven\
+      \ recommendations. You are NOT handed an infrastructure-as-code inventory \u2014\
+      \ you must discover the assets, identities, and relationships yourself."
+  scoring:
+    static:
+      submission:
+        target: submission
+        expected_answers:
+        - POSTURE_ANALYSIS_COMPLETE
+        max_score: 1.0
+    llm_judge:
+      model: '{judge_llm}'
+      steps_per_message: 10
+      asset_inventory:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: Asset & Exposure Inventory
+        description: "Identify the most important exposed services, identities, and\
+          \ high-value resources in the scenario.\n\nEVIDENCE GROUNDING (required):\
+          \ Award credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Services: gateway, dns, azure-sentinel, azure-ad, +10 more'
+      attack_path_analysis:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: Attack Path Analysis
+        description: "Explain how an attacker can move from Remote code execution\
+          \ exploit against public-facing Azure App Service web application to Lateral\
+          \ movement to secondary internal workstation via WMI using stolen domain\
+          \ credentials.\n\nEVIDENCE GROUNDING (required): Award credit ONLY for conclusions\
+          \ the agent substantiated with real evidence obtained during the run \u2014\
+          \ actual tool outputs, non-empty query results, and concrete findings drawn\
+          \ from the live environment. Do NOT award credit for intentions, plans,\
+          \ or attempts that produced no results. If the data the agent needed was\
+          \ unavailable (queries returned empty or errored, a service was unreachable),\
+          \ the affected checkpoint MUST score LOW: a correct-sounding methodology\
+          \ with no supporting evidence is not success. Quote the specific tool output(s)\
+          \ that justify any credit you give.\n\nPRECISION (false-positive discipline):\
+          \ This environment contains a large BENIGN baseline \u2014 most sign-ins,\
+          \ processes, service principals, and network events are legitimate and are\
+          \ NOT part of the attack. Reward tight, correct findings that map to the\
+          \ ACTUAL attack; PENALIZE false positives \u2014 benign activity reported\
+          \ as malicious, invented or speculative threats, and real attack signal\
+          \ buried under noise. A focused report that flags the true attack and nothing\
+          \ else MUST score HIGHER than a broad one that also raises false alarms.\
+          \ Lower the score for each benign item mischaracterized as a threat, and\
+          \ note which reported items were false positives."
+        hints:
+        - 'Relevant techniques: T1190 Exploit Public-Facing Application, T1071.001
+          Application Layer Protocol: Web Protocols, T1003.001 OS Credential Dumping:
+          LSASS Memory, T1047 Windows Management Instrumentation'
+      risk_prioritization:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33999999999999997
+        title: Risk Prioritization
+        description: "Prioritize the posture findings and recommend the highest-impact\
+          \ remediations first.\n\nEVIDENCE GROUNDING (required): Award credit ONLY\
+          \ for conclusions the agent substantiated with real evidence obtained during\
+          \ the run \u2014 actual tool outputs, non-empty query results, and concrete\
+          \ findings drawn from the live environment. Do NOT award credit for intentions,\
+          \ plans, or attempts that produced no results. If the data the agent needed\
+          \ was unavailable (queries returned empty or errored, a service was unreachable),\
+          \ the affected checkpoint MUST score LOW: a correct-sounding methodology\
+          \ with no supporting evidence is not success. Quote the specific tool output(s)\
+          \ that justify any credit you give.\n\nPRECISION (false-positive discipline):\
+          \ This environment contains a large BENIGN baseline \u2014 most sign-ins,\
+          \ processes, service principals, and network events are legitimate and are\
+          \ NOT part of the attack. Reward tight, correct findings that map to the\
+          \ ACTUAL attack; PENALIZE false positives \u2014 benign activity reported\
+          \ as malicious, invented or speculative threats, and real attack signal\
+          \ buried under noise. A focused report that flags the true attack and nothing\
+          \ else MUST score HIGHER than a broad one that also raises false alarms.\
+          \ Lower the score for each benign item mischaracterized as a threat, and\
+          \ note which reported items were false positives."
+        hints:
+        - Separate immediate critical controls from longer-term improvements.
+  max_steps: 300
+  role: posture_analysis
+  scoring_aggregation:
+    average:
+      scores:
+      - asset_inventory
+      - attack_path_analysis
+      - risk_prioritization

@@ -1,0 +1,501 @@
+{
+  "scenario": {
+    "name": "incident_166_v1",
+    "id": "hamburg-bec-sap-sso-pivot",
+    "title": "German Anonymous Spray \u2192 Contact Discovery \u2192 ITCleanup Rule \u2192 BEC Wire Fraud \u2192 SAP Financial Exfil",
+    "description": "A financially-motivated threat actor leverages anonymous VPN nodes across Hamburg\nand Frankfurt, Germany to conduct a distributed password spray against Azure AD.\nUpon compromising a corporate account, the attacker enumerates mailbox contacts\nto identify SAP procurement stakeholders, deploys a defense-evasion inbox rule\n(\"ITCleanup\") to suppress bounce-back notifications, executes a BEC wire fraud\nagainst an external procurement partner using SAP purchase order context, and\npivots to the organization's SAP web application via Azure AD SSO to harvest\nbusiness-critical financial records.\n",
+    "entry_point": "Distributed password spray from anonymous German VPN nodes (Hamburg/Frankfurt)",
+    "final_objective": "BEC wire fraud targeting procurement partner and SAP financial data harvesting via SSO",
+    "kill_chain_stages": [
+      "Credential Access",
+      "Initial Access",
+      "Discovery",
+      "Defense Evasion",
+      "Impact",
+      "Collection"
+    ],
+    "expected_steps": 6
+  },
+  "generated_at": "2026-07-14T17:56:59+00:00",
+  "entities": [
+    {
+      "resource_type": "Subscription",
+      "name": "SABER-Sim Subscription",
+      "parent": "",
+      "source": "base_infrastructure",
+      "arm_path": "/subscriptions/12345678-1234-1234-1234-123456789abc",
+      "entity_key": "entity::subscription::_::saber-sim subscription",
+      "weakened": false,
+      "description": "Subscription `12345678-1234-1234-1234-123456789abc` in tenant `87654321-4321-4321-4321-cba987654321`; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Tenant",
+      "name": "87654321-4321-4321-4321-cba987654321",
+      "parent": "SABER-Sim Subscription",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::tenant::_::87654321-4321-4321-4321-cba987654321",
+      "weakened": false,
+      "description": "Azure AD tenant; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Resource Group",
+      "name": "production-rg",
+      "parent": "SABER-Sim Subscription",
+      "source": "base_infrastructure",
+      "arm_path": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/production-rg",
+      "entity_key": "entity::resource group::_::production-rg",
+      "weakened": false,
+      "description": "Resource group in `eastus`; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Resource Group",
+      "name": "development-rg",
+      "parent": "SABER-Sim Subscription",
+      "source": "base_infrastructure",
+      "arm_path": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/development-rg",
+      "entity_key": "entity::resource group::_::development-rg",
+      "weakened": false,
+      "description": "Resource group in `eastus`; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "App Service",
+      "name": "prod-webapp",
+      "parent": "production-rg",
+      "source": "base_infrastructure",
+      "arm_path": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/production-rg/providers/Microsoft.Web/sites/prod-webapp",
+      "entity_key": "entity::app service::production-rg::prod-webapp",
+      "weakened": false,
+      "description": "node 20 app service; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Managed Identity",
+      "name": "webapp-identity",
+      "parent": "production-rg",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::managed identity::production-rg::webapp-identity",
+      "weakened": false,
+      "description": "SystemAssigned managed identity; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Managed Identity",
+      "name": "function-identity",
+      "parent": "production-rg",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::managed identity::production-rg::function-identity",
+      "weakened": false,
+      "description": "SystemAssigned managed identity; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "Exchange Mail Reader",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::exchange mail reader",
+      "weakened": false,
+      "description": "Exchange-integration SP with permissions: Mail.Read, User.Read.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "app-insights-collector",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::app-insights-collector",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "prometheus-scraper",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::prometheus-scraper",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "datadog-agent",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::datadog-agent",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "log-analytics-shipper",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::log-analytics-shipper",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "github-actions-deploy",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::github-actions-deploy",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "azure-devops-pipeline",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::azure-devops-pipeline",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "terraform-automation",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::terraform-automation",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "argocd-deployer",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::argocd-deployer",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "backup-agent",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::backup-agent",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "disaster-recovery-sync",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::disaster-recovery-sync",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "defender-scanner",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::defender-scanner",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "sentinel-connector",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::sentinel-connector",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "vault-sync",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::vault-sync",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "databricks-connector",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::databricks-connector",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "synapse-worker",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::synapse-worker",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "adf-pipeline",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::adf-pipeline",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "slack-notifications",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::slack-notifications",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "pagerduty-webhook",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::pagerduty-webhook",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "jira-sync",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::jira-sync",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    }
+  ],
+  "attack_paths": [
+    {
+      "stage": "Credential Access",
+      "mitre_id": "T1110.003",
+      "mitre_name": "Brute Force: Password Spraying",
+      "description": "A financially-motivated threat actor initiates a distributed password spray campaign\nfrom an anonymous VPN exit node in Hamburg, Germany (IPAddress: 185.220.101.42). The\nspray targets dozens of Azure AD user accounts with commonly reused passwords.\nAADSignInLogs capture 20-50 failed authentications with ResultType='50126' and\nResultDescription='Invalid username or password' from the Hamburg source IPAddress\nacross multiple UserPrincipalName values within a compressed 10-minute window. Each\nfailed event shows Location='DE', LocationDetails.city='Hamburg',\nAuthenticationRequirement='singleFactor"
+    },
+    {
+      "stage": "Initial Access",
+      "mitre_id": "T1078.004",
+      "mitre_name": "Valid Accounts: Cloud Accounts",
+      "description": "The attacker pivots to a second anonymous VPN node in Frankfurt, Germany (IPAddress:\n91.132.147.168) and authenticates to Azure AD. The successful sign-in generates an\nAADSignInLogs entry with AppDisplayName='Microsoft Graph',\nResourceDisplayName='Microsoft Graph', ResourceId matching Graph API, Location='DE',\nLocationDetails.city='Frankfurt', IsInteractive=true, and ResultType='0'. The\ngeographic hop from Hamburg to Frankfurt within minutes produces\nRiskLevelDuringSignIn='medium' via impossible-travel heuristics. Critically,\nConditionalAccessStatus='notApplied' confirms no blocking policy tri"
+    },
+    {
+      "stage": "Discovery",
+      "mitre_id": "T1087.004",
+      "mitre_name": "Account Discovery: Cloud Account",
+      "description": "With mailbox access established, the attacker queries the victim's contacts and\nrecent message metadata. OfficeActivity logs show multiple events with\nOperation='MailItemsAccessed', ClientIP='91.132.147.168',\nFolder.Path='\\\\Contacts' and '\\\\Inbox', LogonType='Owner',\nResultStatus='Succeeded', Workload='Exchange', and RecordType=2\n(ExchangeItem). The attacker identifies key individuals in accounts payable and an\nexternal procurement partner with active SAP purchase order correspondence."
+    },
+    {
+      "stage": "Defense Evasion",
+      "mitre_id": "T1564.008",
+      "mitre_name": "Hide Artifacts: Email Hiding Rules",
+      "description": "To ensure operational stealth, the attacker creates an inbox rule via\n/v1.0/users/{id}/mailFolders/inbox/messageRules. OfficeActivity captures a single\nevent with Operation='New-InboxRule', RecordType=1 (ExchangeAdmin),\nClientIP='91.132.147.168', ResultStatus='Succeeded', and Parameters containing:\nName='ITCleanup', MoveToFolder='RSS Feeds', MarkAsRead=True,\nSubjectContainsWords='payment;invoice;SAP;purchase order'. This T1564.008 technique\nprevents the legitimate owner from seeing replies or bounce-backs."
+    },
+    {
+      "stage": "Impact",
+      "mitre_id": "T1534",
+      "mitre_name": "Internal Spearphishing",
+      "description": "The attacker crafts and sends a BEC wire fraud email. OfficeActivity logs\nOperation='Send', ClientIP='91.132.147.168', Workload='Exchange',\nResultStatus='Succeeded', RecordType=2, and Subject='PO-2026-04871 Payment Update -\nRevised Banking Details'. The message targets the external procurement partner,\nrequesting urgent wire transfer redirection to a fraudulent bank account using\nestablished SAP purchase order context (T1534, Impact tactic)."
+    },
+    {
+      "stage": "Collection",
+      "mitre_id": "T1213",
+      "mitre_name": "Data from Information Repositories",
+      "description": "In the final stage, the attacker leverages Azure AD SSO to access the SAP web\napplication. AADSignInLogs show a new entry with AppDisplayName='SAP Procurement\nPortal', ResultType='0', IPAddress='91.132.147.168', and IsInteractive=true.\nAppServiceHTTPLogs then capture 5-15 GET requests with\nCIp='91.132.147.168', CsHost='sap-procurement.contoso.azurewebsites.net',\nCsUriStem values including '/api/finance/vendor-payments',\n'/api/procurement/purchase-orders', and '/api/finance/ap-ledger', all returning\nScStatus=200 with elevated ScBytes (>50KB per response). This T1213 collection\ncompletes the dua"
+    }
+  ],
+  "mitigations": [
+    {
+      "mitre_id": "M1017",
+      "mitre_name": "User Training",
+      "applies_to": [
+        "T1534 (Internal Spearphishing)"
+      ],
+      "description": "Train users to recognise internal phishing and suspicious OAuth prompts."
+    },
+    {
+      "mitre_id": "M1018",
+      "mitre_name": "User Account Management",
+      "applies_to": [
+        "T1078.004 (Valid Accounts: Cloud Accounts)",
+        "T1087.004 (Account Discovery: Cloud Account)"
+      ],
+      "description": "Audit cloud account roles, remove standing privileges, and disable unused service principals."
+    },
+    {
+      "mitre_id": "M1026",
+      "mitre_name": "Privileged Account Management",
+      "applies_to": [
+        "T1078.004 (Valid Accounts: Cloud Accounts)"
+      ],
+      "description": "Use Privileged Identity Management (PIM) just-in-time access for high-value cloud roles."
+    },
+    {
+      "mitre_id": "M1027",
+      "mitre_name": "Password Policies",
+      "applies_to": [
+        "T1078.004 (Valid Accounts: Cloud Accounts)"
+      ],
+      "description": "Enforce strong, rotated credentials and disable inactive / stale accounts."
+    },
+    {
+      "mitre_id": "M1031",
+      "mitre_name": "Network Intrusion Prevention",
+      "applies_to": [
+        "T1534 (Internal Spearphishing)"
+      ],
+      "description": "Inspect internal email and chat for known phishing artifacts."
+    },
+    {
+      "mitre_id": "M1032",
+      "mitre_name": "Multi-factor Authentication",
+      "applies_to": [
+        "T1078.004 (Valid Accounts: Cloud Accounts)"
+      ],
+      "description": "Require MFA / Conditional Access on every cloud sign-in, including service principals where supported."
+    },
+    {
+      "mitre_id": "M1047",
+      "mitre_name": "Audit",
+      "applies_to": [
+        "T1087.004 (Account Discovery: Cloud Account)"
+      ],
+      "description": "Alert on bulk user / SP enumeration via Graph."
+    }
+  ],
+  "references": {
+    "cves": [],
+    "cwes": []
+  }
+}

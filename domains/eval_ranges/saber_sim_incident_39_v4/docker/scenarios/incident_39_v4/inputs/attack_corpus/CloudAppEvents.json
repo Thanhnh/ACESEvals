@@ -1,0 +1,23 @@
+[
+  {
+    "TimeGenerated": "",
+    "ActionType": "New-InboxRule",
+    "Application": "Microsoft Exchange Online",
+    "ApplicationId": null,
+    "AccountDisplayName": "j.martinez",
+    "AccountObjectId": "",
+    "AccountType": "",
+    "IPAddress": "",
+    "CountryCode": "",
+    "IsAdminOperation": null,
+    "IsImpersonated": null,
+    "IsExternalUser": null,
+    "ObjectName": "j.martinez",
+    "ObjectType": "",
+    "UserAgent": "",
+    "Type": "",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1564.008"
+  }
+]

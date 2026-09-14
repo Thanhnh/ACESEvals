@@ -1,0 +1,17 @@
+[
+  {
+    "TimeGenerated": "",
+    "OfficeWorkload": "",
+    "Operation": "",
+    "RecordType": "",
+    "UserId": "",
+    "UserType": "",
+    "ClientIP": "",
+    "ResultStatus": "",
+    "OrganizationId": "",
+    "Type": "EmailEvents",
+    "source": "exchange_online",
+    "collectedAt": "2026-07-01T20:18:22.955101Z",
+    "AttackTechnique": "T1566.001"
+  }
+]

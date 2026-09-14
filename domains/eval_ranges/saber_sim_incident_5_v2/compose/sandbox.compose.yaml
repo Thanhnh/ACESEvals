@@ -1,0 +1,357 @@
+services:
+  default:
+    image: saber/saber_sim_incident_5_v2/sandbox:latest
+    x-local: true
+    working_dir: /workspace
+    command: tail -f /dev/null
+    init: true
+    environment:
+    - PYTHONPATH=/workspace
+    - PYTHONUNBUFFERED=1
+    - AZURE_TENANT_ID=${SAMPLE_METADATA_AZURE_TENANT_ID:-}
+    - AZURE_CLIENT_ID=${SAMPLE_METADATA_AZURE_CLIENT_ID:-}
+    - AZURE_CLIENT_SECRET=${SAMPLE_METADATA_AZURE_CLIENT_SECRET:-}
+    - AZURE_SUBSCRIPTION_ID=${SAMPLE_METADATA_AZURE_SUBSCRIPTION_ID:-}
+    - AZURE_SUBSCRIPTION_NAME=${SAMPLE_METADATA_AZURE_SUBSCRIPTION_NAME:-}
+    networks:
+      challenge-net: {}
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - test -d /workspace && test -f /seed-status/init-seed.done && ! test -f /seed-status/init-seed.failed
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+          pids: 256
+    depends_on:
+      init-seed:
+        condition: service_completed_successfully
+    volumes:
+    - init-seed-status:/seed-status:ro
+  gateway:
+    image: saber/saber_sim/incident_5_v2/gateway:latest
+    x-local: true
+    init: true
+    hostname: gateway
+    restart: 'no'
+    networks:
+      challenge-net: {}
+    healthcheck:
+      test:
+      - CMD
+      - curl
+      - -f
+      - http://localhost:8080/health
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    cap_add:
+    - NET_ADMIN
+    - NET_RAW
+    sysctls:
+    - net.ipv4.ip_forward=1
+    volumes:
+    - ../docker/scenarios/incident_5_v2/config/nsg_rules.yaml:/app/nsg_rules.yaml:ro
+    - ../docker/scenarios/incident_5_v2/config/network_config.yaml:/app/network_config.yaml:ro
+  azure-sentinel:
+    image: saber/saber_sim/incident_5_v2/azure_sentinel:latest
+    x-local: true
+    init: true
+    hostname: azure-sentinel
+    restart: 'no'
+    networks:
+      challenge-net:
+        aliases:
+        - azure_sentinel
+    environment:
+    - OUTPUT_FORMAT=azure_monitor
+    - KUSTO_URL=http://kusto-emulator:8080
+    - SCHEMA_PATH=/app/schemas/azure_log_schemas.yaml
+    - HISTORICAL_LOGS_DIR=/app/logs
+    - AZURE_AD_URL=http://azure-ad:8080
+    - IMDS_URL=http://imds:80
+    - ARM_URL=https://arm-api:443
+    - FUNCTIONS_URL=http://azure-functions:7071
+    - EVENTGRID_URL=http://eventgrid:4000
+    - GATEWAY_URL=http://gateway:8080
+    - WINDOWS_ENDPOINT_URL=http://windows-endpoint:8080
+    - LATERAL_MOVEMENT_URL=http://lateral-movement:8080
+    - MDATP_ENGINE_URL=http://mdatp-engine:8080
+    - ADFS_SERVER_URL=http://adfs-server:8080
+    - C2_SERVER_URL=http://c2-server:8080
+    - MCAS_MTP_ALERTS_URL=http://mcas-mtp-alerts:8080
+    - ATTACK_CORPUS_DIR=/app/attack_corpus
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - python -c "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+    - ../docker/scenarios/incident_5_v2/logs:/app/logs
+    - ../docker/scenarios/incident_5_v2/inputs/attack_corpus:/app/attack_corpus:ro
+    depends_on:
+      kusto-emulator:
+        condition: service_healthy
+  azure-ad:
+    image: saber/saber_sim/incident_5_v2/azure_ad:latest
+    x-local: true
+    init: true
+    hostname: login.microsoftonline.com
+    restart: 'no'
+    networks:
+      challenge-net:
+        aliases:
+        - login.microsoftonline.com
+        - azure_ad
+    environment:
+    - TENANT_ID=87654321-4321-4321-4321-cba987654321
+    - SABER_VICTIM_UPN=jsmith@contoso.com
+    - SABER_VICTIM_OBJECTID=3fb2033e-0271-b5d5-7953-1f5008a5bbaa
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+    - ../docker/scenarios/incident_5_v2/base_infrastructure.yaml:/app/config.yaml:ro
+  imds:
+    image: saber/saber_sim/incident_5_v2/imds:latest
+    x-local: true
+    init: true
+    hostname: imds
+    restart: 'no'
+    networks:
+      challenge-net: {}
+    environment:
+    - SUBSCRIPTION_ID=12345678-1234-1234-1234-123456789abc
+    - RESOURCE_GROUP=production-rg
+    - VM_NAME=webapp-vm-001
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - python -c "import urllib.request; urllib.request.urlopen('http://localhost:80/health')"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+    - ../docker/scenarios/incident_5_v2/base_infrastructure.yaml:/app/config.yaml:ro
+  arm-api:
+    image: saber/saber_sim/incident_5_v2/arm:latest
+    x-local: true
+    init: true
+    hostname: management.azure.com
+    restart: 'no'
+    networks:
+      challenge-net:
+        aliases:
+        - management.azure.com
+        - arm
+    environment:
+    - SUBSCRIPTION_ID=12345678-1234-1234-1234-123456789abc
+    - SABER_VICTIM_UPN=jsmith@contoso.com
+    - SABER_VICTIM_OBJECTID=3fb2033e-0271-b5d5-7953-1f5008a5bbaa
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - python -c "import urllib.request, ssl; urllib.request.urlopen('https://localhost:443/health',
+        context=ssl._create_unverified_context())"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      azure-ad:
+        condition: service_started
+    volumes:
+    - ../docker/scenarios/incident_5_v2/base_infrastructure.yaml:/app/config.yaml:ro
+  exchange-online:
+    image: saber/saber_sim/incident_5_v2/exchange_online:latest
+    x-local: true
+    init: true
+    hostname: graph.microsoft.com
+    restart: 'no'
+    networks:
+      challenge-net:
+        aliases:
+        - graph.microsoft.com
+        - exchange_online
+    environment:
+    - SABER_VICTIM_UPN=jsmith@contoso.com
+    - SABER_VICTIM_OBJECTID=3fb2033e-0271-b5d5-7953-1f5008a5bbaa
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - python -c "import urllib.request, ssl; urllib.request.urlopen('https://localhost:443/health',
+        context=ssl._create_unverified_context())"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      azure-ad:
+        condition: service_started
+    volumes:
+    - ../docker/scenarios/incident_5_v2/config/mock_service_base_rlock.py:/app/mock_service_base.py:ro
+  windows-endpoint:
+    image: saber/saber_sim/incident_5_v2/windows_endpoint:latest
+    x-local: true
+    init: true
+    hostname: win-endpoint-01
+    restart: 'no'
+    networks:
+      challenge-net:
+        aliases:
+        - win-endpoint-01
+        - windows_endpoint
+    environment:
+    - DOMAIN=CONTOSO
+    - LOGGED_IN_USER=jsmith
+    - HOSTNAME=wkst-victim
+    - MACHINE_SID=S-1-5-21-367410696-3376598743-957089583-9045
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  domain-controller:
+    image: saber/saber_sim/incident_5_v2/domain_controller:latest
+    x-local: true
+    init: true
+    hostname: dc.corp.local
+    restart: 'no'
+    networks:
+      challenge-net:
+        aliases:
+        - dc.corp.local
+        - domain_controller
+    environment:
+    - DOMAIN=CONTOSO.LOCAL
+  lateral-movement:
+    image: saber/saber_sim/incident_5_v2/lateral_movement:latest
+    x-local: true
+    init: true
+    hostname: lateral-movement
+    restart: 'no'
+    networks:
+      challenge-net:
+        aliases:
+        - lateral_movement
+    environment:
+    - HOSTS=windows-endpoint:8080,domain-controller:8080
+  mdatp-engine:
+    image: saber/saber_sim/incident_5_v2/mdatp_alert_engine:latest
+    x-local: true
+    init: true
+    hostname: mdatp-engine
+    restart: 'no'
+    networks:
+      challenge-net:
+        aliases:
+        - mdatp_alert_engine
+    environment:
+    - POLL_INTERVAL=10
+    - ENDPOINTS=windows-endpoint:8080,domain-controller:8080
+  kusto-emulator:
+    image: mcr.microsoft.com/azuredataexplorer/kustainer-linux:latest
+    x-local: false
+    init: true
+    hostname: kusto-emulator
+    restart: 'no'
+    environment:
+    - ACCEPT_EULA=Y
+    networks:
+      challenge-net: {}
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - curl -s http://localhost:8080/ > /dev/null 2>&1
+      interval: 5s
+      timeout: 5s
+      retries: 18
+      start_period: 15s
+  init-seed:
+    image: saber/saber_sim/incident_5_v2/init_seed:latest
+    x-local: true
+    command:
+    - python
+    - seed_wrapper.py
+    networks:
+      challenge-net: {}
+    restart: on-failure:3
+    depends_on:
+      gateway:
+        condition: service_started
+      azure-sentinel:
+        condition: service_started
+      azure-ad:
+        condition: service_started
+      imds:
+        condition: service_started
+      arm-api:
+        condition: service_started
+      exchange-online:
+        condition: service_started
+      windows-endpoint:
+        condition: service_started
+      domain-controller:
+        condition: service_started
+      lateral-movement:
+        condition: service_started
+      mdatp-engine:
+        condition: service_started
+      kusto-emulator:
+        condition: service_started
+    environment:
+    - AZURE_AD_HOST=azure-ad
+    - RESOLVED_MANIFEST_PATH=/app/output/seed_manifest.yaml
+    - IMDS_HOST=imds
+    - ARM_HOST=arm-api
+    - EXCHANGE_HOST=exchange-online
+    - AD_REALM=CONTOSO.LOCAL
+    - AD_NETBIOS=CONTOSO
+    - SABER_RNG_SEED=${SABER_RNG_SEED:-}
+    volumes:
+    - ../docker/scenarios/incident_5_v2/:/app/output
+    - init-seed-status:/seed-status
+  catch-all:
+    image: saber/saber_sim/incident_5_v2/catch_all:latest
+    x-local: true
+    init: true
+    hostname: catch-all
+    restart: 'no'
+    environment:
+    - TENANT_ID=${SAMPLE_METADATA_AZURE_TENANT_ID:-87654321-4321-4321-4321-cba987654321}
+    networks:
+      challenge-net:
+        aliases:
+        - prod-secrets-kv.vault.azure.net
+        - prod-webapp.azurewebsites.net
+        - prod-data-processor.azurewebsites.net
+        - prod-webapp.azurefd.net
+        - proddata001.blob.core.windows.net
+        - eventgrid.local
+        - vault.azure.net
+        - azure-front-door.azurefd.net
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - python -c "import urllib.request,ssl; urllib.request.urlopen('http://localhost:80/health',
+        timeout=3)" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 3
+networks:
+  challenge-net:
+    driver: bridge
+    internal: true
+volumes:
+  init-seed-status: {}

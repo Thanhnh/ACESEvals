@@ -1,0 +1,16 @@
+domain: saber_sim_incident_38_v3
+global_defaults:
+  prompts:
+    instruction: instructions/saber_sim_instruction.j2
+    assistant: assistants/inspect_assistant.j2
+  max_steps: 500
+  aggregation: max
+  scoring_defaults:
+    llm_judge:
+      judge_system_template: judge/step/saber_sim_evaluation_system.j2
+      judge_user_template: judge/step/saber_sim_evaluation_user.j2
+  tools:
+    bash:
+      timeout: 300
+    python:
+      timeout: 300

@@ -1,0 +1,42 @@
+[
+  {
+    "Timestamp": "2026-06-30T09:15:35.7372146Z",
+    "AccountUpn": "j.martinez@contoso.com",
+    "AccountObjectId": "e98365d5-f279-5317-ac29-0346d4a22b34",
+    "AccountDisplayName": "j.martinez",
+    "IPAddress": "172.30.30.1",
+    "Application": "ROPC Password Grant",
+    "ApplicationId": "11111111-2222-3333-4444-555555555555",
+    "ResourceDisplayName": "ROPC Password Grant",
+    "ErrorCode": 0,
+    "RiskLevelDuringSignIn": "medium",
+    "ConditionalAccessStatus": "notApplied",
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "Country": "US",
+    "ReportId": "bbe8f289-0332-4fd8-8800-2aad8d874962",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1078.004"
+  },
+  {
+    "Timestamp": "2026-06-30T09:15:35.7372146Z",
+    "AccountUpn": "j.martinez@contoso.com",
+    "AccountObjectId": "e98365d5-f279-5317-ac29-0346d4a22b34",
+    "AccountDisplayName": "j.martinez",
+    "IPAddress": "172.30.30.1",
+    "Application": "ROPC Password Grant",
+    "ApplicationId": "11111111-2222-3333-4444-555555555555",
+    "ResourceDisplayName": "ROPC Password Grant",
+    "ErrorCode": 0,
+    "RiskLevelDuringSignIn": "medium",
+    "ConditionalAccessStatus": "notApplied",
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "Country": "US",
+    "ReportId": "bbe8f289-0332-4fd8-8800-2aad8d874962",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1078.004"
+  }
+]

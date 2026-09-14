@@ -1,0 +1,25 @@
+[
+  {
+    "time": "2026-07-01T08:24:18.5312464Z",
+    "resourceId": "/SUBSCRIPTIONS/12345678-1234-1234-1234-123456789ABC/RESOURCEGROUPS/PRODUCTION-RG/PROVIDERS/MICROSOFT.KEYVAULT/VAULTS/PROD-SECRETS-KV",
+    "operationName": "SecretGet",
+    "operationVersion": "7.4",
+    "category": "AuditEvent",
+    "resultType": "Success",
+    "resultSignature": "OK",
+    "resultDescription": "",
+    "durationMs": 65,
+    "callerIpAddress": "172.30.10.1",
+    "correlationId": "a96859aa-b403-4ee3-9dd7-21e70f4c0ab5",
+    "identity": null,
+    "properties": {
+      "clientInfo": "curl/8.14.1",
+      "httpStatusCode": 200,
+      "id": "https://prod-secrets-kv.vault.azure.net/secrets/sp-mail-automation",
+      "isAccessPolicyMatch": true
+    },
+    "source": "keyvault",
+    "collectedAt": "2026-07-01T08:25:08.129537Z",
+    "AttackTechnique": "T1552.004"
+  }
+]

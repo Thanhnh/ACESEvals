@@ -1,0 +1,169 @@
+[
+  {
+    "time": "2026-07-01T03:03:23.383Z",
+    "resourceId": "/SUBSCRIPTIONS/12345678-1234-1234-1234-123456789abc/RESOURCEGROUPS/production-rg/PROVIDERS/MICROSOFT.CDN/PROFILES/prod-frontdoor",
+    "category": "FrontDoorWebApplicationFirewallLog",
+    "operationName": "Microsoft.Network/FrontDoorWebApplicationFirewallLog/Write",
+    "properties": {
+      "action": "Log",
+      "clientIP": "172.30.20.1",
+      "clientPort": "52004",
+      "details": {
+        "matches": [
+          {
+            "matchVariableName": "RequestBody",
+            "matchVariableValue": "__proto__"
+          }
+        ]
+      },
+      "host": "prod-webapp.azurefd.net",
+      "policy": "React2ShellWAFPolicy",
+      "policyMode": "detection",
+      "requestUri": "http://prod-webapp.azurefd.net/_next/rsc",
+      "ruleName": "Prototype Pollution Attempt-CUSTOM-001",
+      "socketIP": "172.30.20.1",
+      "trackingReference": "07781C2A6257E4F129053"
+    },
+    "source": "front_door",
+    "collectedAt": "2026-07-01T03:03:31.548086Z",
+    "AttackTechnique": "T1190"
+  },
+  {
+    "time": "2026-07-01T03:03:23.383Z",
+    "resourceId": "/SUBSCRIPTIONS/12345678-1234-1234-1234-123456789abc/RESOURCEGROUPS/production-rg/PROVIDERS/MICROSOFT.CDN/PROFILES/prod-frontdoor",
+    "category": "FrontDoorWebApplicationFirewallLog",
+    "operationName": "Microsoft.Network/FrontDoorWebApplicationFirewallLog/Write",
+    "properties": {
+      "action": "Log",
+      "clientIP": "172.30.20.1",
+      "clientPort": "52004",
+      "details": {
+        "matches": [
+          {
+            "matchVariableName": "UserAgent",
+            "matchVariableValue": "curl"
+          }
+        ]
+      },
+      "host": "prod-webapp.azurefd.net",
+      "policy": "React2ShellWAFPolicy",
+      "policyMode": "detection",
+      "requestUri": "http://prod-webapp.azurefd.net/_next/rsc",
+      "ruleName": "Suspicious User-Agent - Scripting Tool-920360",
+      "socketIP": "172.30.20.1",
+      "trackingReference": "07781C2A6257E4F129053"
+    },
+    "source": "front_door",
+    "collectedAt": "2026-07-01T03:03:31.548108Z",
+    "AttackTechnique": "T1190"
+  },
+  {
+    "time": "2026-07-01T03:03:23.461Z",
+    "resourceId": "/SUBSCRIPTIONS/12345678-1234-1234-1234-123456789abc/RESOURCEGROUPS/production-rg/PROVIDERS/MICROSOFT.CDN/PROFILES/prod-frontdoor",
+    "category": "FrontDoorWebApplicationFirewallLog",
+    "operationName": "Microsoft.Network/FrontDoorWebApplicationFirewallLog/Write",
+    "properties": {
+      "action": "Log",
+      "clientIP": "172.30.20.1",
+      "clientPort": "52018",
+      "details": {
+        "matches": [
+          {
+            "matchVariableName": "UserAgent",
+            "matchVariableValue": "curl"
+          }
+        ]
+      },
+      "host": "prod-webapp.azurefd.net",
+      "policy": "React2ShellWAFPolicy",
+      "policyMode": "detection",
+      "requestUri": "http://prod-webapp.azurefd.net/web/shell",
+      "ruleName": "Suspicious User-Agent - Scripting Tool-920360",
+      "socketIP": "172.30.20.1",
+      "trackingReference": "042D430522C6A4A108F1F"
+    },
+    "source": "front_door",
+    "collectedAt": "2026-07-01T03:03:31.548123Z",
+    "AttackTechnique": "T1505.003"
+  },
+  {
+    "time": "2026-07-01T03:03:23.391Z",
+    "resourceId": "/SUBSCRIPTIONS/12345678-1234-1234-1234-123456789abc/RESOURCEGROUPS/production-rg/PROVIDERS/MICROSOFT.CDN/PROFILES/prod-frontdoor",
+    "category": "FrontDoorAccessLog",
+    "operationName": "Microsoft.Cdn/Profiles/FrontDoorAccessLog/Write",
+    "properties": {
+      "clientPort": 52004,
+      "requestUri": "http://prod-webapp.azurefd.net/_next/rsc",
+      "trackingReference": "07781C2A6257E4F129053",
+      "cacheStatus": "MISS",
+      "clientIp": "172.30.20.1",
+      "endpoint": "prod-webapp.azurefd.net",
+      "errorInfo": "NoError",
+      "hostName": "prod-webapp.azurefd.net",
+      "httpMethod": "POST",
+      "httpStatusCode": 200,
+      "httpVersion": "HTTP/1.1",
+      "matchedRulesSetName": "",
+      "originIp": "172.30.20.10",
+      "originName": "app-service-origin",
+      "originUrl": "http://172.30.20.10:8080/_next/rsc",
+      "pop": "EUS",
+      "referrer": "",
+      "requestBytes": 50,
+      "requestProtocol": "HTTP",
+      "responseBytes": 646,
+      "result": "",
+      "routeName": "default-route",
+      "securityCipher": null,
+      "securityProtocol": null,
+      "sni": null,
+      "socketIp": "172.30.20.1",
+      "timeTaken": 0.01,
+      "timeToFirstByte": 0.008,
+      "userAgent": "curl/8.14.1"
+    },
+    "source": "front_door",
+    "collectedAt": "2026-07-01T03:03:31.548148Z",
+    "AttackTechnique": "T1190"
+  },
+  {
+    "time": "2026-07-01T03:03:23.465Z",
+    "resourceId": "/SUBSCRIPTIONS/12345678-1234-1234-1234-123456789abc/RESOURCEGROUPS/production-rg/PROVIDERS/MICROSOFT.CDN/PROFILES/prod-frontdoor",
+    "category": "FrontDoorAccessLog",
+    "operationName": "Microsoft.Cdn/Profiles/FrontDoorAccessLog/Write",
+    "properties": {
+      "clientPort": 52018,
+      "requestUri": "http://prod-webapp.azurefd.net/web/shell",
+      "trackingReference": "042D430522C6A4A108F1F",
+      "cacheStatus": "MISS",
+      "clientIp": "172.30.20.1",
+      "endpoint": "prod-webapp.azurefd.net",
+      "errorInfo": "NoError",
+      "hostName": "prod-webapp.azurefd.net",
+      "httpMethod": "POST",
+      "httpStatusCode": 200,
+      "httpVersion": "HTTP/1.1",
+      "matchedRulesSetName": "",
+      "originIp": "172.30.20.10",
+      "originName": "app-service-origin",
+      "originUrl": "http://172.30.20.10:8080/web/shell",
+      "pop": "EUS",
+      "referrer": "",
+      "requestBytes": 85,
+      "requestProtocol": "HTTP",
+      "responseBytes": 88,
+      "result": "",
+      "routeName": "default-route",
+      "securityCipher": null,
+      "securityProtocol": null,
+      "sni": null,
+      "socketIp": "172.30.20.1",
+      "timeTaken": 0.005,
+      "timeToFirstByte": 0.004,
+      "userAgent": "curl/8.14.1"
+    },
+    "source": "front_door",
+    "collectedAt": "2026-07-01T03:03:31.548166Z",
+    "AttackTechnique": "T1505.003"
+  }
+]

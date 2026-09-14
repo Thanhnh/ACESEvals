@@ -1,0 +1,36 @@
+[
+  {
+    "AccountDisplayName": "",
+    "AccountDomain": "CONTOSO",
+    "AccountName": "IIS_APPPOOL",
+    "AccountObjectId": "",
+    "AccountSid": "",
+    "AccountUpn": "",
+    "ActionType": "Replication",
+    "AdditionalFields": {
+      "Operation": "DsGetNcChanges"
+    },
+    "Application": "",
+    "DestinationDeviceName": "",
+    "DestinationIPAddress": "",
+    "DestinationPort": "",
+    "DeviceName": "",
+    "IPAddress": "",
+    "ISP": "",
+    "Location": "",
+    "Port": "",
+    "Protocol": "",
+    "ReportId": "",
+    "SourceSystem": "",
+    "TargetAccountDisplayName": "",
+    "TargetAccountUpn": "Administrator",
+    "TargetDeviceName": "DC.CONTOSO.LOCAL",
+    "TenantId": "",
+    "TimeGenerated": "",
+    "Timestamp": "2026-07-17T19:06:41.885Z",
+    "Type": "IdentityDirectoryEvents",
+    "source": "domain_controller",
+    "collectedAt": "2026-07-17T19:06:47.371946Z",
+    "AttackTechnique": "T1003.006"
+  }
+]

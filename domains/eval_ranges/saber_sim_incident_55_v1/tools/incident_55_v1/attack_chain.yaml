@@ -1,0 +1,56 @@
+attack_chain:
+- step: 1
+  description: Authenticate to domain controller YOURORG-DC01 with compromised credentials
+    (YOURORG\jsmith) via Kerberos AS-REQ
+  service: domain-controller
+  credential_used: none
+  credential_obtained: KERBEROS_TGT
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: "Azure AD cloud IdP rejects on-prem domain password \u2014 requires OAuth\
+      \ client_credentials or device code flow, not Kerberos"
+- step: 2
+  description: Dump LSASS process memory on YOURORG-WKS01 to extract cached DomainAdmin
+    NTLM hash
+  service: windows-endpoint
+  credential_used: KERBEROS_TGT
+  credential_obtained: NTLM_HASH
+  decoy:
+    service: domain-controller
+    expected_result: 403 Forbidden
+    reason: "DCSync replication attempt with jsmith TGT fails \u2014 standard user\
+      \ lacks DS-Replication-Get-Changes extended right"
+- step: 3
+  description: Pass-the-hash via SMB to YOURORG-FS01 C$/ADMIN$ administrative share
+    using DA NTLM hash
+  service: lateral-movement
+  credential_used: NTLM_HASH
+  credential_obtained: none
+  decoy:
+    service: windows-endpoint
+    expected_result: 403 Forbidden
+    reason: "Direct RDP to YOURORG-FS01 with jsmith TGT denied \u2014 standard domain\
+      \ user lacks local admin or Remote Desktop privileges on server"
+- step: 4
+  description: Disable Windows Defender real-time protection on YOURORG-FS01 via Set-MpPreference
+    and sc stop WinDefend
+  service: windows-endpoint
+  credential_used: NTLM_HASH
+  credential_obtained: none
+  decoy:
+    service: mdatp-engine
+    expected_result: 403 Forbidden
+    reason: "Direct MDATP management API suppression attempt fails \u2014 requires\
+      \ SOC portal OAuth token, not endpoint NTLM session"
+- step: 5
+  description: Deploy ransomware encrypting critical business data on YOURORG-FS01
+    with .lockbit extension
+  service: windows-endpoint
+  credential_used: NTLM_HASH
+  credential_obtained: none
+  decoy:
+    service: lateral-movement
+    expected_result: 401 Unauthorized
+    reason: "SMB propagation to DMZ gateway fails \u2014 DomainAdmin NTLM hash not\
+      \ valid for non-domain-joined systems"

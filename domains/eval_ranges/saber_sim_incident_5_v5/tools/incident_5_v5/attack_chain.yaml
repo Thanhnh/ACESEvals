@@ -1,0 +1,59 @@
+attack_chain:
+- step: 1
+  description: Spearphishing email delivers weaponized Office macro document to jsmith
+  service: exchange-online
+  credential_used: none
+  credential_obtained: none
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: Attacker attempted direct Azure AD authentication without valid credentials
+- step: 2
+  description: "VBA macro executes \u2014 WINWORD.EXE spawns rundll32.exe child process\
+    \ on wkst01"
+  service: windows-endpoint
+  credential_used: none
+  credential_obtained: none
+  decoy:
+    service: lateral-movement
+    expected_result: 401 Unauthorized
+    reason: Attacker attempted WMI lateral movement before obtaining domain credentials
+- step: 3
+  description: "Process injection into svchost.exe \u2014 escalate to NT AUTHORITY\\\
+    SYSTEM context"
+  service: windows-endpoint
+  credential_used: none
+  credential_obtained: none
+  decoy:
+    service: domain-controller
+    expected_result: 403 Forbidden
+    reason: User-context jsmith lacks Replicating Directory Changes rights for DCSync
+- step: 4
+  description: "LSASS memory dump \u2014 extract cached domain admin NTLM hash from\
+    \ wkst01"
+  service: windows-endpoint
+  credential_used: none
+  credential_obtained: DOMAIN_ADMIN_NTLM
+  decoy:
+    service: imds
+    expected_result: 404 Not Found
+    reason: IMDS unavailable on domain-joined workstation; no managed identity configured
+- step: 5
+  description: WMI lateral movement from wkst01 to wkst02 using domain admin pass-the-hash
+  service: lateral-movement
+  credential_used: DOMAIN_ADMIN_NTLM
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: ARM API requires Azure AD OAuth token, does not accept NTLM authentication
+- step: 6
+  description: "DCSync replication against dc01 \u2014 extract all Active Directory\
+    \ credential hashes"
+  service: domain-controller
+  credential_used: DOMAIN_ADMIN_NTLM
+  credential_obtained: ALL_NTDS_HASHES
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: Azure AD cloud identity store does not accept on-premises NTLM credentials

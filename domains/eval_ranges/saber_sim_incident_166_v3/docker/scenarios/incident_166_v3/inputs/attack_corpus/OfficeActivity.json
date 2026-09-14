@@ -1,0 +1,32 @@
+[
+  {
+    "TimeGenerated": "",
+    "OfficeWorkload": "",
+    "Operation": "Send",
+    "RecordType": "2",
+    "UserId": "user1",
+    "UserType": "",
+    "ClientIP": "",
+    "ResultStatus": "Succeeded",
+    "OrganizationId": "org-12345678-1234-1234-1234-123456789abc",
+    "Type": "OfficeActivity",
+    "source": "",
+    "collectedAt": "2026-07-01T09:43:12.351030Z",
+    "AttackTechnique": "T1534"
+  },
+  {
+    "TimeGenerated": "",
+    "OfficeWorkload": "",
+    "Operation": "MailItemsAccessed",
+    "RecordType": "2",
+    "UserId": "user1",
+    "UserType": "0",
+    "ClientIP": "172.30.10.1",
+    "ResultStatus": "Succeeded",
+    "OrganizationId": "org-12345678-1234-1234-1234-123456789abc",
+    "Type": "OfficeActivity",
+    "source": "",
+    "collectedAt": "2026-07-01T09:43:12.351043Z",
+    "AttackTechnique": "T1114.002"
+  }
+]

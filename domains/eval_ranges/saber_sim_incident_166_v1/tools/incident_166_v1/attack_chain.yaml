@@ -1,0 +1,61 @@
+attack_chain:
+- step: 1
+  description: "Distributed password spray from Hamburg VPN \u2014 compromise m.schmidt@contoso.com"
+  service: azure-ad
+  credential_used: none
+  credential_obtained: COMPROMISED_PASSWORD
+  decoy:
+    service: exchange-online
+    expected_result: 401 Unauthorized
+    reason: Exchange requires OAuth token via Graph API, not raw password authentication
+- step: 2
+  description: "Authenticate to Azure AD from Frankfurt VPN \u2014 obtain Graph-scoped\
+    \ OAuth token"
+  service: azure-ad
+  credential_used: COMPROMISED_PASSWORD
+  credential_obtained: MAILBOX_OAUTH_TOKEN
+  decoy:
+    service: azure-app-service
+    expected_result: 401 Unauthorized
+    reason: SAP app requires Azure AD SSO token with app-specific audience, not raw
+      credentials
+- step: 3
+  description: Enumerate mailbox contacts for SAP/procurement stakeholders
+  service: exchange-online
+  credential_used: MAILBOX_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: "ARM API requires management.azure.com audience \u2014 Graph-scoped token\
+      \ rejected"
+- step: 4
+  description: Create ITCleanup inbox rule to suppress payment/invoice notifications
+  service: exchange-online
+  credential_used: MAILBOX_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-ad
+    expected_result: 403 Forbidden
+    reason: "Directory modification requires Directory.ReadWrite.All \u2014 user has\
+      \ only Mail scopes"
+- step: 5
+  description: Send BEC wire fraud email to external procurement partner
+  service: exchange-online
+  credential_used: MAILBOX_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: imds
+    expected_result: 403 Forbidden
+    reason: "IMDS only responds to requests from Azure VM/AKS context \u2014 external\
+      \ VPN has no access"
+- step: 6
+  description: "SSO pivot to SAP Procurement Portal \u2014 harvest financial data"
+  service: azure-app-service
+  credential_used: MAILBOX_OAUTH_TOKEN
+  credential_obtained: SAP_APP_TOKEN
+  decoy:
+    service: front-door
+    expected_result: 403 Forbidden
+    reason: Front Door WAF blocks unauthenticated direct access without valid session
+      cookie

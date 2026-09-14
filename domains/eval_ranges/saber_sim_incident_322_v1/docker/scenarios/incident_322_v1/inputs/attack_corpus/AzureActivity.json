@@ -1,0 +1,86 @@
+[
+  {
+    "time": "2026-07-01T20:18:01.645Z",
+    "resourceId": "",
+    "operationName": "Microsoft.Resources/subscriptions/resources/read",
+    "category": "Administrative",
+    "resultType": "Failure",
+    "resultSignature": "",
+    "durationMs": 0,
+    "callerIpAddress": "172.30.30.1",
+    "correlationId": "78b79993-93a8-47c8-b1cb-c60afe5537a5",
+    "level": "",
+    "properties": {
+      "httpMethod": "GET",
+      "statusCode": "Forbidden"
+    },
+    "authorization": null,
+    "claims": null,
+    "source": "",
+    "collectedAt": "2026-07-01T20:18:02.916149Z",
+    "AttackTechnique": "T1580"
+  },
+  {
+    "time": "2026-07-01T20:18:01.905Z",
+    "resourceId": "",
+    "operationName": "Microsoft.Resources/deployments/write",
+    "category": "Administrative",
+    "resultType": "Success",
+    "resultSignature": "",
+    "durationMs": 0,
+    "callerIpAddress": "172.30.30.1",
+    "correlationId": "0cc21014-b287-4718-b818-d0faad292d82",
+    "level": "",
+    "properties": {
+      "httpMethod": "PUT",
+      "statusCode": "OK"
+    },
+    "authorization": null,
+    "claims": null,
+    "source": "",
+    "collectedAt": "2026-07-01T20:18:02.916168Z",
+    "AttackTechnique": "T1496"
+  },
+  {
+    "time": "2026-07-01T20:18:44.783457Z",
+    "resourceId": "/SUBSCRIPTIONS/12345678-1234-1234-1234-123456789ABC",
+    "operationName": "Microsoft.Resources/subscriptions/resources/read",
+    "category": "Administrative",
+    "resultType": "Failure",
+    "resultSignature": "",
+    "durationMs": null,
+    "callerIpAddress": "172.30.30.1",
+    "correlationId": "78b79993-93a8-47c8-b1cb-c60afe5537a5",
+    "level": "Warning",
+    "properties": {
+      "statusCode": "Forbidden",
+      "httpMethod": "GET"
+    },
+    "authorization": null,
+    "claims": null,
+    "source": "arm",
+    "collectedAt": "2026-07-01T20:18:02.916149Z",
+    "AttackTechnique": "T1580"
+  },
+  {
+    "time": "2026-07-01T20:18:45.043457Z",
+    "resourceId": "/SUBSCRIPTIONS/12345678-1234-1234-1234-123456789ABC/RESOURCEGROUPS/PROD-RG/PROVIDERS/MICROSOFT.RESOURCES/DEPLOYMENTS/CRYPTOMINER-DEPLOY",
+    "operationName": "Microsoft.Resources/deployments/write",
+    "category": "Administrative",
+    "resultType": "Success",
+    "resultSignature": "",
+    "durationMs": null,
+    "callerIpAddress": "172.30.30.1",
+    "correlationId": "0cc21014-b287-4718-b818-d0faad292d82",
+    "level": "Informational",
+    "properties": {
+      "statusCode": "OK",
+      "httpMethod": "PUT"
+    },
+    "authorization": null,
+    "claims": null,
+    "source": "arm",
+    "collectedAt": "2026-07-01T20:18:02.916168Z",
+    "AttackTechnique": "T1496"
+  }
+]

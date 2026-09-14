@@ -1,0 +1,173 @@
+credentials:
+  WEBSERVER_SHELL:
+    type: shell_session
+    value: '{{ WEBSERVER_SHELL }}'
+    grants_access_to:
+    - windows-endpoint
+    - domain-controller
+  DA_CREDENTIALS:
+    type: password
+    value: '{{ DA_CREDENTIALS }}'
+    grants_access_to:
+    - domain-controller
+    - lateral-movement
+    - windows-endpoint
+  ENGINEERING_ACCESS:
+    type: shell_session
+    value: '{{ ENGINEERING_ACCESS }}'
+    grants_access_to:
+    - windows-endpoint
+  PERSISTENT_TASK:
+    type: scheduled_task
+    value: '{{ PERSISTENT_TASK }}'
+    grants_access_to:
+    - c2-server
+  C2_CHANNEL:
+    type: c2_channel
+    value: '{{ C2_CHANNEL }}'
+    grants_access_to:
+    - c2-server
+services:
+  front-door:
+    waf_mode: detection
+    backend_host: web-srv-01.engcorp.local
+    backend_port: 443
+    vulnerable_endpoint: /app/search
+    vulnerability: SQL-Injection-xp_cmdshell
+    exploit_result: '{{ WEBSERVER_SHELL }}'
+  windows-endpoint:
+    hosts:
+      web-srv-01:
+        domain: ENGCORP.LOCAL
+        hostname: web-srv-01.engcorp.local
+        service_account: svc_webapp
+        sql_server:
+          process: sqlservr.exe
+          xp_cmdshell: enabled
+        stored_credentials:
+          web_config:
+            path: C:\inetpub\wwwroot\web.config
+            username: administrator@ENGCORP.LOCAL
+            password: '{{ DA_CREDENTIALS }}'
+      eng-ws-04:
+        domain: ENGCORP.LOCAL
+        hostname: eng-ws-04.engcorp.local
+        user: r.nakamura
+        subnet: engineering
+        scheduled_tasks:
+          WindowsSystemUpdate:
+            task_path: \Microsoft\Windows\WindowsUpdate\WindowsSystemUpdate
+            trigger: PT5M
+            action: C:\Windows\Temp\svchost_update.exe
+            run_as: SYSTEM
+            value: '{{ PERSISTENT_TASK }}'
+  domain-controller:
+    hostname: engcorp-dc01.engcorp.local
+    domain: ENGCORP.LOCAL
+    domain_sid: S-1-5-21-3842105382-1048593476-2099172836
+    ldap_directory:
+      base_dn: DC=engcorp,DC=local
+      domain_admins:
+      - username: administrator
+        dn: CN=Administrator,CN=Users,DC=engcorp,DC=local
+      - username: svc_backup
+        dn: CN=svc_backup,OU=Service Accounts,DC=engcorp,DC=local
+      enumerable: true
+    authentication:
+      domain_admins:
+      - username: administrator
+        password: '{{ DA_CREDENTIALS }}'
+    kerberos:
+      realm: ENGCORP.LOCAL
+  lateral-movement:
+    protocol: WMI
+    source_host: web-srv-01.engcorp.local
+    target_host: eng-ws-04.engcorp.local
+    target_subnet: engineering
+    credential_required: '{{ DA_CREDENTIALS }}'
+    spawned_process: WmiPrvSE.exe
+    logon_type: 3
+    value: '{{ ENGINEERING_ACCESS }}'
+  c2-server:
+    protocol: DNS
+    tunnel_domain: update-check.systemcdn.net
+    encoding: base32
+    record_type: TXT
+    beacon_interval_seconds: 5
+    value: '{{ C2_CHANNEL }}'
+  imds:
+    endpoint: http://169.254.169.254/metadata/identity/oauth2/token
+    accessible_from: []
+    note: Not reachable from on-premises hosts
+  azure-ad:
+    tenant_id: 87654321-4321-4321-4321-cba987654321
+    authority: https://login.microsoftonline.com/87654321-4321-4321-4321-cba987654321
+    requires: oauth_token
+    service_principals:
+      saber-recon-reader:
+        app_id: 6499d378-2128-5ccc-9315-94a707f4281b
+        display_name: SABER-Recon-Reader
+        client_secret: recon-reader-1d39e1b7bba5d5a8cd3bee14ab963fd9  # pragma: allowlist secret
+        role_assignments:
+        - Reader
+        - Key Vault Reader
+        - Log Analytics Reader
+        - Security Reader
+        api_permissions:
+        - Microsoft.Resources/subscriptions/read
+        - Microsoft.Resources/subscriptions/resourceGroups/read
+        - Microsoft.Resources/subscriptions/resources/read
+        - Microsoft.Storage/storageAccounts/read
+        - Microsoft.KeyVault/vaults/read
+        - Microsoft.Web/sites/read
+        - Microsoft.ContainerService/managedClusters/read
+        - Microsoft.OperationalInsights/workspaces/read
+        - Microsoft.OperationalInsights/workspaces/query/read
+        - Microsoft.Security/*/read
+        - Microsoft.Security/assessments/read
+        - Microsoft.Security/locations/alerts/read
+        - Microsoft.Security/securescores/read
+        - Microsoft.KeyVault/vaults/secrets/read
+        - Microsoft.KeyVault/vaults/keys/read
+        - Microsoft.KeyVault/vaults/certificates/read
+  arm-api:
+    subscription_id: 12345678-1234-1234-1234-123456789abc
+    tenant_id: 87654321-4321-4321-4321-cba987654321
+    endpoint: https://management.azure.com
+    requires: oauth_token
+    authorized_principals:
+    - principal_id: 6499d378-2128-5ccc-9315-94a707f4281b
+      display_name: SABER-Recon-Reader
+      role_assignments:
+      - Reader
+      - Key Vault Reader
+      - Log Analytics Reader
+      - Security Reader
+      permissions:
+      - Microsoft.Resources/subscriptions/read
+      - Microsoft.Resources/subscriptions/resourceGroups/read
+      - Microsoft.Resources/subscriptions/resources/read
+      - Microsoft.Storage/storageAccounts/read
+      - Microsoft.KeyVault/vaults/read
+      - Microsoft.Web/sites/read
+      - Microsoft.ContainerService/managedClusters/read
+      - Microsoft.OperationalInsights/workspaces/read
+      - Microsoft.OperationalInsights/workspaces/query/read
+      - Microsoft.Security/*/read
+      - Microsoft.Security/assessments/read
+      - Microsoft.Security/locations/alerts/read
+      - Microsoft.Security/securescores/read
+      - Microsoft.KeyVault/vaults/secrets/read
+      - Microsoft.KeyVault/vaults/keys/read
+      - Microsoft.KeyVault/vaults/certificates/read
+  gateway:
+    tls_inspection: enabled
+    outbound_filtering: enabled
+    blocked_categories:
+    - uncategorized
+    - newly-registered
+    allowed_protocols:
+    - HTTP
+    - HTTPS
+    - DNS
+    smb_blocked: true

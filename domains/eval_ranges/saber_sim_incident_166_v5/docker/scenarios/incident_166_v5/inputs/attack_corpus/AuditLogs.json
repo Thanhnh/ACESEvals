@@ -1,0 +1,83 @@
+[
+  {
+    "AADOperationType": "",
+    "AADTenantId": "",
+    "ActivityDateTime": "",
+    "ActivityDisplayName": "",
+    "AdditionalDetails": null,
+    "Category": "AuditLogs",
+    "CorrelationId": "",
+    "DurationMs": 0,
+    "Id": "",
+    "Identity": "",
+    "InitiatedBy": {
+      "user": {
+        "id": "4335f8ab-925b-59bb-e2c5-b5d0cd4c67e3",
+        "ipAddress": "172.30.30.1",
+        "userPrincipalName": "j.martinez@contoso.com"
+      }
+    },
+    "Level": "",
+    "Location": "",
+    "LoggedByService": "",
+    "OperationName": "List users",
+    "OperationVersion": "",
+    "Resource": "",
+    "ResourceGroup": "",
+    "ResourceId": "",
+    "ResourceProvider": "",
+    "Result": "",
+    "ResultDescription": "",
+    "ResultReason": "",
+    "ResultSignature": "",
+    "ResultType": "Success",
+    "SourceSystem": "",
+    "TargetResources": null,
+    "TenantId": "",
+    "TimeGenerated": "2026-07-01T09:53:16.1961035Z",
+    "Type": "AuditLogs",
+    "source": "",
+    "collectedAt": "2026-07-01T09:53:17.108118Z",
+    "AttackTechnique": "T1087.004"
+  },
+  {
+    "AADOperationType": "",
+    "AADTenantId": "",
+    "ActivityDateTime": "",
+    "ActivityDisplayName": "",
+    "AdditionalDetails": null,
+    "Category": "AuditLogs",
+    "CorrelationId": "",
+    "DurationMs": 0,
+    "Id": "",
+    "Identity": "",
+    "InitiatedBy": "j.martinez",
+    "Level": "",
+    "Location": "",
+    "LoggedByService": "",
+    "OperationName": "Add service principal credentials",
+    "OperationVersion": "",
+    "Resource": "",
+    "ResourceGroup": "",
+    "ResourceId": "",
+    "ResourceProvider": "",
+    "Result": "",
+    "ResultDescription": "",
+    "ResultReason": "",
+    "ResultSignature": "",
+    "ResultType": "Success",
+    "SourceSystem": "",
+    "TargetResources": [
+      {
+        "DisplayName": "backdoor",
+        "Id": "22222222-3333-4444-5555-666666666666"
+      }
+    ],
+    "TenantId": "",
+    "TimeGenerated": "2026-07-01T09:53:16.4962387Z",
+    "Type": "AuditLogs",
+    "source": "",
+    "collectedAt": "2026-07-01T09:53:17.108147Z",
+    "AttackTechnique": "T1098.001"
+  }
+]

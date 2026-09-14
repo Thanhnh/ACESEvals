@@ -1,0 +1,42 @@
+[
+  {
+    "Timestamp": "2026-07-01T10:44:48.2051771Z",
+    "AccountUpn": "",
+    "AccountObjectId": "c269a997-8e99-41b7-8f8d-c43c289ea8cc",
+    "AccountDisplayName": "",
+    "IPAddress": "172.30.30.1",
+    "Application": "Service Principal App",
+    "ApplicationId": "11111111-2222-3333-4444-555555555555",
+    "ResourceDisplayName": "Service Principal App",
+    "ErrorCode": 0,
+    "RiskLevelDuringSignIn": "none",
+    "ConditionalAccessStatus": "notApplied",
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "Country": "US",
+    "ReportId": "b448c988-07c1-43d5-8ad2-0e311d5cf1dc",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1078"
+  },
+  {
+    "Timestamp": "2026-07-01T10:44:48.2051771Z",
+    "AccountUpn": "",
+    "AccountObjectId": "c269a997-8e99-41b7-8f8d-c43c289ea8cc",
+    "AccountDisplayName": "",
+    "IPAddress": "172.30.30.1",
+    "Application": "Service Principal App",
+    "ApplicationId": "11111111-2222-3333-4444-555555555555",
+    "ResourceDisplayName": "Service Principal App",
+    "ErrorCode": 0,
+    "RiskLevelDuringSignIn": "none",
+    "ConditionalAccessStatus": "notApplied",
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "Country": "US",
+    "ReportId": "b448c988-07c1-43d5-8ad2-0e311d5cf1dc",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1078"
+  }
+]

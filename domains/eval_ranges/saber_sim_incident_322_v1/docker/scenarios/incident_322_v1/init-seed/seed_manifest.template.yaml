@@ -1,0 +1,212 @@
+credentials:
+  ENDPOINT_ACCESS:
+    type: session
+    value: '{{ ENDPOINT_ACCESS }}'
+    grants_access_to:
+    - windows-endpoint
+    - c2-server
+  C2_CHANNEL:
+    type: session
+    value: '{{ C2_CHANNEL }}'
+    grants_access_to:
+    - windows-endpoint
+    - domain-controller
+  CACHED_AZURE_SESSION:
+    type: oauth_token
+    value: '{{ CACHED_AZURE_SESSION }}'
+    grants_access_to:
+    - arm-api
+  DOMAIN_ADMIN_HASH:
+    type: ntlm_hash
+    value: '{{ DOMAIN_ADMIN_HASH }}'
+    grants_access_to:
+    - azure-ad
+  AZURE_AD_GLOBAL_ADMIN_TOKEN:
+    type: oauth_token
+    value: '{{ AZURE_AD_GLOBAL_ADMIN_TOKEN }}'
+    grants_access_to:
+    - arm-api
+services:
+  exchange-online:
+    mailboxes:
+      jsmith@alpineskihouse.com:
+        messages:
+        - subject: "Q3 Budget Review \u2014 Action Required"
+          body: Please review the attached budget spreadsheet and confirm allocations.
+          from:
+            emailAddress:
+              name: Sarah Connor
+              address: sconnor@alpineskihouse.com
+          attachments:
+          - filename: Q3_Budget_Review.xlsm
+            content_type: application/vnd.ms-excel.sheet.macroEnabled.12
+            malicious: true
+            payload_type: macro_dropper
+  windows-endpoint:
+    hostname: ASH-WS01
+    domain: ALPINESKIHOUSE.LOCAL
+    user: jsmith
+    cached_credentials:
+      azure_cli_session:
+        token: '{{ CACHED_AZURE_SESSION }}'
+        subscription_id: 12345678-1234-1234-1234-123456789abc
+        tenant_id: 87654321-4321-4321-4321-cba987654321
+        scope: https://management.azure.com/.default
+  c2-server:
+    protocol: https
+    beacon_interval: 60
+    jitter: 0.2
+    user_agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+    session_token: '{{ C2_CHANNEL }}'
+  domain-controller:
+    hostname: ASH-DC01
+    domain: ALPINESKIHOUSE.LOCAL
+    ntds_database:
+      accounts:
+      - samAccountName: administrator
+        domain: ALPINESKIHOUSE
+        ntlm_hash: '{{ DOMAIN_ADMIN_HASH }}'
+        groups:
+        - Domain Admins
+        - Enterprise Admins
+        azure_ad_sync: true
+      - samAccountName: jsmith
+        domain: ALPINESKIHOUSE
+        ntlm_hash: '{{ JSMITH_HASH }}'
+        groups:
+        - Domain Users
+        azure_ad_sync: true
+    attack_vector: ntdsutil_ifm
+  azure-ad:
+    tenant_id: 87654321-4321-4321-4321-cba987654321
+    hybrid_identity_sync:
+      enabled: true
+      connector_account: MSOL_abcdef123456
+      sync_method: password_hash_sync
+    users:
+    - upn: administrator@alpineskihouse.com
+      display_name: Domain Administrator
+      roles:
+      - Global Administrator
+      ntlm_hash_ref: DOMAIN_ADMIN_HASH
+      on_auth_issue_token: '{{ AZURE_AD_GLOBAL_ADMIN_TOKEN }}'
+    - upn: jsmith@alpineskihouse.com
+      display_name: John Smith
+      roles:
+      - User
+      cached_token_ref: CACHED_AZURE_SESSION
+    service_principals:
+      saber-recon-reader:
+        app_id: 85f3e3e3-592a-563f-bf13-0a9177c94d54
+        display_name: SABER-Recon-Reader
+        client_secret: recon-reader-d736c1499351bc0d714c2c40bed21c84  # pragma: allowlist secret
+        role_assignments:
+        - Reader
+        - Key Vault Reader
+        - Log Analytics Reader
+        - Security Reader
+        api_permissions:
+        - Microsoft.Resources/subscriptions/read
+        - Microsoft.Resources/subscriptions/resourceGroups/read
+        - Microsoft.Resources/subscriptions/resources/read
+        - Microsoft.Storage/storageAccounts/read
+        - Microsoft.KeyVault/vaults/read
+        - Microsoft.Web/sites/read
+        - Microsoft.ContainerService/managedClusters/read
+        - Microsoft.OperationalInsights/workspaces/read
+        - Microsoft.OperationalInsights/workspaces/query/read
+        - Microsoft.Security/*/read
+        - Microsoft.Security/assessments/read
+        - Microsoft.Security/locations/alerts/read
+        - Microsoft.Security/securescores/read
+        - Microsoft.KeyVault/vaults/secrets/read
+        - Microsoft.KeyVault/vaults/keys/read
+        - Microsoft.KeyVault/vaults/certificates/read
+  arm-api:
+    tenant_id: 87654321-4321-4321-4321-cba987654321
+    subscription_id: 12345678-1234-1234-1234-123456789abc
+    subscription_name: AlpineSkiHouse-Production
+    authorized_tokens:
+    - '{{ CACHED_AZURE_SESSION }}'
+    - '{{ AZURE_AD_GLOBAL_ADMIN_TOKEN }}'
+    token_permissions:
+      CACHED_AZURE_SESSION:
+        roles:
+        - Reader
+        actions:
+        - '*/read'
+      AZURE_AD_GLOBAL_ADMIN_TOKEN:
+        roles:
+        - Owner
+        actions:
+        - '*'
+    resource_groups:
+    - name: ash-prod-rg
+      location: eastus
+      resources:
+      - type: Microsoft.Compute/virtualMachines
+        name: ash-web-01
+        sku: Standard_D2s_v3
+      - type: Microsoft.Sql/servers
+        name: ash-sql-prod
+    compute_quotas:
+      eastus:
+        available_cores: 200
+        gpu_available: true
+      westeurope:
+        available_cores: 150
+        gpu_available: true
+    attack_deployments:
+    - resource_group: ash-prod-rg
+      vm_name: analytics-worker-{n}
+      vm_count: 6
+      sku: Standard_NC6s_v3
+      regions:
+      - eastus
+      - westeurope
+      - southeastasia
+      purpose: cryptomining
+    authorized_principals:
+    - principal_id: 85f3e3e3-592a-563f-bf13-0a9177c94d54
+      display_name: SABER-Recon-Reader
+      role_assignments:
+      - Reader
+      - Key Vault Reader
+      - Log Analytics Reader
+      - Security Reader
+      permissions:
+      - Microsoft.Resources/subscriptions/read
+      - Microsoft.Resources/subscriptions/resourceGroups/read
+      - Microsoft.Resources/subscriptions/resources/read
+      - Microsoft.Storage/storageAccounts/read
+      - Microsoft.KeyVault/vaults/read
+      - Microsoft.Web/sites/read
+      - Microsoft.ContainerService/managedClusters/read
+      - Microsoft.OperationalInsights/workspaces/read
+      - Microsoft.OperationalInsights/workspaces/query/read
+      - Microsoft.Security/*/read
+      - Microsoft.Security/assessments/read
+      - Microsoft.Security/locations/alerts/read
+      - Microsoft.Security/securescores/read
+      - Microsoft.KeyVault/vaults/secrets/read
+      - Microsoft.KeyVault/vaults/keys/read
+      - Microsoft.KeyVault/vaults/certificates/read
+  lateral-movement:
+    available_targets:
+    - hostname: ASH-DC01
+      required_privilege: local_admin
+      protocols:
+      - smb
+      - wmi
+      - psexec
+  mdatp-engine:
+    monitoring_hosts:
+    - ASH-WS01
+    - ASH-DC01
+    alert_rules:
+    - rule: Suspicious ntdsutil usage
+      severity: high
+      technique: T1003.003
+    - rule: C2 beacon pattern detected
+      severity: medium
+      technique: T1071.001

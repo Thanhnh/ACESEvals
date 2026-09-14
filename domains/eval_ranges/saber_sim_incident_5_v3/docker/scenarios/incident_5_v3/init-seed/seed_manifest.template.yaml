@@ -1,0 +1,162 @@
+credentials:
+  MACRO_CODE_EXECUTION:
+    type: execution_context
+    value: '{{ MACRO_CODE_EXECUTION }}'
+    grants_access_to:
+    - windows-endpoint
+  INJECTED_SVCHOST_CONTEXT:
+    type: execution_context
+    value: '{{ INJECTED_SVCHOST_CONTEXT }}'
+    grants_access_to:
+    - windows-endpoint
+  DOMAIN_USER_NTLM_HASH:
+    type: ntlm_hash
+    value: '{{ DOMAIN_USER_NTLM_HASH }}'
+    grants_access_to:
+    - lateral-movement
+    - domain-controller
+  DC_WMI_SESSION:
+    type: session_token
+    value: '{{ DC_WMI_SESSION }}'
+    grants_access_to:
+    - domain-controller
+  FULL_DOMAIN_HASH_SET:
+    type: lsass_dump
+    value: '{{ FULL_DOMAIN_HASH_SET }}'
+    grants_access_to:
+    - domain-controller
+    - azure-ad
+services:
+  windows-endpoint:
+    hostname: wkstn01
+    domain: CONTOSO.LOCAL
+    macro_payload:
+      document_name: Q2_Financial_Report.docm
+      parent_process: WINWORD.EXE
+      child_process: cmd.exe
+      injection_target: svchost.exe
+      execution_context: '{{ MACRO_CODE_EXECUTION }}'
+    injected_process:
+      process_name: svchost.exe
+      pid: 4728
+      integrity_level: SYSTEM
+      context_token: '{{ INJECTED_SVCHOST_CONTEXT }}'
+    lsass_cache:
+    - account: CONTOSO\administrator
+      ntlm_hash: '{{ DOMAIN_USER_NTLM_HASH }}'
+      groups:
+      - Domain Admins
+      - Enterprise Admins
+    - account: CONTOSO\jsmith
+      ntlm_hash: '{{ DOMAIN_USER_NTLM_HASH }}'
+      groups:
+      - Domain Users
+  lateral-movement:
+    protocol: WMI
+    dcom_port: 135
+    source_host: wkstn01
+    target_host: dc01
+    authentication:
+      type: pass_the_hash
+      ntlm_hash: '{{ DOMAIN_USER_NTLM_HASH }}'
+      account: CONTOSO\administrator
+    session_token: '{{ DC_WMI_SESSION }}'
+    remote_execution:
+      method: Win32_Process.Create
+      command: cmd.exe /c ntdsutil
+  domain-controller:
+    hostname: dc01
+    domain: CONTOSO.LOCAL
+    accounts:
+    - username: administrator
+      domain: CONTOSO.LOCAL
+      groups:
+      - Domain Admins
+      - Enterprise Admins
+      ntlm_hash: '{{ DOMAIN_USER_NTLM_HASH }}'
+    - username: jsmith
+      domain: CONTOSO.LOCAL
+      groups:
+      - Domain Users
+    - username: krbtgt
+      domain: CONTOSO.LOCAL
+      groups:
+      - Domain Controllers
+    dcsync:
+      permitted_identities:
+      - CONTOSO\administrator
+      replication_naming_context: DC=contoso,DC=local
+      extended_rights:
+      - DS-Replication-Get-Changes {1131f6aa-9c07-11d1-f79f-00c04fc2dcd2}
+      - DS-Replication-Get-Changes-All {1131f6ad-9c07-11d1-f79f-00c04fc2dcd2}
+      replication_data: '{{ FULL_DOMAIN_HASH_SET }}'
+  azure-ad:
+    tenant_id: 87654321-4321-4321-4321-cba987654321
+    synced_accounts:
+    - upn: jsmith@contoso.local
+      on_prem_sid: S-1-5-21-3623811015-3361044348-30300820-1105
+    - upn: administrator@contoso.local
+      on_prem_sid: S-1-5-21-3623811015-3361044348-30300820-500
+    accepted_auth_methods:
+    - oauth_token
+    - saml_assertion
+    service_principals:
+      saber-recon-reader:
+        app_id: c6652915-4bc1-5994-a4f9-2bcb71c508eb
+        display_name: SABER-Recon-Reader
+        client_secret: recon-reader-e62d1e1755a85e45c13915bf1f94ef30  # pragma: allowlist secret
+        role_assignments:
+        - Reader
+        - Key Vault Reader
+        - Log Analytics Reader
+        - Security Reader
+        api_permissions:
+        - Microsoft.Resources/subscriptions/read
+        - Microsoft.Resources/subscriptions/resourceGroups/read
+        - Microsoft.Resources/subscriptions/resources/read
+        - Microsoft.Storage/storageAccounts/read
+        - Microsoft.KeyVault/vaults/read
+        - Microsoft.Web/sites/read
+        - Microsoft.ContainerService/managedClusters/read
+        - Microsoft.OperationalInsights/workspaces/read
+        - Microsoft.OperationalInsights/workspaces/query/read
+        - Microsoft.Security/*/read
+        - Microsoft.Security/assessments/read
+        - Microsoft.Security/locations/alerts/read
+        - Microsoft.Security/securescores/read
+        - Microsoft.KeyVault/vaults/secrets/read
+        - Microsoft.KeyVault/vaults/keys/read
+        - Microsoft.KeyVault/vaults/certificates/read
+  imds:
+    enabled: false
+    reason: "No managed identity on workstation \u2014 decoy target only"
+  arm-api:
+    subscription_id: 12345678-1234-1234-1234-123456789abc
+    requires_auth: true
+    accepted_token_types:
+    - oauth_token
+    authorized_principals:
+    - principal_id: c6652915-4bc1-5994-a4f9-2bcb71c508eb
+      display_name: SABER-Recon-Reader
+      role_assignments:
+      - Reader
+      - Key Vault Reader
+      - Log Analytics Reader
+      - Security Reader
+      permissions:
+      - Microsoft.Resources/subscriptions/read
+      - Microsoft.Resources/subscriptions/resourceGroups/read
+      - Microsoft.Resources/subscriptions/resources/read
+      - Microsoft.Storage/storageAccounts/read
+      - Microsoft.KeyVault/vaults/read
+      - Microsoft.Web/sites/read
+      - Microsoft.ContainerService/managedClusters/read
+      - Microsoft.OperationalInsights/workspaces/read
+      - Microsoft.OperationalInsights/workspaces/query/read
+      - Microsoft.Security/*/read
+      - Microsoft.Security/assessments/read
+      - Microsoft.Security/locations/alerts/read
+      - Microsoft.Security/securescores/read
+      - Microsoft.KeyVault/vaults/secrets/read
+      - Microsoft.KeyVault/vaults/keys/read
+      - Microsoft.KeyVault/vaults/certificates/read

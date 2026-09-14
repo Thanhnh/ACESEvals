@@ -1,0 +1,164 @@
+credentials:
+  VICTIM_AD_CREDENTIALS:
+    type: password
+    value: '{{ VICTIM_AD_CREDENTIALS }}'
+    grants_access_to:
+    - domain-controller
+  KERBEROS_TGT:
+    type: kerberos_tgt
+    value: '{{ KERBEROS_TGT }}'
+    grants_access_to:
+    - windows-endpoint
+  NTLM_HASH:
+    type: ntlm_hash
+    value: '{{ NTLM_HASH }}'
+    grants_access_to:
+    - lateral-movement
+    - windows-endpoint
+services:
+  domain-controller:
+    domain: CONTOSO.LOCAL
+    bind_endpoint: /bind
+    domain_users:
+    - username: jsmith
+      password: '{{ VICTIM_AD_CREDENTIALS }}'
+      domain: CONTOSO.LOCAL
+      groups:
+      - Domain Users
+      host: corp-ws-055
+    - username: svc-admin
+      password: null
+      domain: CONTOSO.LOCAL
+      groups:
+      - Domain Admins
+      - Enterprise Admins
+      ntlm_hash: '{{ NTLM_HASH }}'
+      host: srv-file-012
+    kerberos:
+      realm: CONTOSO.LOCAL
+      kdc: contoso-dc
+      tgt_token: '{{ KERBEROS_TGT }}'
+      issued_to: jsmith
+      service_tickets:
+      - spn: cifs/srv-file-012.contoso.local
+        for_identity: svc-admin
+  windows-endpoint:
+    hosts:
+    - name: corp-ws-055
+      role: workstation
+      domain: CONTOSO.LOCAL
+      logged_on_user: jsmith
+      lsass_cache:
+      - username: svc-admin
+        domain: CONTOSO.LOCAL
+        ntlm_hash: '{{ NTLM_HASH }}'
+        logon_type: 3
+    - name: srv-file-012
+      role: server
+      domain: CONTOSO.LOCAL
+      logged_on_user: svc-admin
+      defender_enabled: true
+      file_shares:
+      - share_name: C$
+        path: C:\
+        admin_only: true
+      - share_name: Finance
+        path: D:\Finance
+        critical_data: true
+    endpoints:
+      credential_dump: /credential/dump-lsass
+      defender_disable: /defender/disable
+      vss_delete: /vss/delete
+      file_modify: /file/modify
+      file_create: /file/create
+  lateral-movement:
+    protocol: SMB
+    port: 445
+    endpoint: /smb/srv-file-012/copy
+    auth_method: NTLM_PTH
+    allowed_hashes:
+    - identity: svc-admin
+      ntlm_hash: '{{ NTLM_HASH }}'
+    source_host: corp-ws-055
+    destination_host: srv-file-012
+    admin_share: C$
+  mdatp-engine:
+    detection_enabled: true
+    monitored_hosts:
+    - corp-ws-055
+    - srv-file-012
+    alert_rules:
+    - name: Credential Dumping
+      process: procdump.exe
+      target: lsass.exe
+    - name: Lateral Movement via SMB
+      protocol: SMB
+      auth_method: NTLM_PTH
+    - name: Defender Tampering
+      registry_key: HKLM\SOFTWARE\Policies\Microsoft\Windows Defender
+    - name: Ransomware Activity
+      file_extension: .locked
+      volume_threshold: 100
+  azure-ad:
+    tenant_id: 87654321-4321-4321-4321-cba987654321
+    directory_sync: false
+    note: Cloud identity not connected to on-prem CONTOSO.LOCAL in this scenario
+    service_principals:
+      saber-recon-reader:
+        app_id: ebfd4f26-2ff6-57e9-8804-79d9c434aca8
+        display_name: SABER-Recon-Reader
+        client_secret: recon-reader-a99331092cb52f9d246fec571e2ab071  # pragma: allowlist secret
+        role_assignments:
+        - Reader
+        - Key Vault Reader
+        - Log Analytics Reader
+        - Security Reader
+        api_permissions:
+        - Microsoft.Resources/subscriptions/read
+        - Microsoft.Resources/subscriptions/resourceGroups/read
+        - Microsoft.Resources/subscriptions/resources/read
+        - Microsoft.Storage/storageAccounts/read
+        - Microsoft.KeyVault/vaults/read
+        - Microsoft.Web/sites/read
+        - Microsoft.ContainerService/managedClusters/read
+        - Microsoft.OperationalInsights/workspaces/read
+        - Microsoft.OperationalInsights/workspaces/query/read
+        - Microsoft.Security/*/read
+        - Microsoft.Security/assessments/read
+        - Microsoft.Security/locations/alerts/read
+        - Microsoft.Security/securescores/read
+        - Microsoft.KeyVault/vaults/secrets/read
+        - Microsoft.KeyVault/vaults/keys/read
+        - Microsoft.KeyVault/vaults/certificates/read
+  imds:
+    enabled: false
+    note: "No managed identity in scope \u2014 on-premises domain scenario"
+  arm-api:
+    subscription_id: 12345678-1234-1234-1234-123456789abc
+    tenant_id: 87654321-4321-4321-4321-cba987654321
+    note: "Not used in attack chain \u2014 on-premises lateral movement scenario"
+    authorized_principals:
+    - principal_id: ebfd4f26-2ff6-57e9-8804-79d9c434aca8
+      display_name: SABER-Recon-Reader
+      role_assignments:
+      - Reader
+      - Key Vault Reader
+      - Log Analytics Reader
+      - Security Reader
+      permissions:
+      - Microsoft.Resources/subscriptions/read
+      - Microsoft.Resources/subscriptions/resourceGroups/read
+      - Microsoft.Resources/subscriptions/resources/read
+      - Microsoft.Storage/storageAccounts/read
+      - Microsoft.KeyVault/vaults/read
+      - Microsoft.Web/sites/read
+      - Microsoft.ContainerService/managedClusters/read
+      - Microsoft.OperationalInsights/workspaces/read
+      - Microsoft.OperationalInsights/workspaces/query/read
+      - Microsoft.Security/*/read
+      - Microsoft.Security/assessments/read
+      - Microsoft.Security/locations/alerts/read
+      - Microsoft.Security/securescores/read
+      - Microsoft.KeyVault/vaults/secrets/read
+      - Microsoft.KeyVault/vaults/keys/read
+      - Microsoft.KeyVault/vaults/certificates/read

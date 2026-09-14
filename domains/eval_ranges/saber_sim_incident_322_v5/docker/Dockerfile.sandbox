@@ -1,0 +1,31 @@
+ARG SABER_BASE_IMAGE=saber/sandbox:latest
+FROM ${SABER_BASE_IMAGE}
+USER root
+RUN apt-get update &&         apt-get install -y --no-install-recommends         nmap netcat-openbsd socat dnsutils telnet         jq wget file xxd unzip zip gcc make git nano vim         dirb iputils-ping iputils-arping socat         binutils curl dnsutils telnet unzip zip p7zip         p7zip-full nodejs build-essential azure-cli         libnet-ssleay-perl libjson-perl libxml-writer-perl         bandit traceroute         sshpass plink net-tools iproute2 iptables         python3-impacket         && rm -rf /var/lib/apt/lists/*
+
+# Install nikto from source (not packaged in Debian trixie)
+RUN git clone --depth 1 --branch 2.6.0 https://github.com/sullo/nikto.git /opt/nikto &&         ln -s /opt/nikto/program/nikto.pl /usr/local/bin/nikto &&         chmod +x /opt/nikto/program/nikto.pl
+
+COPY docker/wheels/ /tmp/wheels/
+RUN PKGS='beautifulsoup4 pyjwt pycryptodome azure-identity azure-storage-blob lxml'; \
+    pip install --no-cache-dir --retries 5 --timeout 30 $PKGS \
+    || pip install --no-cache-dir --no-index --find-links=/tmp/wheels $PKGS
+
+# Create wordlist directories and download wordlists
+RUN mkdir -p /usr/share/wordlists/dirb && curl -s -o /usr/share/wordlists/dirb/common.txt https://raw.githubusercontent.com/v0re/dirb/master/wordlists/common.txt && curl -s -o /usr/share/wordlists/dirb/directory-list-2.3-medium.txt https://raw.githubusercontent.com/daviddias/node-dirbuster/master/lists/directory-list-2.3-medium.txt && test -f /usr/share/wordlists/dirb/common.txt || echo "ERROR: Failed to download common.txt" && test -f /usr/share/wordlists/dirb/directory-list-2.3-medium.txt || echo "ERROR: Failed to download directory-list-2.3-medium.txt"
+
+# Install additional Python packages for web application security tasks
+RUN PKGS='beautifulsoup4 pycryptodome selenium lxml semgrep'; \
+    pip install --no-cache-dir --retries 5 --timeout 30 $PKGS \
+    || pip install --no-cache-dir --no-index --find-links=/tmp/wheels $PKGS
+
+ENV PATH="/usr/bin:/bin:/usr/local/bin:${PATH}"
+
+RUN rm -rf /tmp/wheels
+
+# Install SABER-Sim mock Azure CLI bridge for reconnaissance tasks.
+COPY docker/saber_az_bridge/ /opt/saber-az-bridge/
+COPY docker/wheels/ /tmp/wheels/
+RUN pip install --no-cache-dir --no-index --find-links=/tmp/wheels --no-build-isolation /opt/saber-az-bridge && chmod +x /opt/saber-az-bridge/bin/az && ln -sf /opt/saber-az-bridge/bin/az /usr/local/bin/az && ln -sf /opt/saber-az-bridge/bin/az /usr/local/bin/saber-az-bridge
+ENV PATH="/usr/local/bin:/usr/bin:/bin:${PATH}" PYTHONPATH="/opt/saber-az-bridge:${PYTHONPATH}" AZ_BRIDGE_BACKEND="hybrid" AZ_BRIDGE_INITIAL_STATE="/workspace/inputs/az_initial_state.json" AZ_BRIDGE_BASE_INFRASTRUCTURE="/workspace/inputs/base_infrastructure.yaml" AZURE_CONFIG_DIR="/workspace/.azure"
+RUN rm -rf /tmp/wheels

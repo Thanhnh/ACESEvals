@@ -1,0 +1,36 @@
+[
+  {
+    "AccountDisplayName": "",
+    "AccountDomain": "CONTOSO",
+    "AccountName": "jsmith",
+    "AccountObjectId": "",
+    "AccountSid": "",
+    "AccountUpn": "",
+    "ActionType": "Replication",
+    "AdditionalFields": {
+      "Operation": "DsGetNcChanges"
+    },
+    "Application": "",
+    "DestinationDeviceName": "",
+    "DestinationIPAddress": "",
+    "DestinationPort": "",
+    "DeviceName": "",
+    "IPAddress": "",
+    "ISP": "",
+    "Location": "",
+    "Port": "",
+    "Protocol": "",
+    "ReportId": "",
+    "SourceSystem": "",
+    "TargetAccountDisplayName": "",
+    "TargetAccountUpn": "svc-backup",
+    "TargetDeviceName": "DC.CONTOSO.LOCAL",
+    "TenantId": "",
+    "TimeGenerated": "",
+    "Timestamp": "2026-07-17T19:25:04.693Z",
+    "Type": "IdentityDirectoryEvents",
+    "source": "domain_controller",
+    "collectedAt": "2026-07-17T19:25:42.968515Z",
+    "AttackTechnique": "T1003.006"
+  }
+]

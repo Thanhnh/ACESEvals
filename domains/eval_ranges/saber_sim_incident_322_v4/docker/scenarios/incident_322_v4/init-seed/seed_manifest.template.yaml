@@ -1,0 +1,169 @@
+credentials:
+  HOST_SHELL_ACCESS:
+    type: shell_session
+    value: '{{ HOST_SHELL_ACCESS }}'
+    grants_access_to:
+    - windows-endpoint
+    - c2-server
+  C2_CHANNEL:
+    type: c2_session
+    value: '{{ C2_CHANNEL }}'
+    grants_access_to:
+    - windows-endpoint
+  DOMAIN_CREDENTIALS:
+    type: ntlm_hash
+    value: '{{ DOMAIN_CREDENTIALS }}'
+    grants_access_to:
+    - lateral-movement
+  WORKSTATION_ACCESS:
+    type: shell_session
+    value: '{{ WORKSTATION_ACCESS }}'
+    grants_access_to: []
+services:
+  azure-app-service:
+    hostname: app-host-01.corpnet.local
+    vulnerable_endpoint: /api/upload/process
+    vulnerability: Remote Code Execution (Deserialization)
+    worker_process: w3wp.exe
+    app_pool_identity: appsvc_worker
+    webroot: C:\inetpub\wwwroot\webapp
+    shell_payload:
+      parent_process: w3wp.exe
+      spawned_process: cmd.exe
+      session_token: '{{ HOST_SHELL_ACCESS }}'
+  c2-server:
+    framework: http-beacon
+    callback_url: https://cdn-analytics.azureedge.net/collect
+    callback_port: 443
+    protocol: HTTPS
+    beacon_interval_seconds: 60
+    jitter_percent: 15
+    user_agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+    session_token: '{{ C2_CHANNEL }}'
+    source_host: app-host-01
+  windows-endpoint:
+    hostname: app-host-01.corpnet.local
+    domain: CORPNET.LOCAL
+    lsass_dump:
+      method: MiniDumpWriteDump
+      tool: comsvcs.dll
+      cached_credentials:
+      - username: j.martinez
+        domain: CORPNET.LOCAL
+        ntlm_hash: '{{ DOMAIN_CREDENTIALS }}'
+        logon_type: 10
+      - username: appsvc_worker
+        domain: CORPNET.LOCAL
+        ntlm_hash: '{{ APPSVC_HASH_DECOY }}'
+        logon_type: 5
+    processes:
+    - name: lsass.exe
+      pid: 672
+      access_mask: '0x1010'
+  lateral-movement:
+    method: WMI
+    protocol: DCOM
+    target_host: ws-analyst-02.corpnet.local
+    target_port: 135
+    credential_type: ntlm_hash
+    credential_ref: '{{ DOMAIN_CREDENTIALS }}'
+    impersonated_user: j.martinez@CORPNET.LOCAL
+    remote_payload:
+      process: powershell.exe
+      command_line: -enc SQBFAFgA...
+      session_token: '{{ WORKSTATION_ACCESS }}'
+    logon_event:
+      event_id: 4624
+      logon_type: 3
+      source_ip: 10.0.1.100
+  domain-controller:
+    domain: CORPNET.LOCAL
+    domain_sid: S-1-5-21-3623811015-3361044348-30300820
+    dc_hostname: dc01.corpnet.local
+    users:
+    - sam_account_name: j.martinez
+      display_name: Jessica Martinez
+      groups:
+      - Domain Users
+      - IT-HelpDesk
+      spn: null
+    - sam_account_name: appsvc_worker
+      display_name: App Service Worker
+      groups:
+      - Domain Users
+      - IIS_WPG
+      spn: HTTP/app-host-01.corpnet.local
+  mdatp-engine:
+    alerts:
+    - alert_name: Suspicious LSASS memory access
+      severity: High
+      technique: T1003.001
+      tactic: CredentialAccess
+      compromised_entity: app-host-01
+      status: New
+    - alert_name: Suspicious WMI remote execution
+      severity: Medium
+      technique: T1047
+      tactic: LateralMovement
+      compromised_entity: ws-analyst-02
+      status: New
+    - alert_name: C2 beacon communication detected
+      severity: Medium
+      technique: T1071.001
+      tactic: CommandAndControl
+      compromised_entity: app-host-01
+      status: New
+  azure-ad:
+    service_principals:
+      saber-recon-reader:
+        app_id: 53e95c70-79bf-5ef9-95c7-dafc3fd1cdbf
+        display_name: SABER-Recon-Reader
+        client_secret: recon-reader-e8032955cb51af72fdd30c6a743856da  # pragma: allowlist secret
+        role_assignments:
+        - Reader
+        - Key Vault Reader
+        - Log Analytics Reader
+        - Security Reader
+        api_permissions:
+        - Microsoft.Resources/subscriptions/read
+        - Microsoft.Resources/subscriptions/resourceGroups/read
+        - Microsoft.Resources/subscriptions/resources/read
+        - Microsoft.Storage/storageAccounts/read
+        - Microsoft.KeyVault/vaults/read
+        - Microsoft.Web/sites/read
+        - Microsoft.ContainerService/managedClusters/read
+        - Microsoft.OperationalInsights/workspaces/read
+        - Microsoft.OperationalInsights/workspaces/query/read
+        - Microsoft.Security/*/read
+        - Microsoft.Security/assessments/read
+        - Microsoft.Security/locations/alerts/read
+        - Microsoft.Security/securescores/read
+        - Microsoft.KeyVault/vaults/secrets/read
+        - Microsoft.KeyVault/vaults/keys/read
+        - Microsoft.KeyVault/vaults/certificates/read
+  arm-api:
+    authorized_principals:
+    - principal_id: 53e95c70-79bf-5ef9-95c7-dafc3fd1cdbf
+      display_name: SABER-Recon-Reader
+      role_assignments:
+      - Reader
+      - Key Vault Reader
+      - Log Analytics Reader
+      - Security Reader
+      permissions:
+      - Microsoft.Resources/subscriptions/read
+      - Microsoft.Resources/subscriptions/resourceGroups/read
+      - Microsoft.Resources/subscriptions/resources/read
+      - Microsoft.Storage/storageAccounts/read
+      - Microsoft.KeyVault/vaults/read
+      - Microsoft.Web/sites/read
+      - Microsoft.ContainerService/managedClusters/read
+      - Microsoft.OperationalInsights/workspaces/read
+      - Microsoft.OperationalInsights/workspaces/query/read
+      - Microsoft.Security/*/read
+      - Microsoft.Security/assessments/read
+      - Microsoft.Security/locations/alerts/read
+      - Microsoft.Security/securescores/read
+      - Microsoft.KeyVault/vaults/secrets/read
+      - Microsoft.KeyVault/vaults/keys/read
+      - Microsoft.KeyVault/vaults/certificates/read

@@ -1,0 +1,106 @@
+[
+  {
+    "TimeGenerated": "2026-07-01T09:16:52.3497926Z",
+    "OperationName": "Sign-in activity",
+    "Category": "SignInLogs",
+    "ResultType": "0",
+    "ResultDescription": "Device code issued",
+    "CorrelationId": "ae30cf67-95c5-4a5d-b956-0f4e09e6410f",
+    "Id": "7cd4eb6d-8d67-4c43-a5a7-ce40933abcad",
+    "UserDisplayName": "victim",
+    "UserPrincipalName": "victim@contoso.com",
+    "UserId": "45e4c716-46a3-5b83-5464-9c9935af995a",
+    "AppDisplayName": "Device Code Flow App",
+    "AppId": "11111111-2222-3333-4444-555555555555",
+    "IPAddress": "172.30.30.1",
+    "Location": "US",
+    "LocationDetails": {
+      "city": "Seattle",
+      "countryOrRegion": "US",
+      "geoCoordinates": {
+        "latitude": 47.6062,
+        "longitude": -122.3321
+      },
+      "state": "Washington"
+    },
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "DeviceDetail": {
+      "browser": "Rich Client",
+      "deviceId": "",
+      "operatingSystem": "Windows 10"
+    },
+    "ConditionalAccessStatus": "notApplied",
+    "IsInteractive": true,
+    "RiskLevelAggregated": "none",
+    "RiskLevelDuringSignIn": "none",
+    "RiskState": "none",
+    "Status": {
+      "errorCode": 0,
+      "failureReason": null
+    },
+    "AuthenticationMethodsUsed": [
+      "Password"
+    ],
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "TokenIssuerType": "AzureAD",
+    "ResourceDisplayName": "Device Code Flow App",
+    "ResourceId": "11111111-2222-3333-4444-555555555555",
+    "HomeTenantId": "87654321-4321-4321-4321-cba987654321",
+    "UserType": "Member",
+    "source": "azure_ad",
+    "collectedAt": "2026-07-01T09:16:53.320648Z",
+    "AttackTechnique": "T1566.002"
+  },
+  {
+    "TimeGenerated": "2026-07-01T09:16:52.0190974Z",
+    "OperationName": "Sign-in activity",
+    "Category": "SignInLogs",
+    "ResultType": "0",
+    "ResultDescription": "Device code authentication completed",
+    "CorrelationId": "2935abd9-ed47-46ec-9572-370219f5a745",
+    "Id": "92df544a-e5f4-4f70-a235-b4e57cd5e678",
+    "UserDisplayName": "victim",
+    "UserPrincipalName": "victim@contoso.com",
+    "UserId": "45e4c716-46a3-5b83-5464-9c9935af995a",
+    "AppDisplayName": "Device Code App",
+    "AppId": "11111111-2222-3333-4444-555555555555",
+    "IPAddress": "172.30.30.1",
+    "Location": "US",
+    "LocationDetails": {
+      "city": "Seattle",
+      "countryOrRegion": "US",
+      "geoCoordinates": {
+        "latitude": 47.6062,
+        "longitude": -122.3321
+      },
+      "state": "Washington"
+    },
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "DeviceDetail": {
+      "browser": "Rich Client",
+      "deviceId": "",
+      "operatingSystem": "Windows 10"
+    },
+    "ConditionalAccessStatus": "notApplied",
+    "IsInteractive": true,
+    "RiskLevelAggregated": "none",
+    "RiskLevelDuringSignIn": "none",
+    "RiskState": "none",
+    "Status": {
+      "errorCode": 0,
+      "failureReason": null
+    },
+    "AuthenticationMethodsUsed": [
+      "Password"
+    ],
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "TokenIssuerType": "AzureAD",
+    "ResourceDisplayName": "Device Code App",
+    "ResourceId": "11111111-2222-3333-4444-555555555555",
+    "HomeTenantId": "87654321-4321-4321-4321-cba987654321",
+    "UserType": "Member",
+    "source": "azure_ad",
+    "collectedAt": "2026-07-01T09:16:53.320657Z",
+    "AttackTechnique": "T1580"
+  }
+]

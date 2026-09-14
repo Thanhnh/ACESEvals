@@ -1,0 +1,28 @@
+[
+  {
+    "TimeGenerated": "",
+    "NetworkMessageId": "b0ae6366-af4e-4b53-aaa4-0bad0276bcb5",
+    "InternetMessageId": "",
+    "SenderFromAddress": "userA",
+    "SenderFromDomain": "",
+    "SenderDisplayName": "",
+    "SenderIPv4": "",
+    "RecipientEmailAddress": "userA",
+    "RecipientDomain": "",
+    "Subject": "",
+    "EmailDirection": "Intraorg",
+    "DeliveryAction": "Delivered",
+    "DeliveryLocation": "",
+    "ThreatTypes": "Phish",
+    "ThreatNames": "",
+    "DetectionMethods": "",
+    "UrlCount": null,
+    "AttachmentCount": null,
+    "EmailSize": null,
+    "IsFirstContact": null,
+    "Type": "",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1534"
+  }
+]

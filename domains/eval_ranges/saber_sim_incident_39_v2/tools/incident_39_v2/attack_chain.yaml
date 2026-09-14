@@ -1,0 +1,61 @@
+attack_chain:
+- step: 1
+  description: "Password spray against Azure AD \u2014 compromise user account and\
+    \ obtain OAuth token"
+  service: azure-ad
+  credential_used: none
+  credential_obtained: VICTIM_OAUTH_TOKEN
+  decoy:
+    service: imds
+    expected_result: 401 Unauthorized
+    reason: IMDS only responds to requests from Azure VM instances; attacker is external
+- step: 2
+  description: Enumerate ARM API to discover Key Vault resources in subscription
+  service: arm-api
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-keyvault
+    expected_result: 403 Forbidden
+    reason: "Attacker attempts direct Key Vault access without knowing vault name\
+      \ \u2014 DNS resolution fails"
+- step: 3
+  description: Retrieve service principal credentials from Key Vault secret
+  service: azure-keyvault
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: SP_CLIENT_SECRET
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: "Attacker tries ARM secrets list operation \u2014 ARM can enumerate vaults\
+      \ but cannot read secret values"
+- step: 4
+  description: Authenticate as service principal via client_credentials grant to obtain
+    application token
+  service: azure-ad
+  credential_used: SP_CLIENT_SECRET
+  credential_obtained: SP_APPLICATION_TOKEN
+  decoy:
+    service: exchange-online
+    expected_result: 401 Unauthorized
+    reason: Exchange requires OAuth bearer token, not raw client_secret
+- step: 5
+  description: Create inbox rules to hide security notifications from mailbox owner
+  service: exchange-online
+  credential_used: SP_APPLICATION_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-ad
+    expected_result: 403 Forbidden
+    reason: "Attacker attempts to elevate SP permissions via Directory API \u2014\
+      \ insufficient Directory.ReadWrite.All scope"
+- step: 6
+  description: Exfiltrate email messages from target mailbox via Graph API
+  service: exchange-online
+  credential_used: SP_APPLICATION_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-keyvault
+    expected_result: 403 Forbidden
+    reason: "SP application token is scoped to Graph API \u2014 not authorized for\
+      \ Key Vault data plane"

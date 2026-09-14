@@ -1,0 +1,47 @@
+[
+  {
+    "TimeGenerated": "",
+    "OfficeWorkload": "",
+    "Operation": "Send",
+    "RecordType": "2",
+    "UserId": "userA",
+    "UserType": "",
+    "ClientIP": "",
+    "ResultStatus": "Succeeded",
+    "OrganizationId": "org-12345678-1234-1234-1234-123456789abc",
+    "Type": "",
+    "source": "exchange_online",
+    "collectedAt": "2026-07-01T09:37:59.991824Z",
+    "AttackTechnique": "T1534"
+  },
+  {
+    "TimeGenerated": "",
+    "OfficeWorkload": "",
+    "Operation": "Send",
+    "RecordType": "2",
+    "UserId": "userA",
+    "UserType": "",
+    "ClientIP": "",
+    "ResultStatus": "Succeeded",
+    "OrganizationId": "org-12345678-1234-1234-1234-123456789abc",
+    "Type": "OfficeActivity",
+    "source": "exchange_online",
+    "collectedAt": "2026-07-01T09:37:59.991824Z",
+    "AttackTechnique": "T1534"
+  },
+  {
+    "TimeGenerated": "",
+    "OfficeWorkload": "",
+    "Operation": "MailItemsAccessed",
+    "RecordType": "2",
+    "UserId": "userA",
+    "UserType": "0",
+    "ClientIP": "172.30.10.1",
+    "ResultStatus": "Succeeded",
+    "OrganizationId": "org-12345678-1234-1234-1234-123456789abc",
+    "Type": "OfficeActivity",
+    "source": "exchange_online",
+    "collectedAt": "2026-07-01T09:37:59.991832Z",
+    "AttackTechnique": "T1114.002"
+  }
+]

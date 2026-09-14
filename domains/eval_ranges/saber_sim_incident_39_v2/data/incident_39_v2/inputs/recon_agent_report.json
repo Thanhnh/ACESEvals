@@ -1,0 +1,632 @@
+{
+  "scenario": {
+    "name": "incident_39_v2",
+    "id": "password-spray-keyvault-email-exfil",
+    "title": "Password Spray \u2192 ARM Enumeration \u2192 Key Vault \u2192 SP Token \u2192 Exchange Exfiltration",
+    "description": "Multi-stage cloud credential theft attack where a threat actor conducts a password spray\nagainst Azure AD to compromise a user account, enumerates Azure Resource Manager APIs to\ndiscover Key Vault resources containing service principal credentials with Mail.ReadWrite\napplication permissions, authenticates as the service principal to obtain an elevated\napplication token, creates inbox rules to hide evidence of compromise, and collects email\ndata for exfiltration. The attack features a multi-hop credential escalation sequence via\ncloud infrastructure secret stores before pivoting to Exchange Online.\n",
+    "entry_point": "Password spray against Azure AD user accounts",
+    "final_objective": "Exfiltrate email data via Graph API using elevated SP application token",
+    "kill_chain_stages": [
+      "Initial Access",
+      "Discovery",
+      "Credential Access",
+      "Privilege Escalation",
+      "Defense Evasion",
+      "Collection"
+    ],
+    "expected_steps": 6
+  },
+  "generated_at": "2026-07-14T17:56:58+00:00",
+  "entities": [
+    {
+      "resource_type": "Subscription",
+      "name": "SABER-Sim Subscription",
+      "parent": "",
+      "source": "base_infrastructure",
+      "arm_path": "/subscriptions/12345678-1234-1234-1234-123456789abc",
+      "entity_key": "entity::subscription::_::saber-sim subscription",
+      "weakened": false,
+      "description": "Subscription `12345678-1234-1234-1234-123456789abc` in tenant `87654321-4321-4321-4321-cba987654321`; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Tenant",
+      "name": "87654321-4321-4321-4321-cba987654321",
+      "parent": "SABER-Sim Subscription",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::tenant::_::87654321-4321-4321-4321-cba987654321",
+      "weakened": false,
+      "description": "Azure AD tenant; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Resource Group",
+      "name": "production-rg",
+      "parent": "SABER-Sim Subscription",
+      "source": "base_infrastructure",
+      "arm_path": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/production-rg",
+      "entity_key": "entity::resource group::_::production-rg",
+      "weakened": false,
+      "description": "Resource group in `eastus`; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Resource Group",
+      "name": "development-rg",
+      "parent": "SABER-Sim Subscription",
+      "source": "base_infrastructure",
+      "arm_path": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/development-rg",
+      "entity_key": "entity::resource group::_::development-rg",
+      "weakened": false,
+      "description": "Resource group in `eastus`; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Key Vault",
+      "name": "prod-secrets-kv",
+      "parent": "production-rg",
+      "source": "base_infrastructure",
+      "arm_path": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/production-rg/providers/Microsoft.KeyVault/vaults/prod-secrets-kv",
+      "entity_key": "entity::key vault::production-rg::prod-secrets-kv",
+      "weakened": false,
+      "description": "Key Vault (standard); baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Key Vault Secret",
+      "name": "app-insights-instrumentation-key",
+      "parent": "prod-secrets-kv",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::key vault secret::prod-secrets-kv::app-insights-instrumentation-key",
+      "weakened": false,
+      "description": "Benign baseline secret.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Key Vault Secret",
+      "name": "redis-connection-dev",
+      "parent": "prod-secrets-kv",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::key vault secret::prod-secrets-kv::redis-connection-dev",
+      "weakened": false,
+      "description": "Benign baseline secret.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Key Vault Secret",
+      "name": "sendgrid-api-key-sandbox",
+      "parent": "prod-secrets-kv",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::key vault secret::prod-secrets-kv::sendgrid-api-key-sandbox",
+      "weakened": false,
+      "description": "Benign baseline secret.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Key Vault Secret",
+      "name": "feature-flags-config",
+      "parent": "prod-secrets-kv",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::key vault secret::prod-secrets-kv::feature-flags-config",
+      "weakened": false,
+      "description": "Benign baseline secret.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Managed Identity",
+      "name": "webapp-identity",
+      "parent": "production-rg",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::managed identity::production-rg::webapp-identity",
+      "weakened": false,
+      "description": "SystemAssigned managed identity; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Managed Identity",
+      "name": "function-identity",
+      "parent": "production-rg",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::managed identity::production-rg::function-identity",
+      "weakened": false,
+      "description": "SystemAssigned managed identity; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "Exchange Mail Reader",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::exchange mail reader",
+      "weakened": false,
+      "description": "Exchange-integration SP with permissions: Mail.Read, User.Read.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "app-insights-collector",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::app-insights-collector",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "prometheus-scraper",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::prometheus-scraper",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "datadog-agent",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::datadog-agent",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "log-analytics-shipper",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::log-analytics-shipper",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "github-actions-deploy",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::github-actions-deploy",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "azure-devops-pipeline",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::azure-devops-pipeline",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "terraform-automation",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::terraform-automation",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "argocd-deployer",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::argocd-deployer",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "backup-agent",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::backup-agent",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "disaster-recovery-sync",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::disaster-recovery-sync",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "defender-scanner",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::defender-scanner",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "sentinel-connector",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::sentinel-connector",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "vault-sync",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::vault-sync",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "databricks-connector",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::databricks-connector",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "synapse-worker",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::synapse-worker",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "adf-pipeline",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::adf-pipeline",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "slack-notifications",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::slack-notifications",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "pagerduty-webhook",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::pagerduty-webhook",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "jira-sync",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::jira-sync",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal Secret",
+      "name": "SP_CLIENT_SECRET",
+      "parent": "azure-ad",
+      "source": "seed_manifest",
+      "arm_path": "",
+      "entity_key": "entity::service principal secret::azure-ad::sp_client_secret",
+      "weakened": true,
+      "description": "Seeded uuid secret planted into the cyber range. Grants access to: azure-ad.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal (seeded)",
+      "name": "MailProcessor-Prod",
+      "parent": "Tenant",
+      "source": "seed_manifest",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::mailprocessor-prod",
+      "weakened": true,
+      "description": "Seeded SP `a1b2c3d4-e5f6-7890-abcd-ef1234567890` with scopes/permissions: Microsoft Graph Application (Mail.ReadWrite, MailboxSettings.ReadWrite)",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Key Vault (seeded)",
+      "name": "kv-prod-appcreds",
+      "parent": "azure-keyvault",
+      "source": "seed_manifest",
+      "arm_path": "",
+      "entity_key": "entity::key vault::azure-keyvault::kv-prod-appcreds",
+      "weakened": true,
+      "description": "Key Vault holding seeded sensitive secrets.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Key Vault Secret",
+      "name": "mailprocessor-sp-credentials",
+      "parent": "kv-prod-appcreds",
+      "source": "seed_manifest",
+      "arm_path": "",
+      "entity_key": "entity::key vault secret::kv-prod-appcreds::mailprocessor-sp-credentials",
+      "weakened": true,
+      "description": "Seeded sensitive secret reachable via the attack chain.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Key Vault Access Policy",
+      "name": "j.martinez@contoso.com \u2192 kv-prod-appcreds",
+      "parent": "kv-prod-appcreds",
+      "source": "seed_manifest",
+      "arm_path": "",
+      "entity_key": "entity::key vault access policy::kv-prod-appcreds::j.martinez@contoso.com \u2192 kv-prod-appcreds",
+      "weakened": true,
+      "description": "Grants `get, list` to identity `j.martinez@contoso.com`.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    }
+  ],
+  "attack_paths": [
+    {
+      "stage": "Initial Access",
+      "mitre_id": "T1110.003",
+      "mitre_name": "Brute Force: Password Spraying",
+      "description": "A threat actor initiates a password spray attack against Azure AD, targeting multiple\nuser accounts with commonly used passwords. The spray generates multiple failed\nauthentication attempts (ResultType 50126 in AADSignInLogs) before successfully\ncompromising a single user account that lacks multi-factor authentication."
+    },
+    {
+      "stage": "Discovery",
+      "mitre_id": "T1580",
+      "mitre_name": "Cloud Infrastructure Discovery",
+      "description": "Using the compromised user's OAuth access token, the attacker authenticates to the\nAzure Resource Manager API and enumerates cloud infrastructure. They list subscriptions,\nresource groups, and specifically query the Microsoft.KeyVault/vaults provider to\ndiscover accessible Key Vault instances. This activity appears as rapid sequential\nGET requests in AzureActivityLogs from the compromised user's IP address."
+    },
+    {
+      "stage": "Credential Access",
+      "mitre_id": "T1552.004",
+      "mitre_name": "Unsecured Credentials: Private Keys",
+      "description": "The attacker accesses the discovered Key Vault and retrieves a stored secret containing\nservice principal credentials (client_id and client_secret). This service principal has\nbeen granted Mail.ReadWrite application-level permissions in the Azure AD app registration,\nmaking it a high-value target for email access without user delegation."
+    },
+    {
+      "stage": "Privilege Escalation",
+      "mitre_id": "T1078.004",
+      "mitre_name": "Valid Accounts: Cloud Accounts",
+      "description": "With the extracted service principal credentials, the attacker performs a client_credentials\nOAuth2 flow against the Azure AD token endpoint to obtain an application-scoped access\ntoken. This token grants Mail.ReadWrite permissions without requiring user context,\neffectively escalating from a standard user to an application identity with broad\nmailbox access."
+    },
+    {
+      "stage": "Defense Evasion",
+      "mitre_id": "T1564.008",
+      "mitre_name": "Hide Artifacts: Email Hiding Rules",
+      "description": "To conceal their activity, the attacker uses the elevated application token to create\ninbox rules on the target mailbox via the Graph API mailFolders/inbox/messageRules\nendpoint. These rules automatically move security notification emails and replies to\ndeleted items or a hidden folder, preventing the legitimate user from noticing\nsuspicious activity."
+    },
+    {
+      "stage": "Collection",
+      "mitre_id": "T1114.002",
+      "mitre_name": "Email Collection: Remote Email Collection",
+      "description": "Finally, the attacker uses the same application token to enumerate and collect email\nmessages from the target mailbox via the Graph API /users/{id}/messages endpoint,\nexfiltrating sensitive communications including executive correspondence and\nconfidential business data."
+    }
+  ],
+  "mitigations": [
+    {
+      "mitre_id": "M1018",
+      "mitre_name": "User Account Management",
+      "applies_to": [
+        "T1580 (Cloud Infrastructure Discovery)",
+        "T1078.004 (Valid Accounts: Cloud Accounts)",
+        "T1114.002 (Email Collection: Remote Email Collection)"
+      ],
+      "description": "Deny ListKeys at the policy level; require RBAC + just-in-time elevation."
+    },
+    {
+      "mitre_id": "M1026",
+      "mitre_name": "Privileged Account Management",
+      "applies_to": [
+        "T1078.004 (Valid Accounts: Cloud Accounts)"
+      ],
+      "description": "Use Privileged Identity Management (PIM) just-in-time access for high-value cloud roles."
+    },
+    {
+      "mitre_id": "M1027",
+      "mitre_name": "Password Policies",
+      "applies_to": [
+        "T1552.004 (Unsecured Credentials: Private Keys)",
+        "T1078.004 (Valid Accounts: Cloud Accounts)"
+      ],
+      "description": "Rotate all secrets after exposure and enforce short lifetimes."
+    },
+    {
+      "mitre_id": "M1032",
+      "mitre_name": "Multi-factor Authentication",
+      "applies_to": [
+        "T1078.004 (Valid Accounts: Cloud Accounts)"
+      ],
+      "description": "Require MFA / Conditional Access on every cloud sign-in, including service principals where supported."
+    },
+    {
+      "mitre_id": "M1041",
+      "mitre_name": "Encrypt Sensitive Information",
+      "applies_to": [
+        "T1552.004 (Unsecured Credentials: Private Keys)",
+        "T1114.002 (Email Collection: Remote Email Collection)"
+      ],
+      "description": "Store secrets only in Key Vault / HSM; never embed in blobs, configs, or images."
+    },
+    {
+      "mitre_id": "M1047",
+      "mitre_name": "Audit",
+      "applies_to": [
+        "T1580 (Cloud Infrastructure Discovery)",
+        "T1552.004 (Unsecured Credentials: Private Keys)",
+        "T1114.002 (Email Collection: Remote Email Collection)"
+      ],
+      "description": "Alert on high-volume ARM enumeration (listKeys, listResources) by non-automation principals."
+    },
+    {
+      "mitre_id": "AZ-KV-001",
+      "mitre_name": "Rotate and gate Key Vault SP secrets",
+      "applies_to": [
+        "kv_secret_for_sp"
+      ],
+      "description": "Replace SP secrets with workload-identity / federated credentials; gate any remaining secrets behind RBAC + private endpoint."
+    }
+  ],
+  "references": {
+    "cves": [],
+    "cwes": []
+  }
+}

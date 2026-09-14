@@ -1,0 +1,55 @@
+attack_chain:
+- step: 1
+  description: "Device code phishing \u2014 victim authorizes attacker-controlled\
+    \ device code granting session"
+  service: azure-ad
+  credential_used: none
+  credential_obtained: VICTIM_AD_CREDENTIALS
+  decoy:
+    service: imds
+    expected_result: 403 Forbidden
+    reason: IMDS only responds to local VM/pod metadata requests; no SSRF path exists
+      in this scenario
+- step: 2
+  description: Redeem device code authorization for OAuth token with Mail.ReadWrite
+    and Mail.Send scopes
+  service: azure-ad
+  credential_used: VICTIM_AD_CREDENTIALS
+  credential_obtained: VICTIM_OAUTH_TOKEN
+  decoy:
+    service: exchange-online
+    expected_result: 401 Unauthorized
+    reason: Exchange requires a valid OAuth bearer token, not raw user credentials
+- step: 3
+  description: Enumerate mailbox contacts and org hierarchy to identify BEC targets
+    in finance
+  service: exchange-online
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: OAuth token is scoped to Mail.* permissions, lacks ARM management plane
+      audience
+- step: 4
+  description: Create inbox rule suppressing replies containing wire/payment keywords
+    to RSS Feeds folder
+  service: exchange-online
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-sentinel
+    expected_result: 403 Forbidden
+    reason: Mail-scoped token lacks Log Analytics Contributor role required for Sentinel
+      workspace access
+- step: 5
+  description: Send fraudulent wire transfer BEC email to finance controller from
+    compromised executive mailbox
+  service: exchange-online
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-ad
+    expected_result: 403 Forbidden
+    reason: Victim's Mail-scoped token lacks Application.ReadWrite.All to persist
+      access via sp_addPassword

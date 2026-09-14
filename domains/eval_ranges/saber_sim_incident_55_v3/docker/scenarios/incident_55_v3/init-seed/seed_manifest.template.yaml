@@ -1,0 +1,167 @@
+credentials:
+  DOMAIN_USER_CREDS:
+    type: password
+    value: '{{ DOMAIN_USER_CREDS }}'
+    grants_access_to:
+    - windows-endpoint
+  DOMAIN_ADMIN_NTLM:
+    type: ntlm_hash
+    value: '{{ DOMAIN_ADMIN_NTLM }}'
+    grants_access_to:
+    - lateral-movement
+    - windows-endpoint
+  SERVER_SYSTEM_ACCESS:
+    type: session_token
+    value: '{{ SERVER_SYSTEM_ACCESS }}'
+    grants_access_to:
+    - windows-endpoint
+services:
+  domain-controller:
+    domain: THORNFIELD.LOCAL
+    dc_hostname: thorn-dc01
+    spray_target_accounts:
+    - username: m.fairfax
+      department: Finance
+      password: '{{ DOMAIN_USER_CREDS }}'
+      lockout_threshold: 5
+    - username: j.rochester
+      department: Executive
+      password: '{{ DECOY_USER_PASSWORD }}'
+      lockout_threshold: 5
+    - username: b.mason
+      department: IT
+      password: '{{ DECOY_USER_PASSWORD_2 }}'
+      lockout_threshold: 5
+    domain_admins:
+    - username: da-admin
+      ntlm_hash: '{{ DOMAIN_ADMIN_NTLM }}'
+    replication_permissions:
+    - identity: da-admin
+      rights:
+      - Replicating Directory Changes
+      - Replicating Directory Changes All
+  windows-endpoint:
+    hosts:
+      corp-fin-ws042:
+        role: workstation
+        domain_user: m.fairfax
+        local_admin: true
+        lsass_dump:
+          cached_credentials:
+          - username: da-admin
+            domain: THORNFIELD
+            ntlm_hash: '{{ DOMAIN_ADMIN_NTLM }}'
+          - username: svc_sqlengine
+            domain: THORNFIELD
+            ntlm_hash: '{{ SVC_ACCOUNT_NTLM }}'
+      srv-sqlprod-01:
+        role: server
+        domain_user: svc_sqlengine
+        accepts_token: '{{ SERVER_SYSTEM_ACCESS }}'
+        defender_service:
+          service_name: MsSense
+          driver: WdFilter
+          status: running
+        file_system:
+          critical_paths:
+          - C:\SQLData
+          - C:\Program Files\Microsoft SQL Server
+          shadow_copies: true
+  lateral-movement:
+    protocol: smb
+    technique: pass-the-hash
+    authenticated_by: '{{ DOMAIN_ADMIN_NTLM }}'
+    targets:
+    - hostname: srv-sqlprod-01
+      shares:
+      - name: ADMIN$
+        path: C:\Windows
+        access_granted: true
+      - name: C$
+        path: C:\
+        access_granted: true
+      session_token: '{{ SERVER_SYSTEM_ACCESS }}'
+    - hostname: srv-backup-01
+      shares:
+      - name: ADMIN$
+        path: C:\Windows
+        access_granted: false
+        deny_reason: "Restricted ACL \u2014 da-admin explicitly denied"
+  mdatp-engine:
+    monitored_hosts:
+    - srv-sqlprod-01
+    - corp-fin-ws042
+    alert_triggers:
+    - event: service_stop
+      service: MsSense
+      severity: high
+    - event: mass_file_rename
+      extension: .thornlock
+      severity: critical
+    - event: vssadmin_delete
+      severity: high
+  azure-ad:
+    tenant_id: 87654321-4321-4321-4321-cba987654321
+    synced_domain: THORNFIELD.LOCAL
+    smart_lockout:
+      threshold: 10
+      duration_seconds: 60
+    service_principals:
+      saber-recon-reader:
+        app_id: b3c816ff-e466-5c37-9331-059fb1d8f927
+        display_name: SABER-Recon-Reader
+        client_secret: recon-reader-bf4b74b4306cb3085484b97c65359e15  # pragma: allowlist secret
+        role_assignments:
+        - Reader
+        - Key Vault Reader
+        - Log Analytics Reader
+        - Security Reader
+        api_permissions:
+        - Microsoft.Resources/subscriptions/read
+        - Microsoft.Resources/subscriptions/resourceGroups/read
+        - Microsoft.Resources/subscriptions/resources/read
+        - Microsoft.Storage/storageAccounts/read
+        - Microsoft.KeyVault/vaults/read
+        - Microsoft.Web/sites/read
+        - Microsoft.ContainerService/managedClusters/read
+        - Microsoft.OperationalInsights/workspaces/read
+        - Microsoft.OperationalInsights/workspaces/query/read
+        - Microsoft.Security/*/read
+        - Microsoft.Security/assessments/read
+        - Microsoft.Security/locations/alerts/read
+        - Microsoft.Security/securescores/read
+        - Microsoft.KeyVault/vaults/secrets/read
+        - Microsoft.KeyVault/vaults/keys/read
+        - Microsoft.KeyVault/vaults/certificates/read
+  imds:
+    enabled: false
+    note: No managed identity in this on-prem scenario
+  arm-api:
+    subscription_id: 12345678-1234-1234-1234-123456789abc
+    requires_token: true
+    note: No cloud credentials obtained in this attack chain
+    authorized_principals:
+    - principal_id: b3c816ff-e466-5c37-9331-059fb1d8f927
+      display_name: SABER-Recon-Reader
+      role_assignments:
+      - Reader
+      - Key Vault Reader
+      - Log Analytics Reader
+      - Security Reader
+      permissions:
+      - Microsoft.Resources/subscriptions/read
+      - Microsoft.Resources/subscriptions/resourceGroups/read
+      - Microsoft.Resources/subscriptions/resources/read
+      - Microsoft.Storage/storageAccounts/read
+      - Microsoft.KeyVault/vaults/read
+      - Microsoft.Web/sites/read
+      - Microsoft.ContainerService/managedClusters/read
+      - Microsoft.OperationalInsights/workspaces/read
+      - Microsoft.OperationalInsights/workspaces/query/read
+      - Microsoft.Security/*/read
+      - Microsoft.Security/assessments/read
+      - Microsoft.Security/locations/alerts/read
+      - Microsoft.Security/securescores/read
+      - Microsoft.KeyVault/vaults/secrets/read
+      - Microsoft.KeyVault/vaults/keys/read
+      - Microsoft.KeyVault/vaults/certificates/read

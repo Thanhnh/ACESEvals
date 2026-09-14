@@ -2,20 +2,6 @@
 
 > **Naming:** The external name for this project is **ACES** (Agent Capability Evaluation Suite). **SABER** (Security Agent Benchmarking and Evaluation Research) is the internal Microsoft codename. Both names refer to the same system. You may see "SABER" in code, package names (`saber`), CLI commands (`uv run saber build`), and logs — this is expected.
 
-<!-- ADO-ONLY:START — strip this banner when syncing to GitHub (ACESEvals is the permanent home, not deprecated) -->
-> ## ⚠️ Repository migration — this Azure DevOps repo is being retired
->
-> **`oss_saber` (Azure DevOps) and its library `SABER` are being discontinued.** Development is
-> moving to GitHub, which is now the **permanent home**:
->
-> - Benchmarks: **[github.com/microsoft/ACESEvals](https://github.com/microsoft/ACESEvals)** — replaces `oss_saber`
-> - Library: **[github.com/microsoft/ACES](https://github.com/microsoft/ACES)** — replaces `SABER`
->
-> **Please migrate your clones and remotes to GitHub by September 30, 2026.** After that date the
-> Azure DevOps `oss_saber` and `SABER` repos will be frozen (read-only) and then removed. All new
-> work, issues, and pull requests should go to the GitHub repos.
-<!-- ADO-ONLY:END -->
-
 A thin Python library for benchmarking AI security agents using YAML-driven task definitions and the [inspect_ai](https://inspect.ai-safety-institute.org.uk/) evaluation framework. No server, no client — just `inspect eval`.
 
 ## Architecture

@@ -1,0 +1,28 @@
+[
+  {
+    "TimeGenerated": "",
+    "NetworkMessageId": "msg-ba1dfe6fb3c3",
+    "InternetMessageId": "",
+    "SenderFromAddress": "billing@vendor-invoices.com",
+    "SenderFromDomain": "",
+    "SenderDisplayName": "",
+    "SenderIPv4": "",
+    "RecipientEmailAddress": "jsmith@contoso.com",
+    "RecipientDomain": "",
+    "Subject": "Outstanding Invoice Q1 - Action Required",
+    "EmailDirection": "Inbound",
+    "DeliveryAction": "Delivered",
+    "DeliveryLocation": "",
+    "ThreatTypes": "Phish",
+    "ThreatNames": "",
+    "DetectionMethods": "",
+    "UrlCount": null,
+    "AttachmentCount": 1,
+    "EmailSize": null,
+    "IsFirstContact": null,
+    "Type": "EmailEvents",
+    "source": "windows_endpoint",
+    "collectedAt": "2026-07-17T19:13:47.425600Z",
+    "AttackTechnique": "T1566.001"
+  }
+]

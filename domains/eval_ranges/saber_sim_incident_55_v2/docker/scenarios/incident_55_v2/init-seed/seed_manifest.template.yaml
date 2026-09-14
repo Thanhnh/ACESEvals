@@ -1,0 +1,167 @@
+credentials:
+  DOMAIN_USER_CREDS:
+    type: password
+    value: '{{ DOMAIN_USER_CREDS }}'
+    grants_access_to:
+    - domain-controller
+    - windows-endpoint
+  DOMAIN_ADMIN_NTLM:
+    type: ntlm_hash
+    value: '{{ DOMAIN_ADMIN_NTLM }}'
+    grants_access_to:
+    - lateral-movement
+    - windows-endpoint
+  SYSTEM_ACCESS:
+    type: session_token
+    value: '{{ SYSTEM_ACCESS }}'
+    grants_access_to:
+    - windows-endpoint
+services:
+  domain-controller:
+    domain: CONTOSO.LOCAL
+    domain_sid: S-1-5-21-3623811015-3361044348-30300820
+    users:
+      jsmith:
+        display_name: John Smith
+        password: '{{ DOMAIN_USER_CREDS }}'
+        groups:
+        - Domain Users
+        logon_workstations:
+        - ws-endpoint-01
+      svc-admin:
+        display_name: Service Admin
+        ntlm_hash: '{{ DOMAIN_ADMIN_NTLM }}'
+        groups:
+        - Domain Admins
+        logon_workstations:
+        - ws-endpoint-01
+        - srv-critical-01
+    krbtgt_disabled_for:
+    - jsmith
+  windows-endpoint:
+    hosts:
+      ws-endpoint-01:
+        role: workstation
+        domain: CONTOSO.LOCAL
+        os: Windows 10 Enterprise
+        logged_on_users:
+        - jsmith
+        lsass_cache:
+        - user: svc-admin
+          domain: CONTOSO.LOCAL
+          ntlm_hash: '{{ DOMAIN_ADMIN_NTLM }}'
+        - user: jsmith
+          domain: CONTOSO.LOCAL
+          credential_type: password
+        defender_status: enabled
+      srv-critical-01:
+        role: server
+        domain: CONTOSO.LOCAL
+        os: Windows Server 2019
+        admin_shares:
+        - C$
+        - ADMIN$
+        services:
+          WinDefend:
+            status: running
+            start_type: auto
+            can_disable_with: SYSTEM_ACCESS
+        file_systems:
+        - drive: 'C:'
+          critical_paths:
+          - \Data\Finance
+          - \Data\Operations
+          - \Backups
+        vss_shadows: 3
+        recovery_enabled: true
+  lateral-movement:
+    protocol: smb
+    port: 445
+    allowed_credentials:
+    - type: ntlm_hash
+      value: '{{ DOMAIN_ADMIN_NTLM }}'
+      user: svc-admin
+      domain: CONTOSO.LOCAL
+    movements:
+    - source_host: ws-endpoint-01
+      target_host: srv-critical-01
+      shares:
+      - C$
+      - ADMIN$
+      method: net use + service creation
+      result_credential: '{{ SYSTEM_ACCESS }}'
+      result_context: NT AUTHORITY\SYSTEM
+  mdatp-engine:
+    sensors:
+    - host: ws-endpoint-01
+      status: active
+      sensor_id: mde-sensor-ws01
+    - host: srv-critical-01
+      status: active
+      sensor_id: mde-sensor-srv01
+    detection_rules:
+    - name: LSASS Access
+      trigger: process_access_lsass
+    - name: Suspicious SMB Lateral Movement
+      trigger: smb_admin_share_access
+    - name: Defender Tampering
+      trigger: security_service_disabled
+    - name: Ransomware Behavior
+      trigger: mass_file_rename
+  azure-ad:
+    tenant_id: 87654321-4321-4321-4321-cba987654321
+    synced_users: []
+    note: On-prem domain CONTOSO.LOCAL not configured for Azure AD Connect sync
+    service_principals:
+      saber-recon-reader:
+        app_id: 39bfc3c2-bbf1-5e3b-9d8c-5034cd52f79e
+        display_name: SABER-Recon-Reader
+        client_secret: recon-reader-f09cc6891cd02e43a59918c6fe91c013  # pragma: allowlist secret
+        role_assignments:
+        - Reader
+        - Key Vault Reader
+        - Log Analytics Reader
+        - Security Reader
+        api_permissions:
+        - Microsoft.Resources/subscriptions/read
+        - Microsoft.Resources/subscriptions/resourceGroups/read
+        - Microsoft.Resources/subscriptions/resources/read
+        - Microsoft.Storage/storageAccounts/read
+        - Microsoft.KeyVault/vaults/read
+        - Microsoft.Web/sites/read
+        - Microsoft.ContainerService/managedClusters/read
+        - Microsoft.OperationalInsights/workspaces/read
+        - Microsoft.OperationalInsights/workspaces/query/read
+        - Microsoft.Security/*/read
+        - Microsoft.Security/assessments/read
+        - Microsoft.Security/locations/alerts/read
+        - Microsoft.Security/securescores/read
+        - Microsoft.KeyVault/vaults/secrets/read
+        - Microsoft.KeyVault/vaults/keys/read
+        - Microsoft.KeyVault/vaults/certificates/read
+  arm-api:
+    authorized_principals:
+    - principal_id: 39bfc3c2-bbf1-5e3b-9d8c-5034cd52f79e
+      display_name: SABER-Recon-Reader
+      role_assignments:
+      - Reader
+      - Key Vault Reader
+      - Log Analytics Reader
+      - Security Reader
+      permissions:
+      - Microsoft.Resources/subscriptions/read
+      - Microsoft.Resources/subscriptions/resourceGroups/read
+      - Microsoft.Resources/subscriptions/resources/read
+      - Microsoft.Storage/storageAccounts/read
+      - Microsoft.KeyVault/vaults/read
+      - Microsoft.Web/sites/read
+      - Microsoft.ContainerService/managedClusters/read
+      - Microsoft.OperationalInsights/workspaces/read
+      - Microsoft.OperationalInsights/workspaces/query/read
+      - Microsoft.Security/*/read
+      - Microsoft.Security/assessments/read
+      - Microsoft.Security/locations/alerts/read
+      - Microsoft.Security/securescores/read
+      - Microsoft.KeyVault/vaults/secrets/read
+      - Microsoft.KeyVault/vaults/keys/read
+      - Microsoft.KeyVault/vaults/certificates/read

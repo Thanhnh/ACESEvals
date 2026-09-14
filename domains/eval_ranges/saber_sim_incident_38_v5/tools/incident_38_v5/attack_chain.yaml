@@ -1,0 +1,53 @@
+attack_chain:
+- step: 1
+  description: Prototype pollution RCE via Front Door to App Service RSC endpoint
+  service: front-door
+  credential_used: none
+  credential_obtained: APP_RCE_ACCESS
+  decoy:
+    service: azure-blob-storage
+    expected_result: 401 Unauthorized
+    reason: "Blob Storage requires OAuth bearer token \u2014 unauthenticated direct\
+      \ access denied"
+- step: 2
+  description: Deploy file-based web shell for persistent command execution on App
+    Service
+  service: azure-app-service
+  credential_used: APP_RCE_ACCESS
+  credential_obtained: WEB_SHELL_ACCESS
+  decoy:
+    service: imds
+    expected_result: 400 Bad Request
+    reason: "IMDS requires Metadata:true header \u2014 request rejected without mandatory\
+      \ header"
+- step: 3
+  description: Query IMDS metadata endpoint to steal managed identity OAuth token
+  service: imds
+  credential_used: WEB_SHELL_ACCESS
+  credential_obtained: MI_TOKEN
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: "Azure AD client_credentials grant requires valid client_secret \u2014\
+      \ MI token is not a client secret"
+- step: 4
+  description: "ARM API enumeration \u2014 discover subscriptions, resource groups,\
+    \ and storage accounts"
+  service: arm-api
+  credential_used: MI_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-blob-storage
+    expected_result: 404 Not Found
+    reason: "Guessed storage container name does not exist \u2014 must enumerate via\
+      \ ARM first"
+- step: 5
+  description: Exfiltrate sensitive data from Azure Blob Storage containers
+  service: azure-blob-storage
+  credential_used: MI_TOKEN
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: "Managed identity lacks Microsoft.Storage/storageAccounts/listKeys/action\
+      \ \u2014 cannot escalate to account key access"

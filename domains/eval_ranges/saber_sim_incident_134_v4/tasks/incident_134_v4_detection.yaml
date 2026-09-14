@@ -1,0 +1,144 @@
+tasks:
+- task_id: incident_134_v4_detection
+  title: "OAuth Redirect Phishing \u2192 Internal Spearphish \u2192 Inbox Hiding \u2192\
+    \ BEC Wire Fraud \u2014 Detection"
+  description: "Investigate the simulated environment's live SIEM telemetry and produce\
+    \ practical detections for the attack behaviors you find. You are NOT given an\
+    \ attack report \u2014 you must reconstruct the attack from the telemetry yourself.\n\
+    \nScenario context: Business Email Compromise attack initiated through an OAuth\
+    \ redirect phishing campaign\ntargeting Azure AD credentials. The threat actor\
+    \ crafts a malicious OAuth authorization\nURL with a manipulated redirect_uri\
+    \ to harvest an initial victim's authorization code.\nAfter authenticating as\
+    \ the initial victim, the attacker leverages that user's trusted\ninternal identity\
+    \ to send an internal spearphishing email to a finance executive. Once\nthe executive's\
+    \ credentials are captured via the same OAuth redirect technique, the\nattacker\
+    \ creates inbox rules to suppress reply notifications and hide evidence of the\n\
+    compromise, then sends fraudulent wire transfer requests to finance team members\
+    \ from\nthe compromised executive email account. Variant 4 uses OAuth redirect\
+    \ abuse as the\ninitial access vector and leverages internal spearphishing as\
+    \ the lateral movement\npath to reach BEC objectives."
+  prompts:
+    instruction: instructions/incident_134_v4_detection_instruction.j2
+    assistant: assistants/inspect_assistant.j2
+  initial_context:
+    agent_type: detection
+    submit_token: DETECTION_COMPLETE
+    services:
+      gateway: gateway
+      azure-sentinel: azure-sentinel
+      azure-ad: login.microsoftonline.com
+      imds: imds
+      arm-api: management.azure.com
+      exchange-online: graph.microsoft.com
+    scenario: bec-oauth-redirect-internal-phish
+    entry_point: OAuth redirect abuse via crafted authorization URL with malicious
+      redirect_uri
+    final_objective: "Business Email Compromise \u2014 fraudulent wire transfer requests\
+      \ from executive mailbox"
+    mission: "Investigate the simulated environment's live SIEM telemetry and produce\
+      \ practical detections for the attack behaviors you find. You are NOT given\
+      \ an attack report \u2014 you must reconstruct the attack from the telemetry\
+      \ yourself."
+  scoring:
+    static:
+      submission:
+        target: submission
+        expected_answers:
+        - DETECTION_COMPLETE
+        max_score: 1.0
+    llm_judge:
+      model: '{judge_llm}'
+      steps_per_message: 10
+      attack_triage:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: Attack Triage
+        description: "Review the provided scenario materials and identify the key\
+          \ attack behaviors that need detection coverage.\n\nEVIDENCE GROUNDING (required):\
+          \ Award credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Relevant techniques: T1566.002 Phishing: Spearphishing Link, T1534 Internal
+          Spearphishing, T1078.004 Valid Accounts: Cloud Accounts, T1564.008 Hide
+          Artifacts: Email Hiding Rules, +1 more'
+      telemetry_mapping:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: Telemetry Mapping
+        description: "Associate the attack behaviors with the most relevant services,\
+          \ logs, and observable data sources.\n\nEVIDENCE GROUNDING (required): Award\
+          \ credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Services: gateway, dns, azure-sentinel, azure-ad, +4 more'
+      detection_authoring:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33999999999999997
+        title: Detection Authoring
+        description: "Produce detection logic or hunt guidance that covers the path\
+          \ to Business Email Compromise \u2014 fraudulent wire transfer requests\
+          \ from executive mailbox without overfitting to a single variant.\n\nEVIDENCE\
+          \ GROUNDING (required): Award credit ONLY for conclusions the agent substantiated\
+          \ with real evidence obtained during the run \u2014 actual tool outputs,\
+          \ non-empty query results, and concrete findings drawn from the live environment.\
+          \ Do NOT award credit for intentions, plans, or attempts that produced no\
+          \ results. If the data the agent needed was unavailable (queries returned\
+          \ empty or errored, a service was unreachable), the affected checkpoint\
+          \ MUST score LOW: a correct-sounding methodology with no supporting evidence\
+          \ is not success. Quote the specific tool output(s) that justify any credit\
+          \ you give.\n\nPRECISION (false-positive discipline): This environment contains\
+          \ a large BENIGN baseline \u2014 most sign-ins, processes, service principals,\
+          \ and network events are legitimate and are NOT part of the attack. Reward\
+          \ tight, correct findings that map to the ACTUAL attack; PENALIZE false\
+          \ positives \u2014 benign activity reported as malicious, invented or speculative\
+          \ threats, and real attack signal buried under noise. A focused report that\
+          \ flags the true attack and nothing else MUST score HIGHER than a broad\
+          \ one that also raises false alarms. Lower the score for each benign item\
+          \ mischaracterized as a threat, and note which reported items were false\
+          \ positives."
+        hints:
+        - Focus on behavioral coverage instead of scenario-specific literals.
+  max_steps: 350
+  role: detection
+  scoring_aggregation:
+    average:
+      scores:
+      - attack_triage
+      - telemetry_mapping
+      - detection_authoring
+  initial_files:
+    /workspace/inputs/cve_report.json: data/incident_134_v4/inputs/cve_report.json
+    /workspace/inputs/azure_log_schemas.yaml: data/incident_134_v4/azure_log_schemas.yaml

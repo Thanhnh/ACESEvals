@@ -1,0 +1,62 @@
+attack_chain:
+- step: 1
+  description: "Device code phishing \u2014 victim authorizes attacker session, yielding\
+    \ delegated OAuth token"
+  service: azure-ad
+  credential_used: none
+  credential_obtained: VICTIM_OAUTH_TOKEN
+  decoy:
+    service: imds
+    expected_result: 404 Not Found
+    reason: Attacker checks IMDS for managed identity token but no MI is attached
+      to workload
+- step: 2
+  description: Enumerate service principals via ARM API to discover app with Mail.ReadWrite.All
+  service: arm-api
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: exchange-online
+    expected_result: 403 Forbidden
+    reason: Delegated token for victim user has no permissions on executive mailbox
+- step: 3
+  description: Inject new client secret into HR-Automation-App via addPassword on
+    service principal
+  service: azure-ad
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: SP_CLIENT_SECRET
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: "ARM provider does not support addPassword \u2014 must use MS Graph API\
+      \ endpoint"
+- step: 4
+  description: Authenticate as service principal using injected secret via client_credentials
+    grant
+  service: azure-ad
+  credential_used: SP_CLIENT_SECRET
+  credential_obtained: SP_APP_TOKEN
+  decoy:
+    service: imds
+    expected_result: 401 Unauthorized
+    reason: "IMDS only issues managed identity tokens \u2014 cannot mint tokens for\
+      \ service principals"
+- step: 5
+  description: Create inbox hiding rule on CFO mailbox to suppress security notifications
+  service: exchange-online
+  credential_used: SP_APP_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-ad
+    expected_result: 403 Forbidden
+    reason: Azure AD identity endpoints do not expose mailbox rule management operations
+- step: 6
+  description: Exfiltrate sensitive emails from CFO mailbox via Graph API application
+    permissions
+  service: exchange-online
+  credential_used: SP_APP_TOKEN
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: ARM API does not serve Microsoft Graph mail operations

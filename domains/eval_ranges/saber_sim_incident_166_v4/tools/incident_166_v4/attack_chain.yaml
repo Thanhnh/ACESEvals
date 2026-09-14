@@ -1,0 +1,57 @@
+attack_chain:
+- step: 1
+  description: "Spearphishing link delivers credential harvester \u2014 victim enters\
+    \ Azure AD credentials, attacker authenticates via password grant and obtains\
+    \ OAuth token"
+  service: azure-ad
+  credential_used: none
+  credential_obtained: VICTIM_OAUTH_TOKEN
+  decoy:
+    service: imds
+    expected_result: 404 Not Found
+    reason: "IMDS has no managed identity configured \u2014 returns identity not found\
+      \ for token request"
+- step: 2
+  description: Enumerate Azure AD directory users via Microsoft Graph /v1.0/users
+    to identify CFO as high-value target
+  service: azure-ad
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: "Victim's OAuth token scoped to graph.microsoft.com audience \u2014 ARM\
+      \ API rejects non-management-plane tokens"
+- step: 3
+  description: "Send internal spearphishing email from victim mailbox to CFO with\
+    \ credential harvester link \u2014 CFO enters credentials on fake page"
+  service: exchange-online
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: EXEC_AD_CREDENTIALS
+  decoy:
+    service: azure-ad
+    expected_result: 403 Forbidden
+    reason: "Victim's token lacks Application.ReadWrite.All \u2014 cannot escalate\
+      \ via addPassword on service principal"
+- step: 4
+  description: "Authenticate as executive to Azure AD using harvested CFO credentials\
+    \ \u2014 obtain executive OAuth token with Mail.Read scope"
+  service: azure-ad
+  credential_used: EXEC_AD_CREDENTIALS
+  credential_obtained: EXEC_OAUTH_TOKEN
+  decoy:
+    service: exchange-online
+    expected_result: 401 Unauthorized
+    reason: "Exchange Graph API requires OAuth bearer token \u2014 raw credentials\
+      \ not accepted as authentication method"
+- step: 5
+  description: Exfiltrate sensitive emails from CFO mailbox via Microsoft Graph Mail
+    API /v1.0/users/{cfo}/messages
+  service: exchange-online
+  credential_used: EXEC_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: "Executive OAuth token scoped to graph.microsoft.com with Mail.Read \u2014\
+      \ ARM management plane rejects it"

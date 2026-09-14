@@ -1,0 +1,51 @@
+attack_chain:
+- step: 1
+  description: Spearphishing macro executes payload on victim workstation
+  service: windows-endpoint
+  credential_used: none
+  credential_obtained: MACRO_CODE_EXECUTION
+  decoy:
+    service: gateway
+    expected_result: 403 Forbidden
+    reason: Macro initial C2 callback blocked by outbound proxy egress rules; attacker
+      pivots to fileless execution
+- step: 2
+  description: Process injection into svchost.exe for SYSTEM-level execution context
+  service: windows-endpoint
+  credential_used: MACRO_CODE_EXECUTION
+  credential_obtained: INJECTED_SVCHOST_CONTEXT
+  decoy:
+    service: domain-controller
+    expected_result: 401 Unauthorized
+    reason: Premature attempt to access DC via SMB before credential harvest; no valid
+      domain admin credentials yet
+- step: 3
+  description: Dump LSASS memory to extract cached domain administrator NTLM hash
+  service: windows-endpoint
+  credential_used: INJECTED_SVCHOST_CONTEXT
+  credential_obtained: DOMAIN_USER_NTLM_HASH
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: NTLM hash cannot authenticate to Azure AD; cloud identity requires OAuth/SAML
+      token flow
+- step: 4
+  description: WMI lateral movement to domain controller using pass-the-hash
+  service: lateral-movement
+  credential_used: DOMAIN_USER_NTLM_HASH
+  credential_obtained: DC_WMI_SESSION
+  decoy:
+    service: imds
+    expected_result: 401 Unauthorized
+    reason: Workstation has no managed identity configured; IMDS returns empty response
+      for cloud pivot attempt
+- step: 5
+  description: DCSync replication extracts full domain credential set including KRBTGT
+  service: domain-controller
+  credential_used: DC_WMI_SESSION
+  credential_obtained: FULL_DOMAIN_HASH_SET
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: ARM API requires Azure AD OAuth token; on-premises domain session credentials
+      not accepted for cloud resource enumeration

@@ -21,6 +21,7 @@ This guide walks you through creating production-ready security domains from scr
 - [Testing Your Domain](#testing-your-domain)
 - [Advanced Patterns](#advanced-patterns)
 - [Best Practices](#best-practices)
+- [SABER-Sim Range Domains](#saber-sim-range-domains)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -1381,6 +1382,87 @@ tasks:
 - Ignore warning messages
 - Assume defaults are correct
 - Test only happy paths
+
+---
+
+## SABER-Sim Range Domains
+
+Each Excytin-derived range is installed as its own domain under
+`domains/eval_ranges/saber_sim_<range>/`, with six tasks and a namespaced sandbox image. The source
+of truth is the sibling `saber_sim` repository; do not hand-edit exported task, prompt,
+compose, scoring, or scenario files here.
+
+### Re-export a range
+
+```bash
+SABER_SIM=../saber_sim
+RANGE=incident_34_v1
+DOMAIN="$PWD/domains/eval_ranges/saber_sim_${RANGE}"
+
+for agent in red_team reconnaissance detection posture_analysis remediation threat_intel; do
+  target="/tmp/saber-export/${RANGE}_${agent}"
+  (cd "$SABER_SIM" && .venv/bin/python -m src.main export-saber \
+    "$RANGE" --agent "$agent" --target "$target")
+  "$SABER_SIM/.venv/bin/python" "$target/install.py" \
+    --domain-root "$DOMAIN" --force
+  rm -rf "$target"
+done
+```
+
+The generated Dockerfile must retain `ARG SABER_BASE_IMAGE=saber/sandbox:latest`; SABER
+uses it to select the react-only or CLI-agents base image. The sandbox tag in `eval.yaml`
+and the compose file must be `saber/saber_sim_<range>/sandbox:latest` so concurrent domains
+cannot overwrite one another.
+
+### Range telemetry
+
+Historical `logs/*.jsonl` files are intentionally excluded from git. Each scenario carries
+`range_logs.yaml`, which pins the HuggingFace dataset repository, immutable revision,
+archive path, SHA-256 digest, and expected file count. `MaterializeRangeLogs` downloads only
+when logs are absent, verifies the archive before extraction, blocks zip-slip/symlinks, and
+atomically replaces the logs directory.
+
+Publish a new pinned set from the sibling `saber_sim` checkout after ranges regenerate:
+
+```bash
+.venv/bin/hf auth login  # requires a write token; enter it directly in the terminal
+.venv/bin/python ../saber_sim/scripts/publish_saber_sim_range_logs.py \
+  --oss-saber-root "$PWD"
+```
+
+The publisher packages files deterministically, uploads all selected ranges in one commit,
+verifies every remote archive at that immutable revision, and rewrites
+`saber_sim/resources/saber_range_logs.yaml`. Re-export the affected domains afterward so each
+installed scenario receives the new pinned manifest.
+
+Setup hooks materialize logs automatically during evaluation. To prefetch all range logs:
+
+```bash
+scripts/fetch_saber_sim_range_logs.sh
+
+# Or selected domains:
+scripts/fetch_saber_sim_range_logs.sh \
+  domains/eval_ranges/saber_sim_incident_34_v1 \
+  domains/eval_ranges/saber_sim_incident_5_v1
+```
+
+An offline host must pre-populate the HuggingFace cache or copy the verified archives into
+that cache before running the fetch script. Never replace the pinned revision with `main`.
+
+### Harness matrix
+
+```bash
+scripts/run_saber_sim_matrix.sh \
+  --model openai/azure/gpt-5.4 \
+  --harnesses react,copilot,claude_code \
+  --epochs 3
+
+.venv/bin/python scripts/analyze_saber_sim_matrix.py
+```
+
+The analyzer reports raw scores, explicit attack-policy refusals, refusal-adjusted scores,
+token usage, epoch spread, and paired harness comparisons. Provider cost is reported only
+when Inspect records `total_cost`; the stage-1 Azure logs do not contain it.
 
 ---
 

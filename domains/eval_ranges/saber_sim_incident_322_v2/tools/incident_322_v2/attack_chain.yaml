@@ -1,0 +1,44 @@
+attack_chain:
+- step: 1
+  description: "Exploit App Service deserialization SSRF to reach IMDS \u2014 obtain\
+    \ managed identity token"
+  service: azure-app-service
+  credential_used: none
+  credential_obtained: MI_TOKEN
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: ARM API requires valid Bearer token; unauthenticated enumeration attempt
+      rejected
+- step: 2
+  description: "LSASS memory dump on app-srv-ext01 \u2014 harvest svc_backup NTLM\
+    \ hash"
+  service: windows-endpoint
+  credential_used: MI_TOKEN
+  credential_obtained: NTLM_HASH
+  decoy:
+    service: domain-controller
+    expected_result: 401 Unauthorized
+    reason: Domain controller rejects OAuth managed identity tokens; requires NTLM
+      or Kerberos authentication
+- step: 3
+  description: Pass-the-hash lateral movement via SMB/RDP to int-srv-db02
+  service: lateral-movement
+  credential_used: NTLM_HASH
+  credential_obtained: LATERAL_SESSION
+  decoy:
+    service: azure-ad
+    expected_result: 403 Forbidden
+    reason: Azure AD does not accept NTLM hashes; requires OAuth client credentials
+      flow
+- step: 4
+  description: Deploy HTTPS C2 implant and establish persistent beacon channel from
+    int-srv-db02
+  service: c2-server
+  credential_used: LATERAL_SESSION
+  credential_obtained: none
+  decoy:
+    service: front-door
+    expected_result: 403 Forbidden
+    reason: Front Door WAF blocks outbound C2 beacon patterns on non-whitelisted egress
+      paths
