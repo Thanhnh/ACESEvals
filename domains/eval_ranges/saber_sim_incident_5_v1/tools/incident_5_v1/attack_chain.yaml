@@ -1,0 +1,44 @@
+attack_chain:
+- step: 1
+  description: "Spearphishing attachment delivers macro payload \u2014 initial shell\
+    \ on wkst-victim"
+  service: exchange-online
+  credential_used: none
+  credential_obtained: INITIAL_SHELL
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: Azure AD OAuth endpoint rejects request without valid client_id and tenant
+      credentials
+- step: 2
+  description: "Process injection into svchost.exe \u2014 escalate to SYSTEM execution\
+    \ context"
+  service: windows-endpoint
+  credential_used: INITIAL_SHELL
+  credential_obtained: SYSTEM_ACCESS
+  decoy:
+    service: domain-controller
+    expected_result: 403 Forbidden
+    reason: User-level shell cannot perform DCSync or access DC admin shares without
+      domain admin credentials
+- step: 3
+  description: "Dump LSASS memory \u2014 harvest dadmin NTLM hash from credential\
+    \ cache"
+  service: windows-endpoint
+  credential_used: SYSTEM_ACCESS
+  credential_obtained: NTLM_HASH
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: ARM API requires Azure AD bearer token, SYSTEM-level Windows access is
+      not a valid credential
+- step: 4
+  description: Pass-the-hash lateral movement via SMB ADMIN$ share to wkst-target
+  service: lateral-movement
+  credential_used: NTLM_HASH
+  credential_obtained: TARGET_ACCESS
+  decoy:
+    service: exchange-online
+    expected_result: 401 Unauthorized
+    reason: Exchange Online requires OAuth bearer token, cannot authenticate with
+      NTLM hash directly

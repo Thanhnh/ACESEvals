@@ -1,0 +1,28 @@
+[
+  {
+    "TimeGenerated": "",
+    "NetworkMessageId": "a3f41531-053b-44d2-9d21-2776ae1ee0d1",
+    "InternetMessageId": "",
+    "SenderFromAddress": "j.martinez",
+    "SenderFromDomain": "",
+    "SenderDisplayName": "",
+    "SenderIPv4": "",
+    "RecipientEmailAddress": "j.martinez",
+    "RecipientDomain": "",
+    "Subject": "",
+    "EmailDirection": "Intraorg",
+    "DeliveryAction": "Delivered",
+    "DeliveryLocation": "",
+    "ThreatTypes": "Phish",
+    "ThreatNames": "",
+    "DetectionMethods": "",
+    "UrlCount": null,
+    "AttachmentCount": null,
+    "EmailSize": null,
+    "IsFirstContact": null,
+    "Type": "",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1534"
+  }
+]

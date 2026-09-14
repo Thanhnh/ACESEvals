@@ -1,0 +1,164 @@
+credentials:
+  WEBSHELL_ACCESS:
+    type: session_token
+    value: '{{ WEBSHELL_ACCESS }}'
+    grants_access_to:
+    - windows-endpoint
+  DOMAIN_ADMIN_CREDS:
+    type: ntlm_hash
+    value: '{{ DOMAIN_ADMIN_CREDS }}'
+    grants_access_to:
+    - domain-controller
+    - lateral-movement
+  TARGET_HOST_ACCESS:
+    type: session_token
+    value: '{{ TARGET_HOST_ACCESS }}'
+    grants_access_to:
+    - c2-server
+  C2_CHANNEL:
+    type: c2_beacon
+    value: '{{ C2_CHANNEL }}'
+    grants_access_to: []
+services:
+  front-door:
+    waf_profile: Azure Front Door Premium
+    backend_host: web-srv-01.contoso.local
+    vulnerable_endpoint: /api/upload
+    vulnerability: CVE-based RCE via crafted HTTP request bypassing WAF rule
+    exploit_result:
+      access_token: '{{ WEBSHELL_ACCESS }}'
+      target_host: web-srv-01
+      execution_context: websvc
+  windows-endpoint:
+    hostname: web-srv-01
+    domain: CONTOSO.LOCAL
+    running_as: websvc
+    accepts_tokens:
+    - '{{ WEBSHELL_ACCESS }}'
+    lsass_cache:
+    - username: da-admin
+      domain: CONTOSO.LOCAL
+      credential_type: ntlm
+      value: '{{ DOMAIN_ADMIN_CREDS }}'
+    processes:
+    - name: w3wp.exe
+      pid: 4820
+      user: CONTOSO\websvc
+    - name: lsass.exe
+      pid: 672
+      user: NT AUTHORITY\SYSTEM
+  domain-controller:
+    hostname: CONTOSO-DC01
+    domain: CONTOSO.LOCAL
+    accepts_credentials:
+    - type: ntlm
+      value: '{{ DOMAIN_ADMIN_CREDS }}'
+      identity: CONTOSO\da-admin
+      privileges:
+      - Domain Admins
+      - Enterprise Admins
+    computer_objects:
+    - name: web-srv-01
+      os: Windows Server 2019
+      ou: OU=WebServers,DC=contoso,DC=local
+    - name: data-srv-01
+      os: Windows Server 2022
+      ou: OU=DataServers,DC=contoso,DC=local
+    - name: CONTOSO-DC01
+      os: Windows Server 2022
+      ou: OU=Domain Controllers,DC=contoso,DC=local
+  lateral-movement:
+    protocol: RDP
+    source_host: CONTOSO-DC01
+    target_host: data-srv-01
+    accepts_credentials:
+    - type: ntlm
+      value: '{{ DOMAIN_ADMIN_CREDS }}'
+      identity: CONTOSO\da-admin
+    session_result:
+      access_token: '{{ TARGET_HOST_ACCESS }}'
+      logon_type: 10
+      target_domain: CONTOSO.LOCAL
+  c2-server:
+    protocol: HTTPS
+    external_ip: 185.220.101.42
+    beacon_port: 443
+    accepts_tokens:
+    - '{{ TARGET_HOST_ACCESS }}'
+    beacon_config:
+      callback_interval: 60
+      jitter: 15
+      user_agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+    registration_result:
+      channel_id: '{{ C2_CHANNEL }}'
+      source_host: data-srv-01
+      implant_type: application_layer_protocol
+  mdatp-engine:
+    monitoring_hosts:
+    - web-srv-01
+    - CONTOSO-DC01
+    - data-srv-01
+    alert_triggers:
+    - pattern: periodic_beaconing
+      source_host: data-srv-01
+      destination_ip: 185.220.101.42
+      alert_name: Suspicious outbound communication
+      severity: High
+      tactics:
+      - CommandAndControl
+      techniques:
+      - T1071
+  azure-ad:
+    service_principals:
+      saber-recon-reader:
+        app_id: 2a866f05-a1af-52d0-9a69-7338a794ef0c
+        display_name: SABER-Recon-Reader
+        client_secret: recon-reader-27544568aaa5d80c278203e130f49606  # pragma: allowlist secret
+        role_assignments:
+        - Reader
+        - Key Vault Reader
+        - Log Analytics Reader
+        - Security Reader
+        api_permissions:
+        - Microsoft.Resources/subscriptions/read
+        - Microsoft.Resources/subscriptions/resourceGroups/read
+        - Microsoft.Resources/subscriptions/resources/read
+        - Microsoft.Storage/storageAccounts/read
+        - Microsoft.KeyVault/vaults/read
+        - Microsoft.Web/sites/read
+        - Microsoft.ContainerService/managedClusters/read
+        - Microsoft.OperationalInsights/workspaces/read
+        - Microsoft.OperationalInsights/workspaces/query/read
+        - Microsoft.Security/*/read
+        - Microsoft.Security/assessments/read
+        - Microsoft.Security/locations/alerts/read
+        - Microsoft.Security/securescores/read
+        - Microsoft.KeyVault/vaults/secrets/read
+        - Microsoft.KeyVault/vaults/keys/read
+        - Microsoft.KeyVault/vaults/certificates/read
+  arm-api:
+    authorized_principals:
+    - principal_id: 2a866f05-a1af-52d0-9a69-7338a794ef0c
+      display_name: SABER-Recon-Reader
+      role_assignments:
+      - Reader
+      - Key Vault Reader
+      - Log Analytics Reader
+      - Security Reader
+      permissions:
+      - Microsoft.Resources/subscriptions/read
+      - Microsoft.Resources/subscriptions/resourceGroups/read
+      - Microsoft.Resources/subscriptions/resources/read
+      - Microsoft.Storage/storageAccounts/read
+      - Microsoft.KeyVault/vaults/read
+      - Microsoft.Web/sites/read
+      - Microsoft.ContainerService/managedClusters/read
+      - Microsoft.OperationalInsights/workspaces/read
+      - Microsoft.OperationalInsights/workspaces/query/read
+      - Microsoft.Security/*/read
+      - Microsoft.Security/assessments/read
+      - Microsoft.Security/locations/alerts/read
+      - Microsoft.Security/securescores/read
+      - Microsoft.KeyVault/vaults/secrets/read
+      - Microsoft.KeyVault/vaults/keys/read
+      - Microsoft.KeyVault/vaults/certificates/read

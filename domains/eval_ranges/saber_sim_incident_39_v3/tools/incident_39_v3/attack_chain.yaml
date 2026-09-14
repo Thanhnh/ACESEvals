@@ -1,0 +1,52 @@
+attack_chain:
+- step: 1
+  description: "Credential stuffing sign-in to Azure AD \u2014 obtain compromised\
+    \ account token"
+  service: azure-ad
+  credential_used: none
+  credential_obtained: COMPROMISED_ACCOUNT_TOKEN
+  decoy:
+    service: exchange-online
+    expected_result: 401 Unauthorized
+    reason: Exchange requires OAuth bearer token, not raw username/password credentials
+- step: 2
+  description: Steal OAuth application access token scoped to Mail.ReadWrite via malicious
+    app consent
+  service: azure-ad
+  credential_used: COMPROMISED_ACCOUNT_TOKEN
+  credential_obtained: EXCHANGE_OAUTH_TOKEN
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: Compromised account token lacks Azure Resource Manager permissions
+- step: 3
+  description: "Internal spearphishing from victim1 mailbox to finance director \u2014\
+    \ obtain second victim token"
+  service: exchange-online
+  credential_used: EXCHANGE_OAUTH_TOKEN
+  credential_obtained: SECOND_VICTIM_TOKEN
+  decoy:
+    service: imds
+    expected_result: 401 Unauthorized
+    reason: IMDS only responds to requests from Azure compute instances, not Exchange
+      OAuth tokens
+- step: 4
+  description: Create inbox rules on target mailbox to hide security notifications
+  service: exchange-online
+  credential_used: SECOND_VICTIM_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-ad
+    expected_result: 403 Forbidden
+    reason: Second victim token scoped to Mail.ReadWrite, lacks Directory.ReadWrite.All
+      for account modification
+- step: 5
+  description: Bulk email collection and exfiltration from target mailbox via Graph
+    API
+  service: exchange-online
+  credential_used: SECOND_VICTIM_TOKEN
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: Second victim token audience is Graph API, not management.azure.com

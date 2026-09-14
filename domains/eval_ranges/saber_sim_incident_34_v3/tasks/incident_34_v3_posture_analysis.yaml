@@ -1,0 +1,136 @@
+tasks:
+- task_id: incident_34_v3_posture_analysis
+  title: "Compromised Azure AD Creds \u2192 ARM Pivot \u2192 SP Credential Addition\
+    \ \u2192 Backdoor Account \u2192 Blob Exfiltration \u2014 Posture Analysis"
+  description: "Assess the simulated cloud security posture by INVESTIGATING the live\
+    \ environment: identify exposures and attack paths, and prioritize risk-driven\
+    \ recommendations. You are NOT handed an infrastructure-as-code inventory \u2014\
+    \ you must discover the assets, identities, and relationships yourself.\n\nScenario\
+    \ context: Multi-stage credential abuse attack in which a threat actor authenticates\n\
+    with compromised Azure AD credentials, pivots through the ARM management\nplane\
+    \ to add credentials to a high-privilege service principal, re-enters\nAzure AD\
+    \ with elevated SP credentials to create a persistent backdoor cloud\naccount,\
+    \ then laterally moves to blob storage under the backdoor identity\nto stage and\
+    \ exfiltrate sensitive data. Variant 3 emphasizes the ARM lateral\nmovement path\
+    \ and backdoor identity pivot to blob storage."
+  prompts:
+    instruction: instructions/incident_34_v3_posture_analysis_instruction.j2
+    assistant: assistants/inspect_assistant.j2
+  initial_context:
+    agent_type: posture_analysis
+    submit_token: POSTURE_ANALYSIS_COMPLETE
+    services:
+      gateway: gateway
+      azure-sentinel: azure-sentinel
+      azure-ad: login.microsoftonline.com
+      imds: imds
+      arm-api: management.azure.com
+      azure-blob-storage: proddata001.blob.core.windows.net
+      blob-proxy: blob-proxy
+    scenario: credential-abuse-arm-pivot-blob-exfil-v3
+    entry_point: Compromised Azure AD user credentials (valid account)
+    final_objective: Stage and exfiltrate sensitive data from Azure Blob Storage via
+      backdoor identity
+    mission: "Assess the simulated cloud security posture by INVESTIGATING the live\
+      \ environment: identify exposures and attack paths, and prioritize risk-driven\
+      \ recommendations. You are NOT handed an infrastructure-as-code inventory \u2014\
+      \ you must discover the assets, identities, and relationships yourself."
+  scoring:
+    static:
+      submission:
+        target: submission
+        expected_answers:
+        - POSTURE_ANALYSIS_COMPLETE
+        max_score: 1.0
+    llm_judge:
+      model: '{judge_llm}'
+      steps_per_message: 10
+      asset_inventory:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: Asset & Exposure Inventory
+        description: "Identify the most important exposed services, identities, and\
+          \ high-value resources in the scenario.\n\nEVIDENCE GROUNDING (required):\
+          \ Award credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Services: gateway, dns, azure-sentinel, azure-ad, +5 more'
+      attack_path_analysis:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: Attack Path Analysis
+        description: "Explain how an attacker can move from Compromised Azure AD user\
+          \ credentials (valid account) to Stage and exfiltrate sensitive data from\
+          \ Azure Blob Storage via backdoor identity.\n\nEVIDENCE GROUNDING (required):\
+          \ Award credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Relevant techniques: T1078.004 Valid Accounts: Cloud Accounts, T1098.001
+          Account Manipulation: Additional Cloud Credentials, T1078.004 Valid Accounts:
+          Cloud Accounts, T1136.003 Create Account: Cloud Account, +2 more'
+      risk_prioritization:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33999999999999997
+        title: Risk Prioritization
+        description: "Prioritize the posture findings and recommend the highest-impact\
+          \ remediations first.\n\nEVIDENCE GROUNDING (required): Award credit ONLY\
+          \ for conclusions the agent substantiated with real evidence obtained during\
+          \ the run \u2014 actual tool outputs, non-empty query results, and concrete\
+          \ findings drawn from the live environment. Do NOT award credit for intentions,\
+          \ plans, or attempts that produced no results. If the data the agent needed\
+          \ was unavailable (queries returned empty or errored, a service was unreachable),\
+          \ the affected checkpoint MUST score LOW: a correct-sounding methodology\
+          \ with no supporting evidence is not success. Quote the specific tool output(s)\
+          \ that justify any credit you give.\n\nPRECISION (false-positive discipline):\
+          \ This environment contains a large BENIGN baseline \u2014 most sign-ins,\
+          \ processes, service principals, and network events are legitimate and are\
+          \ NOT part of the attack. Reward tight, correct findings that map to the\
+          \ ACTUAL attack; PENALIZE false positives \u2014 benign activity reported\
+          \ as malicious, invented or speculative threats, and real attack signal\
+          \ buried under noise. A focused report that flags the true attack and nothing\
+          \ else MUST score HIGHER than a broad one that also raises false alarms.\
+          \ Lower the score for each benign item mischaracterized as a threat, and\
+          \ note which reported items were false positives."
+        hints:
+        - Separate immediate critical controls from longer-term improvements.
+  max_steps: 300
+  role: posture_analysis
+  scoring_aggregation:
+    average:
+      scores:
+      - asset_inventory
+      - attack_path_analysis
+      - risk_prioritization

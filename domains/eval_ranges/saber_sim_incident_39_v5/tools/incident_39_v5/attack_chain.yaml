@@ -1,0 +1,46 @@
+attack_chain:
+- step: 1
+  description: "Password spray against Azure AD \u2014 obtain developer session token"
+  service: azure-ad
+  credential_used: none
+  credential_obtained: DEVELOPER_AD_TOKEN
+  decoy:
+    service: exchange-online
+    expected_result: 403 Forbidden
+    reason: Developer account has no delegated access to executive mailbox
+- step: 2
+  description: Access Azure Functions Kudu VFS to steal OAuth app client credentials
+  service: azure-functions
+  credential_used: DEVELOPER_AD_TOKEN
+  credential_obtained: FUNCTIONS_OAUTH_TOKEN
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: Developer lacks subscription-level Reader role for ARM resource enumeration
+- step: 3
+  description: Send internal spearphishing as HR notification app to finance executive
+  service: exchange-online
+  credential_used: FUNCTIONS_OAUTH_TOKEN
+  credential_obtained: HVT_SESSION_TOKEN
+  decoy:
+    service: azure-ad
+    expected_result: 403 Forbidden
+    reason: Function app SP token scoped to Mail.Send only, lacks Directory.Read.All
+- step: 4
+  description: Create inbox rules to suppress security alert notifications
+  service: exchange-online
+  credential_used: HVT_SESSION_TOKEN
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: HVT session token is Graph-scoped, not accepted by ARM management plane
+- step: 5
+  description: Exfiltrate sensitive financial emails via Graph API batch requests
+  service: exchange-online
+  credential_used: HVT_SESSION_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-functions
+    expected_result: 401 Unauthorized
+    reason: HVT has no Contributor role assignment on the function app resource

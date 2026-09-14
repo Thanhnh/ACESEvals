@@ -1,0 +1,50 @@
+attack_chain:
+- step: 1
+  description: Authenticate to domain with compromised jsmith credentials
+  service: domain-controller
+  credential_used: none
+  credential_obtained: DOMAIN_USER_CREDS
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: Azure AD rejects on-prem-only domain credentials not synced to cloud tenant
+- step: 2
+  description: Dump LSASS on ws-endpoint-01 to extract svc-admin NTLM hash
+  service: windows-endpoint
+  credential_used: DOMAIN_USER_CREDS
+  credential_obtained: DOMAIN_ADMIN_NTLM
+  decoy:
+    service: domain-controller
+    expected_result: 403 Forbidden
+    reason: DCSync replication requires Replicating Directory Changes permission that
+      jsmith lacks
+- step: 3
+  description: SMB lateral movement to srv-critical-01 via admin shares using pass-the-hash
+  service: lateral-movement
+  credential_used: DOMAIN_ADMIN_NTLM
+  credential_obtained: SYSTEM_ACCESS
+  decoy:
+    service: windows-endpoint
+    expected_result: 403 Forbidden
+    reason: "Direct WinRM rejected \u2014 NLA blocks pass-the-hash for remote management\
+      \ without SMB relay"
+- step: 4
+  description: Disable Windows Defender and EDR on srv-critical-01
+  service: windows-endpoint
+  credential_used: SYSTEM_ACCESS
+  credential_obtained: none
+  decoy:
+    service: mdatp-engine
+    expected_result: 401 Unauthorized
+    reason: MDE cloud API requires valid Azure bearer token, not local SYSTEM session
+- step: 5
+  description: "Deploy ransomware \u2014 delete VSS shadows, disable recovery, encrypt\
+    \ file systems"
+  service: windows-endpoint
+  credential_used: SYSTEM_ACCESS
+  credential_obtained: none
+  decoy:
+    service: lateral-movement
+    expected_result: 403 Forbidden
+    reason: "Attempt to propagate ransomware to additional hosts fails \u2014 no other\
+      \ hosts trust svc-admin admin shares"

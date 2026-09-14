@@ -1,0 +1,24 @@
+[
+  {
+    "time": "",
+    "TimeGenerated": "2026-07-01T03:56:44.086Z",
+    "category": "",
+    "operationName": "",
+    "resultType": "",
+    "properties": null,
+    "_source": "app_service",
+    "EventID": 4688,
+    "Activity": "4688 - A new process has been created.",
+    "Channel": "Security",
+    "Computer": "prod-webapp.azurewebsites.net",
+    "LogonType": null,
+    "TargetUserName": "",
+    "TargetDomainName": "",
+    "SubjectUserName": "IIS APPPOOL\\DefaultAppPool",
+    "IpAddress": "",
+    "WorkstationName": "",
+    "source": "app_service",
+    "collectedAt": "2026-07-01T03:57:04.096750Z",
+    "AttackTechnique": "T1190"
+  }
+]

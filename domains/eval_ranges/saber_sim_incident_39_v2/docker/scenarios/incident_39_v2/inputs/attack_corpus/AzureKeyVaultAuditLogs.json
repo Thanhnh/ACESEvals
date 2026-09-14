@@ -1,0 +1,25 @@
+[
+  {
+    "time": "2026-07-01T08:53:19.4487769Z",
+    "resourceId": "/SUBSCRIPTIONS/12345678-1234-1234-1234-123456789ABC/RESOURCEGROUPS/PRODUCTION-RG/PROVIDERS/MICROSOFT.KEYVAULT/VAULTS/PROD-SECRETS-KV",
+    "operationName": "SecretGet",
+    "operationVersion": "7.4",
+    "category": "AuditEvent",
+    "resultType": "Success",
+    "resultSignature": "OK",
+    "resultDescription": "",
+    "durationMs": 31,
+    "callerIpAddress": "172.30.10.1",
+    "correlationId": "ce7c7dd8-628e-4541-b5bf-434c7d0ee821",
+    "identity": null,
+    "properties": {
+      "clientInfo": "curl/8.14.1",
+      "httpStatusCode": 200,
+      "id": "https://prod-secrets-kv.vault.azure.net/secrets/mailprocessor-sp-credentials",
+      "isAccessPolicyMatch": true
+    },
+    "source": "keyvault",
+    "collectedAt": "2026-07-01T08:54:09.504280Z",
+    "AttackTechnique": "T1552.004"
+  }
+]

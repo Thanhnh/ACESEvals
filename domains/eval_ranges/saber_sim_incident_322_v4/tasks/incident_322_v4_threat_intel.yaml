@@ -1,0 +1,146 @@
+tasks:
+- task_id: incident_322_v4_threat_intel
+  title: "App Service Exploitation \u2192 C2 Beacon \u2192 LSASS Credential Dump \u2192\
+    \ WMI Lateral Movement \u2014 Threat Intel"
+  description: "Produce a high-quality threat intelligence brief by RECONSTRUCTING\
+    \ the attack from the environment's telemetry: the threat story, MITRE mapping,\
+    \ and relevant adversary or CVE context. You are NOT given the scenario intent\
+    \ \u2014 reconstruct it from evidence.\n\nScenario context: Variant 4 of an external\
+    \ exploitation-to-C2 attack chain. A threat actor exploits a\npublic-facing web\
+    \ application hosted on Azure App Service to gain initial code execution\non the\
+    \ underlying Windows host. The attacker establishes a persistent HTTP-based\n\
+    command-and-control channel, then discovers and dumps domain credentials from\
+    \ LSASS\nmemory for privilege escalation. Finally, the attacker pivots laterally\
+    \ to a secondary\ninternal workstation via WMI remote execution, demonstrating\
+    \ an alternate lateral\nmovement path. Evidence surfaces across SecurityEvent\
+    \ (Windows host logon/process\nevents), CommonSecurityLog (network device C2 traffic\
+    \ detection), and SecurityAlert\n(detection engine alerts) tables."
+  prompts:
+    instruction: instructions/incident_322_v4_threat_intel_instruction.j2
+    assistant: assistants/inspect_assistant.j2
+  initial_context:
+    agent_type: threat_intel
+    submit_token: THREAT_INTEL_COMPLETE
+    services:
+      gateway: gateway
+      azure-sentinel: azure-sentinel
+      azure-ad: login.microsoftonline.com
+      imds: imds
+      arm-api: management.azure.com
+      azure-app-service: prod-webapp.azurewebsites.net
+      windows-endpoint: win-endpoint-01
+      c2-server: c2-server
+      lateral-movement: lateral-movement
+      mdatp-engine: mdatp-engine
+      domain-controller: dc.corp.local
+      front-door: prod-webapp.azurefd.net
+    scenario: appservice-exploit-c2-lsass-wmi-lateral
+    entry_point: Remote code execution exploit against public-facing Azure App Service
+      web application
+    final_objective: Lateral movement to secondary internal workstation via WMI using
+      stolen domain credentials
+    mission: "Produce a high-quality threat intelligence brief by RECONSTRUCTING the\
+      \ attack from the environment's telemetry: the threat story, MITRE mapping,\
+      \ and relevant adversary or CVE context. You are NOT given the scenario intent\
+      \ \u2014 reconstruct it from evidence."
+  scoring:
+    static:
+      submission:
+        target: submission
+        expected_answers:
+        - THREAT_INTEL_COMPLETE
+        max_score: 1.0
+    llm_judge:
+      model: '{judge_llm}'
+      steps_per_message: 10
+      scenario_summary:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: Scenario Threat Summary
+        description: "Summarize the attacker objective, entry point, and critical\
+          \ stages of the scenario clearly.\n\nEVIDENCE GROUNDING (required): Award\
+          \ credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Entry point: Remote code execution exploit against public-facing Azure
+          App Service web application'
+        - 'Objective: Lateral movement to secondary internal workstation via WMI using
+          stolen domain credentials'
+      mitre_mapping:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: MITRE & Adversary Mapping
+        description: "Map the scenario to MITRE ATT&CK techniques and characterize\
+          \ the kind of adversary behavior it represents.\n\nEVIDENCE GROUNDING (required):\
+          \ Award credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Relevant techniques: T1190 Exploit Public-Facing Application, T1071.001
+          Application Layer Protocol: Web Protocols, T1003.001 OS Credential Dumping:
+          LSASS Memory, T1047 Windows Management Instrumentation'
+      intel_delivery:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33999999999999997
+        title: Threat Intel Delivery
+        description: "Deliver actionable threat context that can guide downstream\
+          \ detection and remediation teams.\n\nEVIDENCE GROUNDING (required): Award\
+          \ credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - Keep the output operationally useful and grounded in the scenario.
+  max_steps: 300
+  role: threat_intel
+  scoring_aggregation:
+    average:
+      scores:
+      - scenario_summary
+      - mitre_mapping
+      - intel_delivery

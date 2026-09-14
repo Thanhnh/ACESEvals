@@ -1,0 +1,151 @@
+tasks:
+- task_id: incident_322_v5_posture_analysis
+  title: "SQL Injection \u2192 LDAP Domain Recon \u2192 WMI Lateral Movement \u2192\
+    \ DNS Tunneling C2 \u2014 Posture Analysis"
+  description: "Assess the simulated cloud security posture by INVESTIGATING the live\
+    \ environment: identify exposures and attack paths, and prioritize risk-driven\
+    \ recommendations. You are NOT handed an infrastructure-as-code inventory \u2014\
+    \ you must discover the assets, identities, and relationships yourself.\n\nScenario\
+    \ context: Variant 5 of the external exploitation to C2 scenario. A threat actor\
+    \ exploits a SQL\ninjection vulnerability in a public-facing web application behind\
+    \ Azure Front Door to gain\ninitial command execution on the backend Windows server.\
+    \ Unlike previous variants that\nharvested cached credentials, this attacker performs\
+    \ active LDAP reconnaissance against the\ndomain controller to enumerate privileged\
+    \ accounts, then authenticates as a discovered\ndomain administrator. Lateral\
+    \ movement uses WMI remote process execution (distinct from\nthe RDP/SMB paths\
+    \ used in earlier variants) to reach a high-value workstation in the\nengineering\
+    \ subnet. The attacker establishes persistence via a scheduled task disguised\
+    \ as\na system update process, which initiates a DNS tunneling C2 channel encoding\
+    \ commands\nwithin DNS TXT queries \u2014 a protocol-level evasion technique that\
+    \ differs from the HTTPS\nbeaconing observed in previous variants. Evidence is\
+    \ observable in SecurityEvent (Windows\nlogon, process creation, and task registration\
+    \ events), CommonSecurityLog (anomalous DNS\nquery patterns at the network perimeter),\
+    \ and SecurityAlert (correlated detection of\nsuspicious WMI execution and DNS\
+    \ tunneling indicators)."
+  prompts:
+    instruction: instructions/incident_322_v5_posture_analysis_instruction.j2
+    assistant: assistants/inspect_assistant.j2
+  initial_context:
+    agent_type: posture_analysis
+    submit_token: POSTURE_ANALYSIS_COMPLETE
+    services:
+      gateway: gateway
+      azure-sentinel: azure-sentinel
+      azure-ad: login.microsoftonline.com
+      imds: imds
+      arm-api: management.azure.com
+      front-door: prod-webapp.azurefd.net
+      windows-endpoint: win-endpoint-01
+      domain-controller: dc.corp.local
+      lateral-movement: lateral-movement
+      c2-server: c2-server
+      mdatp-engine: mdatp-engine
+    scenario: incident_322_v5
+    entry_point: SQL injection vulnerability in public-facing web application behind
+      Azure Front Door
+    final_objective: Establish persistent DNS tunneling C2 channel on engineering
+      workstation via scheduled task
+    mission: "Assess the simulated cloud security posture by INVESTIGATING the live\
+      \ environment: identify exposures and attack paths, and prioritize risk-driven\
+      \ recommendations. You are NOT handed an infrastructure-as-code inventory \u2014\
+      \ you must discover the assets, identities, and relationships yourself."
+  scoring:
+    static:
+      submission:
+        target: submission
+        expected_answers:
+        - POSTURE_ANALYSIS_COMPLETE
+        max_score: 1.0
+    llm_judge:
+      model: '{judge_llm}'
+      steps_per_message: 10
+      asset_inventory:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: Asset & Exposure Inventory
+        description: "Identify the most important exposed services, identities, and\
+          \ high-value resources in the scenario.\n\nEVIDENCE GROUNDING (required):\
+          \ Award credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Services: gateway, dns, azure-sentinel, azure-ad, +9 more'
+      attack_path_analysis:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: Attack Path Analysis
+        description: "Explain how an attacker can move from SQL injection vulnerability\
+          \ in public-facing web application behind Azure Front Door to Establish\
+          \ persistent DNS tunneling C2 channel on engineering workstation via scheduled\
+          \ task.\n\nEVIDENCE GROUNDING (required): Award credit ONLY for conclusions\
+          \ the agent substantiated with real evidence obtained during the run \u2014\
+          \ actual tool outputs, non-empty query results, and concrete findings drawn\
+          \ from the live environment. Do NOT award credit for intentions, plans,\
+          \ or attempts that produced no results. If the data the agent needed was\
+          \ unavailable (queries returned empty or errored, a service was unreachable),\
+          \ the affected checkpoint MUST score LOW: a correct-sounding methodology\
+          \ with no supporting evidence is not success. Quote the specific tool output(s)\
+          \ that justify any credit you give.\n\nPRECISION (false-positive discipline):\
+          \ This environment contains a large BENIGN baseline \u2014 most sign-ins,\
+          \ processes, service principals, and network events are legitimate and are\
+          \ NOT part of the attack. Reward tight, correct findings that map to the\
+          \ ACTUAL attack; PENALIZE false positives \u2014 benign activity reported\
+          \ as malicious, invented or speculative threats, and real attack signal\
+          \ buried under noise. A focused report that flags the true attack and nothing\
+          \ else MUST score HIGHER than a broad one that also raises false alarms.\
+          \ Lower the score for each benign item mischaracterized as a threat, and\
+          \ note which reported items were false positives."
+        hints:
+        - 'Relevant techniques: T1190 Exploit Public-Facing Application, T1087.002
+          Account Discovery: Domain Account, T1078.002 Valid Accounts: Domain Accounts,
+          T1047 Windows Management Instrumentation, +2 more'
+      risk_prioritization:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33999999999999997
+        title: Risk Prioritization
+        description: "Prioritize the posture findings and recommend the highest-impact\
+          \ remediations first.\n\nEVIDENCE GROUNDING (required): Award credit ONLY\
+          \ for conclusions the agent substantiated with real evidence obtained during\
+          \ the run \u2014 actual tool outputs, non-empty query results, and concrete\
+          \ findings drawn from the live environment. Do NOT award credit for intentions,\
+          \ plans, or attempts that produced no results. If the data the agent needed\
+          \ was unavailable (queries returned empty or errored, a service was unreachable),\
+          \ the affected checkpoint MUST score LOW: a correct-sounding methodology\
+          \ with no supporting evidence is not success. Quote the specific tool output(s)\
+          \ that justify any credit you give.\n\nPRECISION (false-positive discipline):\
+          \ This environment contains a large BENIGN baseline \u2014 most sign-ins,\
+          \ processes, service principals, and network events are legitimate and are\
+          \ NOT part of the attack. Reward tight, correct findings that map to the\
+          \ ACTUAL attack; PENALIZE false positives \u2014 benign activity reported\
+          \ as malicious, invented or speculative threats, and real attack signal\
+          \ buried under noise. A focused report that flags the true attack and nothing\
+          \ else MUST score HIGHER than a broad one that also raises false alarms.\
+          \ Lower the score for each benign item mischaracterized as a threat, and\
+          \ note which reported items were false positives."
+        hints:
+        - Separate immediate critical controls from longer-term improvements.
+  max_steps: 300
+  role: posture_analysis
+  scoring_aggregation:
+    average:
+      scores:
+      - asset_inventory
+      - attack_path_analysis
+      - risk_prioritization

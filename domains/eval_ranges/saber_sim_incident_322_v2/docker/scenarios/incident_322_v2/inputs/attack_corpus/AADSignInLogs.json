@@ -1,0 +1,52 @@
+[
+  {
+    "TimeGenerated": "2026-07-01T10:44:48.2051771Z",
+    "OperationName": "Sign-in activity",
+    "Category": "SignInLogs",
+    "ResultType": "0",
+    "ResultDescription": "Authenticated via stolen_token",
+    "CorrelationId": "7ed6f902-f07b-4814-b8e5-896b4d244062",
+    "Id": "b448c988-07c1-43d5-8ad2-0e311d5cf1dc",
+    "UserDisplayName": "",
+    "UserPrincipalName": "",
+    "UserId": "c269a997-8e99-41b7-8f8d-c43c289ea8cc",
+    "AppDisplayName": "Service Principal App",
+    "AppId": "11111111-2222-3333-4444-555555555555",
+    "IPAddress": "172.30.30.1",
+    "Location": "US",
+    "LocationDetails": {
+      "city": "Seattle",
+      "countryOrRegion": "US",
+      "geoCoordinates": {
+        "latitude": 47.6062,
+        "longitude": -122.3321
+      },
+      "state": "Washington"
+    },
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "DeviceDetail": {
+      "browser": "Rich Client",
+      "deviceId": "",
+      "operatingSystem": "Windows 10"
+    },
+    "ConditionalAccessStatus": "notApplied",
+    "IsInteractive": false,
+    "RiskLevelAggregated": "none",
+    "RiskLevelDuringSignIn": "none",
+    "RiskState": "none",
+    "Status": {
+      "errorCode": 0,
+      "failureReason": null
+    },
+    "AuthenticationMethodsUsed": null,
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "TokenIssuerType": "AzureAD",
+    "ResourceDisplayName": "Service Principal App",
+    "ResourceId": "11111111-2222-3333-4444-555555555555",
+    "HomeTenantId": "87654321-4321-4321-4321-cba987654321",
+    "UserType": "Member",
+    "source": "",
+    "collectedAt": "2026-07-01T10:45:26.327199Z",
+    "AttackTechnique": "T1078"
+  }
+]

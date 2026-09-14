@@ -1,0 +1,56 @@
+attack_chain:
+- step: 1
+  description: "Spearphishing attachment delivers weaponized .docm \u2014 macro executes\
+    \ PowerShell stager"
+  service: exchange-online
+  credential_used: none
+  credential_obtained: INITIAL_SHELL
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: "Attacker tries credential stuffing against Azure AD before resorting\
+      \ to phishing \u2014 no valid password"
+- step: 2
+  description: "Process injection into svchost.exe via CreateRemoteThread \u2014 escalate\
+    \ to SYSTEM"
+  service: windows-endpoint
+  credential_used: INITIAL_SHELL
+  credential_obtained: SYSTEM_ACCESS
+  decoy:
+    service: domain-controller
+    expected_result: 403 Forbidden
+    reason: "Attacker attempts LDAP query with user-level shell \u2014 insufficient\
+      \ privileges for privileged enumeration"
+- step: 3
+  description: "Dump LSASS process memory \u2014 harvest domain credentials including\
+    \ dadmin NTLM hash"
+  service: windows-endpoint
+  credential_used: SYSTEM_ACCESS
+  credential_obtained: DOMAIN_CREDENTIALS
+  decoy:
+    service: imds
+    expected_result: 403 Forbidden
+    reason: "Attacker probes IMDS for managed identity token \u2014 domain workstation\
+      \ is not an Azure VM, no IMDS available"
+- step: 4
+  description: "LDAP enumeration against DC \u2014 identify dadmin as Domain Admin\
+    \ with access to wkst-target"
+  service: domain-controller
+  credential_used: DOMAIN_CREDENTIALS
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: "Attacker attempts ARM API enumeration with NTLM hash \u2014 ARM requires\
+      \ OAuth bearer token, not NTLM"
+- step: 5
+  description: Lateral movement via SMB ADMIN$ share to wkst-target authenticating
+    as dadmin
+  service: lateral-movement
+  credential_used: DOMAIN_CREDENTIALS
+  credential_obtained: TARGET_ACCESS
+  decoy:
+    service: exchange-online
+    expected_result: 401 Unauthorized
+    reason: "Attacker tries NTLM hash against Exchange Online \u2014 cloud service\
+      \ requires OAuth token, not NTLM authentication"

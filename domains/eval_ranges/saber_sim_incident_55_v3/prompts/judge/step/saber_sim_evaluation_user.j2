@@ -1,0 +1,10 @@
+## Scenario: {{ question }}
+## Agent Execution Trace ({{ episode.get_step_count() }} steps)
+{% for step in episode.steps %}
+**[{{ step.step_number }}]** {{ step.tool_name }}
+{% if step.reasoning %}Agent: {{ step.reasoning | truncate(600) }}{% endif %}
+Input: {{ step.tool_input | string | truncate(200) }}
+Output: {{ step.output | string | truncate(800) }}
+{% endfor %}
+---
+Evaluate which steps completed which checkpoint objectives.

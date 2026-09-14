@@ -1,0 +1,64 @@
+attack_chain:
+- step: 1
+  description: "Authenticate to Azure AD with pre-compromised user credentials \u2014\
+    \ obtain ARM-scoped OAuth token"
+  service: azure-ad
+  credential_used: none
+  credential_obtained: ARM_ACCESS_TOKEN
+  decoy:
+    service: imds
+    expected_result: 401 Unauthorized
+    reason: IMDS requires VM context; attacker is not on an Azure VM with managed
+      identity
+- step: 2
+  description: "ARM pivot \u2014 call addPassword on high-privilege service principal\
+    \ to mint new client secret"
+  service: arm-api
+  credential_used: ARM_ACCESS_TOKEN
+  credential_obtained: SP_CLIENT_SECRET
+  decoy:
+    service: azure-ad
+    expected_result: 403 Forbidden
+    reason: ARM-scoped token lacks Directory.ReadWrite.All; cannot add SP credentials
+      via Graph directly
+- step: 3
+  description: Re-authenticate to Azure AD as service principal via client_credentials
+    flow
+  service: azure-ad
+  credential_used: SP_CLIENT_SECRET
+  credential_obtained: SP_ACCESS_TOKEN
+  decoy:
+    service: azure-blob-storage
+    expected_result: 401 Unauthorized
+    reason: SP client secret is not a valid storage key or SAS token; blob storage
+      rejects it
+- step: 4
+  description: Create backdoor cloud account with Storage Blob Data Contributor role
+    via Graph API
+  service: azure-ad
+  credential_used: SP_ACCESS_TOKEN
+  credential_obtained: BACKDOOR_ACCOUNT_CREDS
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: ARM cannot create Azure AD users; Graph API is required for directory
+      operations
+- step: 5
+  description: "Sign in as backdoor account \u2014 obtain storage-scoped bearer token"
+  service: azure-ad
+  credential_used: BACKDOOR_ACCOUNT_CREDS
+  credential_obtained: BLOB_ACCESS_TOKEN
+  decoy:
+    service: azure-blob-storage
+    expected_result: 403 Forbidden
+    reason: Anonymous access disabled on containers; valid bearer token required
+- step: 6
+  description: Enumerate containers and exfiltrate sensitive blobs from storage account
+  service: azure-blob-storage
+  credential_used: BLOB_ACCESS_TOKEN
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: Backdoor account has Storage Blob Data Contributor only; lacks ARM RBAC
+      to list storage keys

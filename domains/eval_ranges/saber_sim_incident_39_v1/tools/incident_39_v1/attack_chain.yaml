@@ -1,0 +1,53 @@
+attack_chain:
+- step: 1
+  description: Authenticate to Azure AD with compromised cloud account credentials
+    (T1078.004)
+  service: azure-ad
+  credential_used: none
+  credential_obtained: VICTIM_OAUTH_TOKEN
+  decoy:
+    service: imds
+    expected_result: 403 Forbidden
+    reason: "IMDS only responds to requests from Azure VM context \u2014 attacker\
+      \ is external"
+- step: 2
+  description: Add password to service principal via sp_addPassword and obtain Graph
+    API token (T1528)
+  service: azure-ad
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: GRAPH_API_TOKEN
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: Victim user token lacks ARM RBAC role assignments for management plane
+      access
+- step: 3
+  description: Enumerate cloud accounts via ARM API to identify high-value mailbox
+    targets (T1087.004)
+  service: arm-api
+  credential_used: GRAPH_API_TOKEN
+  credential_obtained: none
+  decoy:
+    service: imds
+    expected_result: 403 Forbidden
+    reason: Attacker attempts IMDS for additional tokens but has no Azure VM context
+- step: 4
+  description: Create inbox rules to suppress security notifications and delivery
+    alerts (T1564.008)
+  service: exchange-online
+  credential_used: GRAPH_API_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-ad
+    expected_result: 403 Forbidden
+    reason: SP lacks Policy.ReadWrite.ConditionalAccess to disable MFA policies
+- step: 5
+  description: Exfiltrate sensitive emails from executive mailbox via Graph API (T1114.002)
+  service: exchange-online
+  credential_used: GRAPH_API_TOKEN
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: SP not assigned Storage Account Key Operator role for additional data
+      exfil

@@ -1,0 +1,47 @@
+[
+  {
+    "TimeGenerated": "",
+    "OfficeWorkload": "",
+    "Operation": "New-InboxRule",
+    "RecordType": "6",
+    "UserId": "j.smith",
+    "UserType": "",
+    "ClientIP": "",
+    "ResultStatus": "Succeeded",
+    "OrganizationId": "org-12345678-1234-1234-1234-123456789abc",
+    "Type": "OfficeActivity",
+    "source": "exchange_online",
+    "collectedAt": "2026-07-01T08:48:30.903200Z",
+    "AttackTechnique": "T1564.008"
+  },
+  {
+    "TimeGenerated": "",
+    "OfficeWorkload": "",
+    "Operation": "MailItemsAccessed",
+    "RecordType": "2",
+    "UserId": "ceo",
+    "UserType": "0",
+    "ClientIP": "172.30.10.1",
+    "ResultStatus": "Succeeded",
+    "OrganizationId": "org-12345678-1234-1234-1234-123456789abc",
+    "Type": "OfficeActivity",
+    "source": "exchange_online",
+    "collectedAt": "2026-07-01T08:48:30.903209Z",
+    "AttackTechnique": "T1114.002"
+  },
+  {
+    "TimeGenerated": "",
+    "OfficeWorkload": "",
+    "Operation": "New-InboxRule",
+    "RecordType": "6",
+    "UserId": "j.smith",
+    "UserType": "",
+    "ClientIP": "",
+    "ResultStatus": "Succeeded",
+    "OrganizationId": "org-12345678-1234-1234-1234-123456789abc",
+    "Type": "",
+    "source": "exchange_online",
+    "collectedAt": "2026-07-01T08:48:30.903200Z",
+    "AttackTechnique": "T1564.008"
+  }
+]

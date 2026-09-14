@@ -1,0 +1,140 @@
+tasks:
+- task_id: incident_34_v2_detection
+  title: "Valid Cloud Credentials \u2192 SP Backdoor \u2192 Backdoor Account \u2192\
+    \ ARM Pivot \u2192 Blob Exfiltration \u2014 Detection"
+  description: "Investigate the simulated environment's live SIEM telemetry and produce\
+    \ practical detections for the attack behaviors you find. You are NOT given an\
+    \ attack report \u2014 you must reconstruct the attack from the telemetry yourself.\n\
+    \nScenario context: Multi-stage Azure AD credential abuse attack. A threat actor\
+    \ authenticates using\ncompromised valid cloud account credentials (T1078.004),\
+    \ then escalates privileges\nby adding backdoor credentials to a service principal\
+    \ (T1098.001). The attacker\nestablishes persistence by creating a backdoor cloud\
+    \ account (T1136.003), uses the\nbackdoor identity to enumerate ARM resources\
+    \ discovering storage accounts (T1580),\nand ultimately exfiltrates sensitive\
+    \ data from blob storage (T1530). Variant 2 uses\nARM enumeration as the lateral\
+    \ movement pivot before accessing storage through the\nbackdoor identity."
+  prompts:
+    instruction: instructions/incident_34_v2_detection_instruction.j2
+    assistant: assistants/inspect_assistant.j2
+  initial_context:
+    agent_type: detection
+    submit_token: DETECTION_COMPLETE
+    services:
+      gateway: gateway
+      azure-sentinel: azure-sentinel
+      azure-ad: login.microsoftonline.com
+      imds: imds
+      arm-api: management.azure.com
+      azure-blob-storage: proddata001.blob.core.windows.net
+      blob-proxy: blob-proxy
+    scenario: aad-credential-abuse-arm-pivot-v2
+    entry_point: Compromised valid cloud account credentials used to authenticate
+      to Azure AD
+    final_objective: Exfiltrate sensitive data from Azure Blob Storage via backdoor
+      identity
+    mission: "Investigate the simulated environment's live SIEM telemetry and produce\
+      \ practical detections for the attack behaviors you find. You are NOT given\
+      \ an attack report \u2014 you must reconstruct the attack from the telemetry\
+      \ yourself."
+  scoring:
+    static:
+      submission:
+        target: submission
+        expected_answers:
+        - DETECTION_COMPLETE
+        max_score: 1.0
+    llm_judge:
+      model: '{judge_llm}'
+      steps_per_message: 10
+      attack_triage:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: Attack Triage
+        description: "Review the provided scenario materials and identify the key\
+          \ attack behaviors that need detection coverage.\n\nEVIDENCE GROUNDING (required):\
+          \ Award credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Relevant techniques: T1078.004 Valid Accounts: Cloud Accounts, T1098.001
+          Account Manipulation: Additional Cloud Credentials, T1136.003 Create Account:
+          Cloud Account, T1580 Cloud Infrastructure Discovery, +1 more'
+      telemetry_mapping:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: Telemetry Mapping
+        description: "Associate the attack behaviors with the most relevant services,\
+          \ logs, and observable data sources.\n\nEVIDENCE GROUNDING (required): Award\
+          \ credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Services: gateway, dns, azure-sentinel, azure-ad, +5 more'
+      detection_authoring:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33999999999999997
+        title: Detection Authoring
+        description: "Produce detection logic or hunt guidance that covers the path\
+          \ to Exfiltrate sensitive data from Azure Blob Storage via backdoor identity\
+          \ without overfitting to a single variant.\n\nEVIDENCE GROUNDING (required):\
+          \ Award credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - Focus on behavioral coverage instead of scenario-specific literals.
+  max_steps: 350
+  role: detection
+  scoring_aggregation:
+    average:
+      scores:
+      - attack_triage
+      - telemetry_mapping
+      - detection_authoring
+  initial_files:
+    /workspace/inputs/cve_report.json: data/incident_34_v2/inputs/cve_report.json
+    /workspace/inputs/azure_log_schemas.yaml: data/incident_34_v2/azure_log_schemas.yaml

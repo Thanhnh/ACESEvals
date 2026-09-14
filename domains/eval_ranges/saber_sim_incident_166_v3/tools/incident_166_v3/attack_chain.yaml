@@ -1,0 +1,59 @@
+attack_chain:
+- step: 1
+  description: "Device code phishing via spearphishing link \u2014 victim authorizes,\
+    \ attacker obtains OAuth token"
+  technique: T1566.002
+  service: azure-ad
+  credential_used: none
+  credential_obtained: USER1_OAUTH_TOKEN
+  decoy:
+    service: exchange-online
+    expected_result: 401 Unauthorized
+    reason: Exchange requires valid Bearer token; attacker attempted direct mailbox
+      access before obtaining credentials
+- step: 2
+  description: "Authenticate to Exchange Online with user1 OAuth token \u2014 access\
+    \ victim mailbox"
+  technique: T1078.004
+  service: exchange-online
+  credential_used: USER1_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: User1 has no Azure RBAC role assignments; attacker tried ARM resource
+      enumeration first
+- step: 3
+  description: "Enumerate Global Address List via Exchange \u2014 identify executive\
+    \ targets"
+  technique: T1087.004
+  service: exchange-online
+  credential_used: USER1_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-ad
+    expected_result: 403 Forbidden
+    reason: User1 lacks Directory.Read.All scope; attacker tried Graph API user enumeration
+- step: 4
+  description: "Internal spearphishing from user1 mailbox to executive \u2014 executive\
+    \ authorizes device code"
+  technique: T1534
+  service: azure-ad
+  credential_used: USER1_OAUTH_TOKEN
+  credential_obtained: USER2_OAUTH_TOKEN
+  decoy:
+    service: exchange-online
+    expected_result: 403 Forbidden
+    reason: User1 lacks FullAccess delegation on executive mailbox; attacker tried
+      direct mailbox impersonation
+- step: 5
+  description: Access executive mailbox and exfiltrate sensitive email communications
+  technique: T1114.002
+  service: exchange-online
+  credential_used: USER2_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: imds
+    expected_result: 403 Forbidden
+    reason: IMDS not reachable from external network; attacker probed for managed
+      identity to persist access

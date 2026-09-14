@@ -1,0 +1,19 @@
+[
+  {
+    "AlertId": "alert-1",
+    "AttackTechniques": "T1003.001",
+    "Category": "CredentialAccess",
+    "DetectionSource": "EDR",
+    "ServiceSource": "Microsoft Defender for Endpoint",
+    "Severity": "High",
+    "SourceSystem": "",
+    "TenantId": "",
+    "TimeGenerated": "2026-07-17T19:33:51.764Z",
+    "Timestamp": "2026-07-17T19:33:51.764Z",
+    "Title": "Suspicious LSASS memory access",
+    "Type": "AlertInfo",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1003.001"
+  }
+]

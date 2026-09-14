@@ -1,0 +1,24 @@
+[
+  {
+    "time": "",
+    "TimeGenerated": "2026-06-30T20:33:39.136Z",
+    "category": "",
+    "operationName": "",
+    "resultType": "",
+    "properties": null,
+    "_source": "windows_endpoint",
+    "EventID": 4624,
+    "Activity": "4624 - An account was successfully logged on.",
+    "Channel": "Security",
+    "Computer": "wkst-victim",
+    "LogonType": 3,
+    "TargetUserName": "dadmin",
+    "TargetDomainName": "CONTOSO",
+    "SubjectUserName": "",
+    "IpAddress": "windows-endpoint",
+    "WorkstationName": "windows-endpoint",
+    "source": "windows_endpoint",
+    "collectedAt": "2026-06-30T20:34:02.937352Z",
+    "AttackTechnique": "T1021.002"
+  }
+]

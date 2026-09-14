@@ -1,0 +1,53 @@
+attack_chain:
+- step: 1
+  description: Password spray Azure AD to compromise Application Administrator account
+  service: azure-ad
+  credential_used: none
+  credential_obtained: APP_ADMIN_TOKEN
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: "ARM requires a bearer token \u2014 anonymous enumeration attempt fails\
+      \ without authentication"
+- step: 2
+  description: Inject new client secret on high-privilege SP via addPassword API
+  service: azure-ad
+  credential_used: APP_ADMIN_TOKEN
+  credential_obtained: SP_CLIENT_SECRET
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: APP_ADMIN_TOKEN has Application Administrator role but no ARM RBAC assignment
+      at subscription scope
+- step: 3
+  description: Authenticate as service principal via client_credentials grant for
+    ARM-scoped token
+  service: azure-ad
+  credential_used: SP_CLIENT_SECRET
+  credential_obtained: ARM_ACCESS_TOKEN
+  decoy:
+    service: azure-blob-storage
+    expected_result: 403 Forbidden
+    reason: SP_CLIENT_SECRET is an OAuth client secret, not a valid storage account
+      key or SAS token
+- step: 4
+  description: Create backdoor Global Administrator account via Microsoft Graph API
+  service: azure-ad
+  credential_used: ARM_ACCESS_TOKEN
+  credential_obtained: GLOBAL_ADMIN_CREDS
+  decoy:
+    service: imds
+    expected_result: 403 Forbidden
+    reason: "IMDS only responds to requests from local compute context \u2014 external\
+      \ tokens cannot query metadata service"
+- step: 5
+  description: Retrieve storage keys via ARM listKeys and exfiltrate blob data from
+    financial-reports container
+  service: azure-blob-storage
+  credential_used: ARM_ACCESS_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-ad
+    expected_result: 403 Forbidden
+    reason: "ARM_ACCESS_TOKEN lacks Directory.Read.All scope \u2014 cannot export\
+      \ user directory data via Graph API"

@@ -1,0 +1,58 @@
+slug: saber_sim_incident_39_v1
+name: SABER-SIM Simulated Azure Security Tasks
+description: 'AI-generated Azure cloud security simulations. Each scenario can be
+  exported for red-team, reconnaissance, detection, posture analysis, remediation,
+  or threat-intel benchmarking against mock Azure services.
+
+  '
+version: 1.0.0
+tags:
+- cloud-security
+- azure
+- security-evaluation
+- red-team
+- saber-sim
+images:
+  sandbox:
+    tag: saber/saber_sim_incident_39_v1/sandbox:latest
+    dockerfile: docker/Dockerfile.sandbox
+  incident_39_v1_mock_base_alpine:
+    tag: saber/saber_sim/incident_39_v1/mock_base_alpine:latest
+    dockerfile: docker/scenarios/incident_39_v1/mock_base/alpine/Dockerfile
+    context: docker/scenarios/incident_39_v1/mock_base/alpine
+  incident_39_v1_mock_base_slim:
+    tag: saber/saber_sim/incident_39_v1/mock_base_slim:latest
+    dockerfile: docker/scenarios/incident_39_v1/mock_base/slim/Dockerfile
+    context: docker/scenarios/incident_39_v1/mock_base/slim
+  incident_39_v1_arm:
+    tag: saber/saber_sim/incident_39_v1/arm:latest
+    dockerfile: docker/scenarios/incident_39_v1/mock_services/arm/Dockerfile
+    context: docker/scenarios/incident_39_v1/mock_services/arm
+  incident_39_v1_azure_ad:
+    tag: saber/saber_sim/incident_39_v1/azure_ad:latest
+    dockerfile: docker/scenarios/incident_39_v1/mock_services/azure_ad/Dockerfile
+    context: docker/scenarios/incident_39_v1/mock_services/azure_ad
+  incident_39_v1_azure_sentinel:
+    tag: saber/saber_sim/incident_39_v1/azure_sentinel:latest
+    dockerfile: docker/scenarios/incident_39_v1/mock_services/azure_sentinel/Dockerfile
+    context: docker/scenarios/incident_39_v1
+  incident_39_v1_exchange_online:
+    tag: saber/saber_sim/incident_39_v1/exchange_online:latest
+    dockerfile: docker/scenarios/incident_39_v1/mock_services/exchange_online/Dockerfile
+    context: docker/scenarios/incident_39_v1/mock_services/exchange_online
+  incident_39_v1_gateway:
+    tag: saber/saber_sim/incident_39_v1/gateway:latest
+    dockerfile: docker/scenarios/incident_39_v1/mock_services/gateway/Dockerfile
+    context: docker/scenarios/incident_39_v1/mock_services/gateway
+  incident_39_v1_imds:
+    tag: saber/saber_sim/incident_39_v1/imds:latest
+    dockerfile: docker/scenarios/incident_39_v1/mock_services/imds/Dockerfile
+    context: docker/scenarios/incident_39_v1/mock_services/imds
+  incident_39_v1_init_seed:
+    tag: saber/saber_sim/incident_39_v1/init_seed:latest
+    dockerfile: docker/scenarios/incident_39_v1/init-seed/Dockerfile
+    context: docker/scenarios/incident_39_v1/init-seed
+  incident_39_v1_catch_all:
+    tag: saber/saber_sim/incident_39_v1/catch_all:latest
+    dockerfile: docker/scenarios/incident_39_v1/mock_services/catch_all/Dockerfile
+    context: docker/scenarios/incident_39_v1/mock_services/catch_all

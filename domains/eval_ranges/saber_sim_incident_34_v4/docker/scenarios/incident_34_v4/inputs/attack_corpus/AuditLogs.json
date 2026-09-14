@@ -1,0 +1,88 @@
+[
+  {
+    "AADOperationType": "",
+    "AADTenantId": "",
+    "ActivityDateTime": "",
+    "ActivityDisplayName": "",
+    "AdditionalDetails": null,
+    "Category": "AuditLogs",
+    "CorrelationId": "",
+    "DurationMs": 0,
+    "Id": "",
+    "Identity": "",
+    "InitiatedBy": "s.chen",
+    "Level": "",
+    "Location": "",
+    "LoggedByService": "",
+    "OperationName": "Add service principal credentials",
+    "OperationVersion": "",
+    "Resource": "",
+    "ResourceGroup": "",
+    "ResourceId": "",
+    "ResourceProvider": "",
+    "Result": "",
+    "ResultDescription": "",
+    "ResultReason": "",
+    "ResultSignature": "",
+    "ResultType": "Success",
+    "SourceSystem": "",
+    "TargetResources": [
+      {
+        "DisplayName": "backdoor",
+        "Id": "22222222-3333-4444-5555-666666666666"
+      }
+    ],
+    "TenantId": "",
+    "TimeGenerated": "2026-06-30T09:25:47.2338302Z",
+    "Type": "AuditLogs",
+    "source": "",
+    "collectedAt": "2026-06-30T09:25:48.039842Z",
+    "AttackTechnique": "T1098.001"
+  },
+  {
+    "AADOperationType": "",
+    "AADTenantId": "",
+    "ActivityDateTime": "",
+    "ActivityDisplayName": "",
+    "AdditionalDetails": null,
+    "Category": "AuditLogs",
+    "CorrelationId": "",
+    "DurationMs": 0,
+    "Id": "",
+    "Identity": "",
+    "InitiatedBy": {
+      "user": {
+        "id": "3e326dc8-b8ba-41fe-9f7f-d8bf44929310",
+        "ipAddress": "172.30.30.1"
+      }
+    },
+    "Level": "",
+    "Location": "",
+    "LoggedByService": "",
+    "OperationName": "Add user",
+    "OperationVersion": "",
+    "Resource": "",
+    "ResourceGroup": "",
+    "ResourceId": "",
+    "ResourceProvider": "",
+    "Result": "",
+    "ResultDescription": "",
+    "ResultReason": "",
+    "ResultSignature": "",
+    "ResultType": "Success",
+    "SourceSystem": "",
+    "TargetResources": [
+      {
+        "id": "46b994c4-c83e-5bd1-928b-fd9efba3100c",
+        "type": "User",
+        "userPrincipalName": "svc-backup@contoso.com"
+      }
+    ],
+    "TenantId": "",
+    "TimeGenerated": "2026-06-30T09:25:47.1492683Z",
+    "Type": "AuditLogs",
+    "source": "",
+    "collectedAt": "2026-06-30T09:25:48.039875Z",
+    "AttackTechnique": "T1136.003"
+  }
+]

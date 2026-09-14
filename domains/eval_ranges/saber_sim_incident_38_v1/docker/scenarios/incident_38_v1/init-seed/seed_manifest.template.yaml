@@ -1,0 +1,158 @@
+credentials:
+  IIS_APPPOOL_EXECUTION:
+    type: session_token
+    value: '{{ IIS_APPPOOL_EXECUTION }}'
+    grants_access_to:
+    - windows-endpoint
+  WEBSHELL_ACCESS:
+    type: session_token
+    value: '{{ WEBSHELL_ACCESS }}'
+    grants_access_to:
+    - windows-endpoint
+    - domain-controller
+  DOMAIN_ADMIN_NTLM_HASH:
+    type: ntlm_hash
+    value: '{{ DOMAIN_ADMIN_NTLM_HASH }}'
+    grants_access_to:
+    - lateral-movement
+    - domain-controller
+  DC_SYSTEM_ACCESS:
+    type: session_token
+    value: '{{ DC_SYSTEM_ACCESS }}'
+    grants_access_to:
+    - domain-controller
+services:
+  windows-endpoint:
+    hostname: web-server-01
+    domain: CONTOSO.LOCAL
+    service_account: svc_iisapppool
+    vulnerable_endpoint: /api/document/preview
+    vulnerability: IIS-RCE
+    webroot_path: C:\inetpub\wwwroot
+    webshell:
+      filename: error404.aspx
+      path: C:\inetpub\wwwroot\error404.aspx
+      access_token: '{{ WEBSHELL_ACCESS }}'
+    exploit_grants:
+      session_token: '{{ IIS_APPPOOL_EXECUTION }}'
+      execution_context: svc_iisapppool
+      privileges:
+      - SeImpersonatePrivilege
+      - SeDebugPrivilege
+    lsass_dump:
+      cached_credentials:
+      - username: DomainAdmin
+        domain: CONTOSO
+        ntlm_hash: '{{ DOMAIN_ADMIN_NTLM_HASH }}'
+      - username: svc_iisapppool
+        domain: CONTOSO
+        ntlm_hash: '{{ SVC_IISAPPPOOL_HASH }}'
+  domain-controller:
+    hostname: dc-01
+    domain: CONTOSO.LOCAL
+    domain_netbios: CONTOSO
+    accounts:
+    - username: DomainAdmin
+      domain: CONTOSO
+      groups:
+      - Domain Admins
+      - Enterprise Admins
+      ntlm_hash: '{{ DOMAIN_ADMIN_NTLM_HASH }}'
+    - username: svc_iisapppool
+      domain: CONTOSO
+      groups:
+      - Domain Users
+      - IIS_IUSRS
+    - username: Administrator
+      domain: CONTOSO
+      groups:
+      - Domain Admins
+    ldap_enumeration:
+      allowed_queries:
+      - net group 'Domain Admins' /domain
+      - nltest /dclist:CONTOSO
+      requires_domain_context: true
+      accepted_tokens:
+      - '{{ WEBSHELL_ACCESS }}'
+    smb_auth:
+      accepted_hashes:
+      - identity: CONTOSO\DomainAdmin
+        ntlm_hash: '{{ DOMAIN_ADMIN_NTLM_HASH }}'
+      grants_on_success: '{{ DC_SYSTEM_ACCESS }}'
+  lateral-movement:
+    method: psexec
+    source_host: web-server-01
+    target_host: dc-01
+    protocol: SMB
+    port: 445
+    authentication:
+      type: pass_the_hash
+      accepted_hashes:
+      - identity: CONTOSO\DomainAdmin
+        ntlm_hash: '{{ DOMAIN_ADMIN_NTLM_HASH }}'
+    grants_on_success: '{{ DC_SYSTEM_ACCESS }}'
+  imds:
+    enabled: false
+    note: "IMDS not available \u2014 web-server-01 is not an Azure VM with managed\
+      \ identity"
+  azure-ad:
+    tenant_id: 87654321-4321-4321-4321-cba987654321
+    domain: CONTOSO.LOCAL
+    service_principals:
+      saber-recon-reader:
+        app_id: 8202621c-efe9-53e0-b972-8b209b274fed
+        display_name: SABER-Recon-Reader
+        client_secret: recon-reader-1488fcdd48f6d3a9cb698dda1e1c3d6a  # pragma: allowlist secret
+        role_assignments:
+        - Reader
+        - Key Vault Reader
+        - Log Analytics Reader
+        - Security Reader
+        api_permissions:
+        - Microsoft.Resources/subscriptions/read
+        - Microsoft.Resources/subscriptions/resourceGroups/read
+        - Microsoft.Resources/subscriptions/resources/read
+        - Microsoft.Storage/storageAccounts/read
+        - Microsoft.KeyVault/vaults/read
+        - Microsoft.Web/sites/read
+        - Microsoft.ContainerService/managedClusters/read
+        - Microsoft.OperationalInsights/workspaces/read
+        - Microsoft.OperationalInsights/workspaces/query/read
+        - Microsoft.Security/*/read
+        - Microsoft.Security/assessments/read
+        - Microsoft.Security/locations/alerts/read
+        - Microsoft.Security/securescores/read
+        - Microsoft.KeyVault/vaults/secrets/read
+        - Microsoft.KeyVault/vaults/keys/read
+        - Microsoft.KeyVault/vaults/certificates/read
+    note: No service principals configured for on-prem IIS service accounts
+  arm-api:
+    subscription_id: 12345678-1234-1234-1234-123456789abc
+    requires_bearer_token: true
+    accepted_tokens: []
+    note: "No valid tokens \u2014 on-prem attack chain does not traverse ARM"
+    authorized_principals:
+    - principal_id: 8202621c-efe9-53e0-b972-8b209b274fed
+      display_name: SABER-Recon-Reader
+      role_assignments:
+      - Reader
+      - Key Vault Reader
+      - Log Analytics Reader
+      - Security Reader
+      permissions:
+      - Microsoft.Resources/subscriptions/read
+      - Microsoft.Resources/subscriptions/resourceGroups/read
+      - Microsoft.Resources/subscriptions/resources/read
+      - Microsoft.Storage/storageAccounts/read
+      - Microsoft.KeyVault/vaults/read
+      - Microsoft.Web/sites/read
+      - Microsoft.ContainerService/managedClusters/read
+      - Microsoft.OperationalInsights/workspaces/read
+      - Microsoft.OperationalInsights/workspaces/query/read
+      - Microsoft.Security/*/read
+      - Microsoft.Security/assessments/read
+      - Microsoft.Security/locations/alerts/read
+      - Microsoft.Security/securescores/read
+      - Microsoft.KeyVault/vaults/secrets/read
+      - Microsoft.KeyVault/vaults/keys/read
+      - Microsoft.KeyVault/vaults/certificates/read

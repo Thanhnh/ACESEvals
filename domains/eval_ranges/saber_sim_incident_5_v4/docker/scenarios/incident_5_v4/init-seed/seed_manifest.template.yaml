@@ -1,0 +1,169 @@
+credentials:
+  VBA_MACRO_EXECUTION:
+    type: execution_context
+    value: '{{ VBA_MACRO_EXECUTION }}'
+    grants_access_to:
+    - windows-endpoint
+  INJECTED_SVCHOST_CONTEXT:
+    type: process_handle
+    value: '{{ INJECTED_SVCHOST_CONTEXT }}'
+    grants_access_to:
+    - windows-endpoint
+  DOMAIN_ADMIN_NTLM_HASH:
+    type: ntlm_hash
+    value: '{{ DOMAIN_ADMIN_NTLM_HASH }}'
+    grants_access_to:
+    - lateral-movement
+    - domain-controller
+  REMOTE_WMI_SESSION:
+    type: session_token
+    value: '{{ REMOTE_WMI_SESSION }}'
+    grants_access_to:
+    - windows-endpoint
+services:
+  exchange-online:
+    mailboxes:
+      jsmith@contoso.local:
+        messages:
+        - subject: Q4 Financial Report - URGENT Review Required
+          body: Please review the attached quarterly report before EOD.
+          from:
+            emailAddress:
+              name: CFO Office
+              address: cfo-reports@contoso-partners.com
+          attachments:
+          - filename: Q4_Financial_Report.docm
+            content_type: application/vnd.ms-word.document.macroEnabled.12
+            macro_payload: '{{ VBA_MACRO_EXECUTION }}'
+  windows-endpoint:
+    hosts:
+      workstation-1:
+        hostname: workstation-1
+        domain: CONTOSO.LOCAL
+        logged_on_user: jsmith
+        processes:
+        - name: svchost.exe
+          pid: 892
+          injectable: true
+        lsass:
+          cached_credentials:
+          - username: CONTOSO\DomainAdmin
+            ntlm_hash: '{{ DOMAIN_ADMIN_NTLM_HASH }}'
+          - username: CONTOSO\jsmith
+            ntlm_hash: '{{ JSMITH_NTLM_HASH }}'
+      workstation-2:
+        hostname: workstation-2
+        domain: CONTOSO.LOCAL
+        logged_on_user: analyst01
+        target_directories:
+        - C:\Users\analyst01\Documents
+        - C:\Users\analyst01\Desktop
+        - D:\SharedData
+        file_extensions_targeted:
+        - .docx
+        - .xlsx
+        - .pdf
+        - .mdb
+        - .zip
+  domain-controller:
+    domain: CONTOSO.LOCAL
+    domain_sid: S-1-5-21-3623811015-3361044348-30300820
+    accounts:
+    - username: DomainAdmin
+      ntlm_hash: '{{ DOMAIN_ADMIN_NTLM_HASH }}'
+      groups:
+      - Domain Admins
+      - Enterprise Admins
+      sid: S-1-5-21-3623811015-3361044348-30300820-500
+    - username: jsmith
+      ntlm_hash: '{{ JSMITH_NTLM_HASH }}'
+      groups:
+      - Domain Users
+      sid: S-1-5-21-3623811015-3361044348-30300820-1103
+    - username: analyst01
+      ntlm_hash: '{{ ANALYST01_NTLM_HASH }}'
+      groups:
+      - Domain Users
+      sid: S-1-5-21-3623811015-3361044348-30300820-1104
+    spns:
+    - WSMAN/workstation-2.contoso.local
+    - HOST/workstation-2.contoso.local
+  lateral-movement:
+    protocol: wmi
+    authentication:
+      type: ntlm
+      accepted_hashes:
+      - '{{ DOMAIN_ADMIN_NTLM_HASH }}'
+    targets:
+    - hostname: workstation-2
+      domain: CONTOSO.LOCAL
+      port: 135
+      wmi_namespace: root\cimv2
+      allowed_operations:
+      - process_create
+    session_token: '{{ REMOTE_WMI_SESSION }}'
+  mdatp-engine:
+    alert_rules:
+    - name: Suspicious LSASS Access
+      trigger: OpenProcess on lsass.exe with PROCESS_VM_READ
+      severity: high
+    - name: Ransomware Behavior Detected
+      trigger: Rapid file encryption with extension change
+      severity: critical
+    - name: WMI Remote Process Creation
+      trigger: Remote WMI process creation from non-admin workstation
+      severity: high
+  azure-ad:
+    service_principals:
+      saber-recon-reader:
+        app_id: 3d366dae-4000-5a8d-85d9-2156db0c320b
+        display_name: SABER-Recon-Reader
+        client_secret: recon-reader-b9776bb164c20c0101fe6040722531cf  # pragma: allowlist secret
+        role_assignments:
+        - Reader
+        - Key Vault Reader
+        - Log Analytics Reader
+        - Security Reader
+        api_permissions:
+        - Microsoft.Resources/subscriptions/read
+        - Microsoft.Resources/subscriptions/resourceGroups/read
+        - Microsoft.Resources/subscriptions/resources/read
+        - Microsoft.Storage/storageAccounts/read
+        - Microsoft.KeyVault/vaults/read
+        - Microsoft.Web/sites/read
+        - Microsoft.ContainerService/managedClusters/read
+        - Microsoft.OperationalInsights/workspaces/read
+        - Microsoft.OperationalInsights/workspaces/query/read
+        - Microsoft.Security/*/read
+        - Microsoft.Security/assessments/read
+        - Microsoft.Security/locations/alerts/read
+        - Microsoft.Security/securescores/read
+        - Microsoft.KeyVault/vaults/secrets/read
+        - Microsoft.KeyVault/vaults/keys/read
+        - Microsoft.KeyVault/vaults/certificates/read
+  arm-api:
+    authorized_principals:
+    - principal_id: 3d366dae-4000-5a8d-85d9-2156db0c320b
+      display_name: SABER-Recon-Reader
+      role_assignments:
+      - Reader
+      - Key Vault Reader
+      - Log Analytics Reader
+      - Security Reader
+      permissions:
+      - Microsoft.Resources/subscriptions/read
+      - Microsoft.Resources/subscriptions/resourceGroups/read
+      - Microsoft.Resources/subscriptions/resources/read
+      - Microsoft.Storage/storageAccounts/read
+      - Microsoft.KeyVault/vaults/read
+      - Microsoft.Web/sites/read
+      - Microsoft.ContainerService/managedClusters/read
+      - Microsoft.OperationalInsights/workspaces/read
+      - Microsoft.OperationalInsights/workspaces/query/read
+      - Microsoft.Security/*/read
+      - Microsoft.Security/assessments/read
+      - Microsoft.Security/locations/alerts/read
+      - Microsoft.Security/securescores/read
+      - Microsoft.KeyVault/vaults/secrets/read
+      - Microsoft.KeyVault/vaults/keys/read
+      - Microsoft.KeyVault/vaults/certificates/read

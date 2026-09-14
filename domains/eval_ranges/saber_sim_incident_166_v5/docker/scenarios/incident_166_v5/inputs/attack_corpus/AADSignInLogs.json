@@ -1,0 +1,156 @@
+[
+  {
+    "TimeGenerated": "2026-07-01T09:53:16.9888890Z",
+    "OperationName": "Sign-in activity",
+    "Category": "SignInLogs",
+    "ResultType": "0",
+    "ResultDescription": "Device code issued",
+    "CorrelationId": "89c5675c-7960-4cf7-a6df-3304f69771dc",
+    "Id": "88ef57bc-4164-4322-b93a-bd493422d002",
+    "UserDisplayName": "j.martinez",
+    "UserPrincipalName": "j.martinez@contoso.com",
+    "UserId": "4335f8ab-925b-59bb-e2c5-b5d0cd4c67e3",
+    "AppDisplayName": "Device Code Flow App",
+    "AppId": "11111111-2222-3333-4444-555555555555",
+    "IPAddress": "172.30.30.1",
+    "Location": "US",
+    "LocationDetails": {
+      "city": "Seattle",
+      "countryOrRegion": "US",
+      "geoCoordinates": {
+        "latitude": 47.6062,
+        "longitude": -122.3321
+      },
+      "state": "Washington"
+    },
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "DeviceDetail": {
+      "browser": "Rich Client",
+      "deviceId": "",
+      "operatingSystem": "Windows 10"
+    },
+    "ConditionalAccessStatus": "notApplied",
+    "IsInteractive": true,
+    "RiskLevelAggregated": "none",
+    "RiskLevelDuringSignIn": "none",
+    "RiskState": "none",
+    "Status": {
+      "errorCode": 0,
+      "failureReason": null
+    },
+    "AuthenticationMethodsUsed": [
+      "Password"
+    ],
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "TokenIssuerType": "AzureAD",
+    "ResourceDisplayName": "Device Code Flow App",
+    "ResourceId": "11111111-2222-3333-4444-555555555555",
+    "HomeTenantId": "87654321-4321-4321-4321-cba987654321",
+    "UserType": "Member",
+    "source": "azure_ad",
+    "collectedAt": "2026-07-01T09:53:17.108012Z",
+    "AttackTechnique": "T1566.002"
+  },
+  {
+    "TimeGenerated": "2026-07-01T09:53:16.0266937Z",
+    "OperationName": "Sign-in activity",
+    "Category": "SignInLogs",
+    "ResultType": "0",
+    "ResultDescription": "Device code authentication completed",
+    "CorrelationId": "d0dab4db-ba96-4779-9539-5bdce62807d2",
+    "Id": "561e987a-8eba-4933-99b6-c7747a74e91d",
+    "UserDisplayName": "j.martinez",
+    "UserPrincipalName": "j.martinez@contoso.com",
+    "UserId": "4335f8ab-925b-59bb-e2c5-b5d0cd4c67e3",
+    "AppDisplayName": "Device Code App",
+    "AppId": "11111111-2222-3333-4444-555555555555",
+    "IPAddress": "172.30.30.1",
+    "Location": "US",
+    "LocationDetails": {
+      "city": "Seattle",
+      "countryOrRegion": "US",
+      "geoCoordinates": {
+        "latitude": 47.6062,
+        "longitude": -122.3321
+      },
+      "state": "Washington"
+    },
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "DeviceDetail": {
+      "browser": "Rich Client",
+      "deviceId": "",
+      "operatingSystem": "Windows 10"
+    },
+    "ConditionalAccessStatus": "notApplied",
+    "IsInteractive": true,
+    "RiskLevelAggregated": "none",
+    "RiskLevelDuringSignIn": "none",
+    "RiskState": "none",
+    "Status": {
+      "errorCode": 0,
+      "failureReason": null
+    },
+    "AuthenticationMethodsUsed": [
+      "Password"
+    ],
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "TokenIssuerType": "AzureAD",
+    "ResourceDisplayName": "Device Code App",
+    "ResourceId": "11111111-2222-3333-4444-555555555555",
+    "HomeTenantId": "87654321-4321-4321-4321-cba987654321",
+    "UserType": "Member",
+    "source": "azure_ad",
+    "collectedAt": "2026-07-01T09:53:17.108022Z",
+    "AttackTechnique": "T1566.002"
+  },
+  {
+    "TimeGenerated": "2026-07-01T09:53:16.7668209Z",
+    "OperationName": "Sign-in activity",
+    "Category": "SignInLogs",
+    "ResultType": "50126",
+    "ResultDescription": "Invalid client_secret provided",
+    "CorrelationId": "7d4d10c7-4873-4a05-984d-892c88ab200c",
+    "Id": "8670d19d-ba4a-4df2-b7a5-bdc361f1dfff",
+    "UserDisplayName": "",
+    "UserPrincipalName": "",
+    "UserId": "959cca0f-cb00-4689-8e0e-e942d088f34c",
+    "AppDisplayName": "Unknown Application",
+    "AppId": "11111111-2222-3333-4444-555555555555",
+    "IPAddress": "172.30.30.1",
+    "Location": "US",
+    "LocationDetails": {
+      "city": "Seattle",
+      "countryOrRegion": "US",
+      "geoCoordinates": {
+        "latitude": 47.6062,
+        "longitude": -122.3321
+      },
+      "state": "Washington"
+    },
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "DeviceDetail": {
+      "browser": "Rich Client",
+      "deviceId": "",
+      "operatingSystem": "Windows 10"
+    },
+    "ConditionalAccessStatus": "notApplied",
+    "IsInteractive": false,
+    "RiskLevelAggregated": "none",
+    "RiskLevelDuringSignIn": "none",
+    "RiskState": "none",
+    "Status": {
+      "errorCode": 50126,
+      "failureReason": "Invalid client_secret provided"
+    },
+    "AuthenticationMethodsUsed": [],
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "TokenIssuerType": "AzureAD",
+    "ResourceDisplayName": "Unknown Application",
+    "ResourceId": "11111111-2222-3333-4444-555555555555",
+    "HomeTenantId": "87654321-4321-4321-4321-cba987654321",
+    "UserType": "Member",
+    "source": "azure_ad",
+    "collectedAt": "2026-07-01T09:53:17.108151Z",
+    "AttackTechnique": "T1078.004"
+  }
+]

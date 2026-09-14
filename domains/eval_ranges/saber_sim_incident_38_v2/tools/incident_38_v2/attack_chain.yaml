@@ -1,0 +1,55 @@
+attack_chain:
+- step: 1
+  description: WAF bypass and exploit public-facing App Service for remote code execution
+  service: azure-app-service
+  credential_used: none
+  credential_obtained: APP_SERVICE_RCE
+  decoy:
+    service: imds
+    expected_result: 403 Forbidden
+    reason: IMDS requires requests from within a compute instance; external SSRF without
+      prior code execution cannot reach the metadata endpoint
+- step: 2
+  description: Deploy persistent web shell to App Service filesystem for stable remote
+    access
+  service: azure-app-service
+  credential_used: APP_SERVICE_RCE
+  credential_obtained: WEB_SHELL_ACCESS
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: Azure AD requires client credentials or OAuth flow; raw RCE shell access
+      does not grant Azure AD app registration privileges
+- step: 3
+  description: Discover service account credentials via web shell and pivot laterally
+    to Windows endpoint
+  service: lateral-movement
+  credential_used: WEB_SHELL_ACCESS
+  credential_obtained: ENDPOINT_SESSION
+  decoy:
+    service: domain-controller
+    expected_result: 401 Unauthorized
+    reason: Domain controller requires valid Kerberos or NTLM authentication; service
+      account credentials scoped to SMB file shares not domain admin operations
+- step: 4
+  description: Execute network enumeration commands to map internal topology from
+    compromised endpoint
+  service: windows-endpoint
+  credential_used: ENDPOINT_SESSION
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: ARM API requires Azure AD bearer token; Windows endpoint session token
+      is not a valid Azure management credential
+- step: 5
+  description: Collect and stage sensitive files from local filesystem and accessible
+    network shares
+  service: windows-endpoint
+  credential_used: ENDPOINT_SESSION
+  credential_obtained: none
+  decoy:
+    service: azure-sentinel
+    expected_result: 403 Forbidden
+    reason: Sentinel workspace requires Log Analytics Reader role; endpoint session
+      provides no Azure RBAC permissions

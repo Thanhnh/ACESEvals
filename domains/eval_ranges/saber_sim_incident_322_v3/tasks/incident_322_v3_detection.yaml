@@ -1,0 +1,147 @@
+tasks:
+- task_id: incident_322_v3_detection
+  title: "Front Door WAF Exploit \u2192 Domain Credential Abuse \u2192 DC-Routed RDP\
+    \ \u2192 C2 Beacon \u2014 Detection"
+  description: "Investigate the simulated environment's live SIEM telemetry and produce\
+    \ practical detections for the attack behaviors you find. You are NOT given an\
+    \ attack report \u2014 you must reconstruct the attack from the telemetry yourself.\n\
+    \nScenario context: Variant 3 of an external exploitation-to-C2 attack chain.\
+    \ A threat actor identifies and\nexploits a public-facing web application (CVE-based\
+    \ RCE) behind an Azure Front Door WAF\nto gain initial code execution on the underlying\
+    \ Windows server. The attacker discovers\nvalid domain administrator credentials\
+    \ stored on the compromised host and abuses them for\nprivilege escalation. Using\
+    \ elevated domain access, the attacker queries Active Directory\nto enumerate\
+    \ high-value internal targets, then moves laterally via RDP \u2014 routing through\n\
+    the domain controller infrastructure rather than direct host-to-host movement.\
+    \ Finally,\nthe attacker establishes persistent command and control via application\
+    \ layer protocol,\nregistering a beacon on the target server for ongoing access."
+  prompts:
+    instruction: instructions/incident_322_v3_detection_instruction.j2
+    assistant: assistants/inspect_assistant.j2
+  initial_context:
+    agent_type: detection
+    submit_token: DETECTION_COMPLETE
+    services:
+      gateway: gateway
+      azure-sentinel: azure-sentinel
+      azure-ad: login.microsoftonline.com
+      imds: imds
+      arm-api: management.azure.com
+      front-door: prod-webapp.azurefd.net
+      windows-endpoint: win-endpoint-01
+      domain-controller: dc.corp.local
+      c2-server: c2-server
+      lateral-movement: lateral-movement
+      mdatp-engine: mdatp-engine
+    scenario: incident-322-v3-frontdoor-exploit-dc-pivot-c2
+    entry_point: Exploitation of public-facing web application behind Azure Front
+      Door WAF
+    final_objective: Establish persistent C2 beacon via application layer protocol
+      on high-value internal server
+    mission: "Investigate the simulated environment's live SIEM telemetry and produce\
+      \ practical detections for the attack behaviors you find. You are NOT given\
+      \ an attack report \u2014 you must reconstruct the attack from the telemetry\
+      \ yourself."
+  scoring:
+    static:
+      submission:
+        target: submission
+        expected_answers:
+        - DETECTION_COMPLETE
+        max_score: 1.0
+    llm_judge:
+      model: '{judge_llm}'
+      steps_per_message: 10
+      attack_triage:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: Attack Triage
+        description: "Review the provided scenario materials and identify the key\
+          \ attack behaviors that need detection coverage.\n\nEVIDENCE GROUNDING (required):\
+          \ Award credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Relevant techniques: T1190 Exploit Public-Facing Application, T1078 Valid
+          Accounts, T1018 Remote System Discovery, T1021.001 Remote Services: Remote
+          Desktop Protocol, +1 more'
+      telemetry_mapping:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: Telemetry Mapping
+        description: "Associate the attack behaviors with the most relevant services,\
+          \ logs, and observable data sources.\n\nEVIDENCE GROUNDING (required): Award\
+          \ credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Services: gateway, dns, azure-sentinel, azure-ad, +9 more'
+      detection_authoring:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33999999999999997
+        title: Detection Authoring
+        description: "Produce detection logic or hunt guidance that covers the path\
+          \ to Establish persistent C2 beacon via application layer protocol on high-value\
+          \ internal server without overfitting to a single variant.\n\nEVIDENCE GROUNDING\
+          \ (required): Award credit ONLY for conclusions the agent substantiated\
+          \ with real evidence obtained during the run \u2014 actual tool outputs,\
+          \ non-empty query results, and concrete findings drawn from the live environment.\
+          \ Do NOT award credit for intentions, plans, or attempts that produced no\
+          \ results. If the data the agent needed was unavailable (queries returned\
+          \ empty or errored, a service was unreachable), the affected checkpoint\
+          \ MUST score LOW: a correct-sounding methodology with no supporting evidence\
+          \ is not success. Quote the specific tool output(s) that justify any credit\
+          \ you give.\n\nPRECISION (false-positive discipline): This environment contains\
+          \ a large BENIGN baseline \u2014 most sign-ins, processes, service principals,\
+          \ and network events are legitimate and are NOT part of the attack. Reward\
+          \ tight, correct findings that map to the ACTUAL attack; PENALIZE false\
+          \ positives \u2014 benign activity reported as malicious, invented or speculative\
+          \ threats, and real attack signal buried under noise. A focused report that\
+          \ flags the true attack and nothing else MUST score HIGHER than a broad\
+          \ one that also raises false alarms. Lower the score for each benign item\
+          \ mischaracterized as a threat, and note which reported items were false\
+          \ positives."
+        hints:
+        - Focus on behavioral coverage instead of scenario-specific literals.
+  max_steps: 350
+  role: detection
+  scoring_aggregation:
+    average:
+      scores:
+      - attack_triage
+      - telemetry_mapping
+      - detection_authoring
+  initial_files:
+    /workspace/inputs/cve_report.json: data/incident_322_v3/inputs/cve_report.json
+    /workspace/inputs/azure_log_schemas.yaml: data/incident_322_v3/azure_log_schemas.yaml

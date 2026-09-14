@@ -1,0 +1,36 @@
+[
+  {
+    "AlertId": "alert-1",
+    "AttackTechniques": "T1562.001",
+    "Category": "DefenseEvasion",
+    "DetectionSource": "EDR",
+    "ServiceSource": "Microsoft Defender for Endpoint",
+    "Severity": "High",
+    "SourceSystem": "",
+    "TenantId": "",
+    "TimeGenerated": "2026-07-17T19:06:41.660Z",
+    "Timestamp": "2026-07-17T19:06:41.660Z",
+    "Title": "Windows Defender AV disabled",
+    "Type": "AlertInfo",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1562.001"
+  },
+  {
+    "AlertId": "alert-2",
+    "AttackTechniques": "T1053.005",
+    "Category": "Persistence",
+    "DetectionSource": "EDR",
+    "ServiceSource": "Microsoft Defender for Endpoint",
+    "Severity": "Medium",
+    "SourceSystem": "",
+    "TenantId": "",
+    "TimeGenerated": "2026-07-17T19:06:41.902Z",
+    "Timestamp": "2026-07-17T19:06:41.902Z",
+    "Title": "Suspicious scheduled task creation",
+    "Type": "AlertInfo",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1053.005"
+  }
+]

@@ -1,0 +1,61 @@
+attack_chain:
+- step: 1
+  description: Exploit IIS deserialization vulnerability and deploy ASPX web shell
+  service: windows-endpoint
+  credential_used: none
+  credential_obtained: WEBSHELL_ACCESS
+  decoy:
+    service: gateway
+    expected_result: 403 Forbidden
+    reason: WAF on gateway blocks serialized exploit payload in HTTP request body
+- step: 2
+  description: Disable Windows Defender real-time monitoring via web shell
+  service: windows-endpoint
+  credential_used: WEBSHELL_ACCESS
+  credential_obtained: none
+  decoy:
+    service: mdatp-engine
+    expected_result: 401 Unauthorized
+    reason: MDATP cloud management console requires Azure AD OAuth token, not local
+      shell access
+- step: 3
+  description: "Kerberoast service account SPNs \u2014 request RC4 TGS tickets and\
+    \ crack offline"
+  service: domain-controller
+  credential_used: WEBSHELL_ACCESS
+  credential_obtained: SVC_ACCOUNT_CREDS
+  decoy:
+    service: imds
+    expected_result: 403 Forbidden
+    reason: "IMDS endpoint unreachable from on-premises server \u2014 no cloud metadata\
+      \ available"
+- step: 4
+  description: WMI lateral movement to domain controller using cracked service account
+  service: lateral-movement
+  credential_used: SVC_ACCOUNT_CREDS
+  credential_obtained: DC_SYSTEM_ACCESS
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: ARM API requires Azure OAuth bearer token, not NTLM/Kerberos domain credentials
+- step: 5
+  description: "DCSync replication attack \u2014 dump all domain password hashes via\
+    \ DRS protocol"
+  service: domain-controller
+  credential_used: DC_SYSTEM_ACCESS
+  credential_obtained: DOMAIN_HASHES
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: Azure AD directory sync requires AAD Connect credentials, not domain session
+      tokens
+- step: 6
+  description: Create scheduled task on DC for persistent SYSTEM-level access
+  service: domain-controller
+  credential_used: DC_SYSTEM_ACCESS
+  credential_obtained: none
+  decoy:
+    service: dns
+    expected_result: 403 Forbidden
+    reason: "DNS service does not support remote task scheduling \u2014 incorrect\
+      \ persistence target"

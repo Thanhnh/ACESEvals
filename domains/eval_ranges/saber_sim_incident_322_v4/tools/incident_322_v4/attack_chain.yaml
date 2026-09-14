@@ -1,0 +1,44 @@
+attack_chain:
+- step: 1
+  description: Exploit RCE vulnerability in public-facing App Service to gain shell
+    on app-host-01
+  service: azure-app-service
+  credential_used: none
+  credential_obtained: HOST_SHELL_ACCESS
+  decoy:
+    service: imds
+    expected_result: 403 Forbidden
+    reason: IMDS requires requests from local compute instance, external SSRF blocked
+      by front-door WAF
+- step: 2
+  description: Deploy HTTP-based C2 implant beaconing to attacker infrastructure over
+    HTTPS/443
+  service: c2-server
+  credential_used: HOST_SHELL_ACCESS
+  credential_obtained: C2_CHANNEL
+  decoy:
+    service: dns
+    expected_result: 403 Forbidden
+    reason: "DNS tunneling attempt blocked by network policy \u2014 only standard\
+      \ DNS queries permitted outbound"
+- step: 3
+  description: Dump LSASS memory via C2 channel to extract CORPNET.LOCAL domain credentials
+  service: windows-endpoint
+  credential_used: C2_CHANNEL
+  credential_obtained: DOMAIN_CREDENTIALS
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: "Azure AD requires valid OAuth token \u2014 host shell access does not\
+      \ grant cloud identity tokens"
+- step: 4
+  description: WMI remote execution to ws-analyst-02 using stolen credentials for
+    j.martinez
+  service: lateral-movement
+  credential_used: DOMAIN_CREDENTIALS
+  credential_obtained: WORKSTATION_ACCESS
+  decoy:
+    service: domain-controller
+    expected_result: 403 Forbidden
+    reason: "DCSync requires Replicating Directory Changes privileges \u2014 j.martinez\
+      \ is standard domain user"

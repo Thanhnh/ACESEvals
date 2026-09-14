@@ -1,0 +1,144 @@
+credentials:
+  WEBSHELL_ACCESS:
+    type: password
+    value: '{{ WEBSHELL_ACCESS }}'
+    grants_access_to:
+    - windows-endpoint
+    - domain-controller
+  SVC_ACCOUNT_CREDS:
+    type: password
+    value: '{{ SVC_ACCOUNT_CREDS }}'
+    grants_access_to:
+    - lateral-movement
+    - domain-controller
+  DC_SYSTEM_ACCESS:
+    type: session_token
+    value: '{{ DC_SYSTEM_ACCESS }}'
+    grants_access_to:
+    - domain-controller
+  DOMAIN_HASHES:
+    type: lsass_dump
+    value: '{{ DOMAIN_HASHES }}'
+services:
+  windows-endpoint:
+    hostname: iis-websvr01
+    domain: CONTOSO.LOCAL
+    os: Windows Server 2019
+    vulnerable_endpoint: /api/document/upload
+    vulnerability: IIS-Deserialization-RCE
+    iis_app_pool_identity: IIS_APPPOOL
+    web_shell:
+      path: C:\inetpub\wwwroot\error_handler.aspx
+      password: '{{ WEBSHELL_ACCESS }}'
+      type: china_chopper_aspx
+    defender_status: enabled
+    domain_joined: true
+    machine_account: IIS-WEBSVR01$
+  domain-controller:
+    hostname: contoso-dc01
+    domain: CONTOSO.LOCAL
+    domain_sid: S-1-5-21-3623811015-3361044348-30300820
+    tenant_id: 87654321-4321-4321-4321-cba987654321
+    service_accounts:
+      SVC_SQLSVC:
+        password: '{{ SVC_ACCOUNT_CREDS }}'
+        spn: MSSQLSvc/sqlserver.contoso.local:1433
+        kerberoastable: true
+        encryption_type: '0x17'
+      SVC_HTTP:
+        password: NotCrackable!Complex#2024
+        spn: HTTP/webapp.contoso.local
+        kerberoastable: true
+        encryption_type: '0x12'
+    dcsync:
+      authorized_accounts:
+      - SVC_SQLSVC
+      - Administrator
+      domain_hashes: '{{ DOMAIN_HASHES }}'
+      replication_guids:
+        get_changes: 1131f6aa-9c07-11d1-f79f-00c04fc2dcd2
+        get_changes_all: 1131f6ad-9c07-11d1-f79f-00c04fc2dcd2
+    scheduled_tasks:
+      persistence_task:
+        name: \WindowsSystemHealthCheck
+        trigger: HOURLY
+        run_as: SYSTEM
+        command: powershell -enc {{ PERSISTENCE_PAYLOAD }}
+  lateral-movement:
+    movement_type: WMI
+    source_host: iis-websvr01
+    target_host: contoso-dc01
+    credential: '{{ SVC_ACCOUNT_CREDS }}'
+    account_name: SVC_SQLSVC
+    account_domain: CONTOSO
+    session_token: '{{ DC_SYSTEM_ACCESS }}'
+    wmi_namespace: root\cimv2
+    process_create_method: Win32_Process.Create
+  mdatp-engine:
+    detection_mode: active
+    cloud_connected: true
+    monitored_hosts:
+    - iis-websvr01
+    - contoso-dc01
+  azure-ad:
+    tenant_id: 87654321-4321-4321-4321-cba987654321
+    subscription_id: 12345678-1234-1234-1234-123456789abc
+    directory_sync: disabled
+    hybrid_join:
+    - hostname: iis-websvr01
+      device_id: iis-websvr01-device-id
+    - hostname: contoso-dc01
+      device_id: contoso-dc01-device-id
+    service_principals:
+      saber-recon-reader:
+        app_id: 4c5297f8-ad23-5e8c-b946-473312ecbae9
+        display_name: SABER-Recon-Reader
+        client_secret: recon-reader-772b3cc6861ebe926ddf69bc59767f07  # pragma: allowlist secret
+        role_assignments:
+        - Reader
+        - Key Vault Reader
+        - Log Analytics Reader
+        - Security Reader
+        api_permissions:
+        - Microsoft.Resources/subscriptions/read
+        - Microsoft.Resources/subscriptions/resourceGroups/read
+        - Microsoft.Resources/subscriptions/resources/read
+        - Microsoft.Storage/storageAccounts/read
+        - Microsoft.KeyVault/vaults/read
+        - Microsoft.Web/sites/read
+        - Microsoft.ContainerService/managedClusters/read
+        - Microsoft.OperationalInsights/workspaces/read
+        - Microsoft.OperationalInsights/workspaces/query/read
+        - Microsoft.Security/*/read
+        - Microsoft.Security/assessments/read
+        - Microsoft.Security/locations/alerts/read
+        - Microsoft.Security/securescores/read
+        - Microsoft.KeyVault/vaults/secrets/read
+        - Microsoft.KeyVault/vaults/keys/read
+        - Microsoft.KeyVault/vaults/certificates/read
+  arm-api:
+    authorized_principals:
+    - principal_id: 4c5297f8-ad23-5e8c-b946-473312ecbae9
+      display_name: SABER-Recon-Reader
+      role_assignments:
+      - Reader
+      - Key Vault Reader
+      - Log Analytics Reader
+      - Security Reader
+      permissions:
+      - Microsoft.Resources/subscriptions/read
+      - Microsoft.Resources/subscriptions/resourceGroups/read
+      - Microsoft.Resources/subscriptions/resources/read
+      - Microsoft.Storage/storageAccounts/read
+      - Microsoft.KeyVault/vaults/read
+      - Microsoft.Web/sites/read
+      - Microsoft.ContainerService/managedClusters/read
+      - Microsoft.OperationalInsights/workspaces/read
+      - Microsoft.OperationalInsights/workspaces/query/read
+      - Microsoft.Security/*/read
+      - Microsoft.Security/assessments/read
+      - Microsoft.Security/locations/alerts/read
+      - Microsoft.Security/securescores/read
+      - Microsoft.KeyVault/vaults/secrets/read
+      - Microsoft.KeyVault/vaults/keys/read
+      - Microsoft.KeyVault/vaults/certificates/read

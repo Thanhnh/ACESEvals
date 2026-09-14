@@ -1,0 +1,61 @@
+attack_chain:
+- step: 1
+  description: "SQL injection through Front Door WAF \u2014 xp_cmdshell RCE on web-srv-01"
+  service: front-door
+  credential_used: none
+  credential_obtained: WEBSERVER_SHELL
+  decoy:
+    service: imds
+    expected_result: 403 Forbidden
+    reason: IMDS metadata endpoint not accessible; web-srv-01 is domain-joined on-premises,
+      not an Azure VM with managed identity
+- step: 2
+  description: "LDAP reconnaissance \u2014 enumerate Domain Admins group on engcorp-dc01"
+  service: domain-controller
+  credential_used: WEBSERVER_SHELL
+  credential_obtained: none
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: Azure AD Graph API requires OAuth bearer token; OS shell context provides
+      no cloud authentication
+- step: 3
+  description: Authenticate as Domain Admin using credentials from web.config
+  service: domain-controller
+  credential_used: WEBSERVER_SHELL
+  credential_obtained: DA_CREDENTIALS
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: ARM API requires Azure AD OAuth authentication; Windows domain credentials
+      not valid for cloud management plane
+- step: 4
+  description: WMI remote process execution to eng-ws-04 in engineering subnet
+  service: lateral-movement
+  credential_used: DA_CREDENTIALS
+  credential_obtained: ENGINEERING_ACCESS
+  decoy:
+    service: front-door
+    expected_result: 403 Forbidden
+    reason: Front Door WAF only proxies inbound HTTP/HTTPS; cannot route RDP/SMB lateral
+      movement to internal hosts
+- step: 5
+  description: Create WindowsSystemUpdate scheduled task for persistence on eng-ws-04
+  service: windows-endpoint
+  credential_used: DA_CREDENTIALS
+  credential_obtained: PERSISTENT_TASK
+  decoy:
+    service: domain-controller
+    expected_result: 403 Forbidden
+    reason: Remote scheduled task creation on domain controller blocked by hardened
+      Group Policy restricting non-GPO task registration
+- step: 6
+  description: DNS tunneling C2 via TXT queries to update-check.systemcdn.net
+  service: c2-server
+  credential_used: PERSISTENT_TASK
+  credential_obtained: C2_CHANNEL
+  decoy:
+    service: gateway
+    expected_result: Connection Reset
+    reason: HTTPS beacon to uncategorized external domain blocked by gateway proxy
+      TLS inspection and content filtering

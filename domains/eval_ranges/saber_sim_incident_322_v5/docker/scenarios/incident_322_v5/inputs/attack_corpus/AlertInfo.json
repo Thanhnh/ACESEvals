@@ -1,0 +1,36 @@
+[
+  {
+    "AlertId": "alert-1",
+    "AttackTechniques": "T1053.005",
+    "Category": "Persistence",
+    "DetectionSource": "EDR",
+    "ServiceSource": "Microsoft Defender for Endpoint",
+    "Severity": "Medium",
+    "SourceSystem": "",
+    "TenantId": "",
+    "TimeGenerated": "2026-07-01T04:12:20.584Z",
+    "Timestamp": "2026-07-01T04:12:20.584Z",
+    "Title": "Suspicious scheduled task creation",
+    "Type": "AlertInfo",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1053.005"
+  },
+  {
+    "AlertId": "alert-2",
+    "AttackTechniques": "T1543.003",
+    "Category": "Persistence",
+    "DetectionSource": "EDR",
+    "ServiceSource": "Microsoft Defender for Endpoint",
+    "Severity": "Medium",
+    "SourceSystem": "",
+    "TenantId": "",
+    "TimeGenerated": "2026-07-01T04:12:20.646Z",
+    "Timestamp": "2026-07-01T04:12:20.646Z",
+    "Title": "Suspicious service installation",
+    "Type": "AlertInfo",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1543.003"
+  }
+]

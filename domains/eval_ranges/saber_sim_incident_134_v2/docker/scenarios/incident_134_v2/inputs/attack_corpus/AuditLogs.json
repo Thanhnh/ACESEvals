@@ -1,0 +1,42 @@
+[
+  {
+    "AADOperationType": "",
+    "AADTenantId": "",
+    "ActivityDateTime": "",
+    "ActivityDisplayName": "",
+    "AdditionalDetails": null,
+    "Category": "AuditLogs",
+    "CorrelationId": "",
+    "DurationMs": 0,
+    "Id": "",
+    "Identity": "",
+    "InitiatedBy": "victim",
+    "Level": "",
+    "Location": "",
+    "LoggedByService": "",
+    "OperationName": "Add service principal credentials",
+    "OperationVersion": "",
+    "Resource": "",
+    "ResourceGroup": "",
+    "ResourceId": "",
+    "ResourceProvider": "",
+    "Result": "",
+    "ResultDescription": "",
+    "ResultReason": "",
+    "ResultSignature": "",
+    "ResultType": "Success",
+    "SourceSystem": "",
+    "TargetResources": [
+      {
+        "DisplayName": "backdoor",
+        "Id": "22222222-3333-4444-5555-666666666666"
+      }
+    ],
+    "TenantId": "",
+    "TimeGenerated": "2026-07-01T09:16:52.1236660Z",
+    "Type": "AuditLogs",
+    "source": "",
+    "collectedAt": "2026-07-01T09:16:53.320751Z",
+    "AttackTechnique": "T1098.001"
+  }
+]

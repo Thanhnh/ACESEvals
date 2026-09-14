@@ -1,0 +1,23 @@
+[
+  {
+    "TimeGenerated": "",
+    "ActionType": "MailItemsAccessed",
+    "Application": "Microsoft Exchange Online",
+    "ApplicationId": null,
+    "AccountDisplayName": "victim",
+    "AccountObjectId": "",
+    "AccountType": "",
+    "IPAddress": "172.30.10.1",
+    "CountryCode": "",
+    "IsAdminOperation": null,
+    "IsImpersonated": null,
+    "IsExternalUser": null,
+    "ObjectName": "victim",
+    "ObjectType": "",
+    "UserAgent": "",
+    "Type": "",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1114.002"
+  }
+]

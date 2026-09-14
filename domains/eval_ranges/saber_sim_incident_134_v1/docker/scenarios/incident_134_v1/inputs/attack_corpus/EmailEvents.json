@@ -1,0 +1,28 @@
+[
+  {
+    "TimeGenerated": "",
+    "NetworkMessageId": "7f46c0b0-de6b-4093-b102-ddcdd06f31e1",
+    "InternetMessageId": "",
+    "SenderFromAddress": "j.harrison",
+    "SenderFromDomain": "",
+    "SenderDisplayName": "",
+    "SenderIPv4": "",
+    "RecipientEmailAddress": "j.harrison",
+    "RecipientDomain": "",
+    "Subject": "",
+    "EmailDirection": "Intraorg",
+    "DeliveryAction": "Delivered",
+    "DeliveryLocation": "",
+    "ThreatTypes": "Phish",
+    "ThreatNames": "",
+    "DetectionMethods": "",
+    "UrlCount": null,
+    "AttachmentCount": null,
+    "EmailSize": null,
+    "IsFirstContact": null,
+    "Type": "",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1534"
+  }
+]

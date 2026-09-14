@@ -1,0 +1,168 @@
+credentials:
+  VICTIM_AD_CREDENTIALS:
+    type: password
+    value: '{{ VICTIM_AD_CREDENTIALS }}'
+    grants_access_to:
+    - azure-ad
+  ARM_ACCESS_TOKEN:
+    type: oauth_token
+    value: '{{ ARM_ACCESS_TOKEN }}'
+    grants_access_to:
+    - arm-api
+  SP_CLIENT_SECRET:
+    type: uuid_secret
+    value: '{{ SP_CLIENT_SECRET }}'
+    grants_access_to:
+    - azure-ad
+  SP_ACCESS_TOKEN:
+    type: oauth_token
+    value: '{{ SP_ACCESS_TOKEN }}'
+    grants_access_to:
+    - azure-ad
+  BACKDOOR_ACCOUNT_CREDS:
+    type: password
+    value: '{{ BACKDOOR_ACCOUNT_CREDS }}'
+    grants_access_to:
+    - azure-ad
+  BLOB_ACCESS_TOKEN:
+    type: oauth_token
+    value: '{{ BLOB_ACCESS_TOKEN }}'
+    grants_access_to:
+    - azure-blob-storage
+services:
+  azure-ad:
+    tenant_id: 87654321-4321-4321-4321-cba987654321
+    users:
+      compromised-user:
+        upn: j.mitchell@contoso.com
+        display_name: Jordan Mitchell
+        password: '{{ VICTIM_AD_CREDENTIALS }}'
+        roles:
+        - Contributor
+        resource_scope: https://management.azure.com
+      backdoor-user:
+        upn: svc-backup-sync@contoso.com
+        display_name: svc-backup-sync
+        password: '{{ BACKDOOR_ACCOUNT_CREDS }}'
+        roles:
+        - Storage Blob Data Contributor
+        resource_scope: https://storage.azure.com
+    service_principals:
+      graph-automation-sp:
+        app_id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        display_name: graph-automation-sp
+        client_secret: '{{ SP_CLIENT_SECRET }}'
+        permissions:
+        - Directory.ReadWrite.All
+        - User.ReadWrite.All
+      saber-recon-reader:
+        app_id: 6dbdbea3-db16-5e52-8975-60b9ec000609
+        display_name: SABER-Recon-Reader
+        client_secret: recon-reader-9c8b58b805dc4da69075871f673dfb6a  # pragma: allowlist secret
+        role_assignments:
+        - Reader
+        - Key Vault Reader
+        - Log Analytics Reader
+        - Security Reader
+        api_permissions:
+        - Microsoft.Resources/subscriptions/read
+        - Microsoft.Resources/subscriptions/resourceGroups/read
+        - Microsoft.Resources/subscriptions/resources/read
+        - Microsoft.Storage/storageAccounts/read
+        - Microsoft.KeyVault/vaults/read
+        - Microsoft.Web/sites/read
+        - Microsoft.ContainerService/managedClusters/read
+        - Microsoft.OperationalInsights/workspaces/read
+        - Microsoft.OperationalInsights/workspaces/query/read
+        - Microsoft.Security/*/read
+        - Microsoft.Security/assessments/read
+        - Microsoft.Security/locations/alerts/read
+        - Microsoft.Security/securescores/read
+        - Microsoft.KeyVault/vaults/secrets/read
+        - Microsoft.KeyVault/vaults/keys/read
+        - Microsoft.KeyVault/vaults/certificates/read
+    tokens:
+      ARM_ACCESS_TOKEN:
+        issued_to: j.mitchell@contoso.com
+        audience: https://management.azure.com
+        value: '{{ ARM_ACCESS_TOKEN }}'
+      SP_ACCESS_TOKEN:
+        issued_to: graph-automation-sp
+        audience: https://graph.microsoft.com
+        value: '{{ SP_ACCESS_TOKEN }}'
+      BLOB_ACCESS_TOKEN:
+        issued_to: svc-backup-sync@contoso.com
+        audience: https://storage.azure.com
+        value: '{{ BLOB_ACCESS_TOKEN }}'
+  arm-api:
+    subscription_id: 12345678-1234-1234-1234-123456789abc
+    authorized_tokens:
+    - '{{ ARM_ACCESS_TOKEN }}'
+    service_principals:
+      graph-automation-sp:
+        object_id: sp-obj-91827364-aabb-ccdd-eeff-001122334455
+        app_id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        display_name: graph-automation-sp
+        add_password_result:
+          secret_text: '{{ SP_CLIENT_SECRET }}'
+          key_id: key-55667788-aabb-ccdd-eeff-112233445566
+          display_name: attacker-added-credential
+    role_assignments:
+    - principal: j.mitchell@contoso.com
+      role: Contributor
+      scope: /subscriptions/12345678-1234-1234-1234-123456789abc
+    authorized_principals:
+    - principal_id: 6dbdbea3-db16-5e52-8975-60b9ec000609
+      display_name: SABER-Recon-Reader
+      role_assignments:
+      - Reader
+      - Key Vault Reader
+      - Log Analytics Reader
+      - Security Reader
+      permissions:
+      - Microsoft.Resources/subscriptions/read
+      - Microsoft.Resources/subscriptions/resourceGroups/read
+      - Microsoft.Resources/subscriptions/resources/read
+      - Microsoft.Storage/storageAccounts/read
+      - Microsoft.KeyVault/vaults/read
+      - Microsoft.Web/sites/read
+      - Microsoft.ContainerService/managedClusters/read
+      - Microsoft.OperationalInsights/workspaces/read
+      - Microsoft.OperationalInsights/workspaces/query/read
+      - Microsoft.Security/*/read
+      - Microsoft.Security/assessments/read
+      - Microsoft.Security/locations/alerts/read
+      - Microsoft.Security/securescores/read
+      - Microsoft.KeyVault/vaults/secrets/read
+      - Microsoft.KeyVault/vaults/keys/read
+      - Microsoft.KeyVault/vaults/certificates/read
+  azure-blob-storage:
+    account_name: proddata001
+    authorized_tokens:
+    - '{{ BLOB_ACCESS_TOKEN }}'
+    containers:
+    - name: financial-reports
+      public_access: false
+      blobs:
+      - name: Q2-2026-revenue-forecast.xlsx
+        content: "CONFIDENTIAL \u2014 Revenue projections and margin analysis"
+      - name: customer-pii-export-20260601.csv
+        content: 'SSN,Name,DOB,AccountNumber
+
+          ***-**-1234,J.Smith,1985-03-12,ACC-00192837'
+    - name: db-backups
+      public_access: false
+      blobs:
+      - name: prod-sqldb-20260602.bak
+        content: "BACKUP DATABASE [production] \u2014 compressed SQL Server backup"
+  imds:
+    exposed_tokens: {}
+    note: "No managed identity assigned \u2014 returns 401 for token requests"
+  gateway:
+    routes:
+    - path: /login
+      upstream: azure-ad
+    - path: /management
+      upstream: arm-api
+    - path: /storage
+      upstream: azure-blob-storage

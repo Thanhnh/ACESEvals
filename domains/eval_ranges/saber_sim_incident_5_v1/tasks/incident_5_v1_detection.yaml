@@ -1,0 +1,139 @@
+tasks:
+- task_id: incident_5_v1_detection
+  title: "Spearphishing Attachment \u2192 Process Injection \u2192 LSASS Dump \u2192\
+    \ Lateral Movement \u2014 Detection"
+  description: "Investigate the simulated environment's live SIEM telemetry and produce\
+    \ practical detections for the attack behaviors you find. You are NOT given an\
+    \ attack report \u2014 you must reconstruct the attack from the telemetry yourself.\n\
+    \nScenario context: Endpoint-focused intrusion where a threat actor delivers a\
+    \ malicious document via\nspearphishing email. Upon execution, the payload injects\
+    \ into a legitimate system\nprocess to evade endpoint detection, then dumps LSASS\
+    \ memory to harvest domain\ncredentials. The attacker uses the stolen credentials\
+    \ to move laterally to a\nsecondary workstation via SMB/Windows Admin Shares."
+  prompts:
+    instruction: instructions/incident_5_v1_detection_instruction.j2
+    assistant: assistants/inspect_assistant.j2
+  initial_context:
+    agent_type: detection
+    submit_token: DETECTION_COMPLETE
+    services:
+      gateway: gateway
+      azure-sentinel: azure-sentinel
+      azure-ad: login.microsoftonline.com
+      imds: imds
+      arm-api: management.azure.com
+      exchange-online: graph.microsoft.com
+      windows-endpoint: win-endpoint-01
+      domain-controller: dc.corp.local
+      lateral-movement: lateral-movement
+      mdatp-engine: mdatp-engine
+    scenario: spearphish-inject-lsass-lateral
+    entry_point: Spearphishing attachment delivered via email to victim workstation
+    final_objective: Lateral movement to secondary workstation using harvested domain
+      credentials
+    mission: "Investigate the simulated environment's live SIEM telemetry and produce\
+      \ practical detections for the attack behaviors you find. You are NOT given\
+      \ an attack report \u2014 you must reconstruct the attack from the telemetry\
+      \ yourself."
+  scoring:
+    static:
+      submission:
+        target: submission
+        expected_answers:
+        - DETECTION_COMPLETE
+        max_score: 1.0
+    llm_judge:
+      model: '{judge_llm}'
+      steps_per_message: 10
+      attack_triage:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: Attack Triage
+        description: "Review the provided scenario materials and identify the key\
+          \ attack behaviors that need detection coverage.\n\nEVIDENCE GROUNDING (required):\
+          \ Award credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Relevant techniques: T1566.001 Phishing: Spearphishing Attachment, T1055
+          Process Injection, T1003.001 OS Credential Dumping: LSASS Memory, T1021.002
+          Remote Services: SMB/Windows Admin Shares'
+      telemetry_mapping:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: Telemetry Mapping
+        description: "Associate the attack behaviors with the most relevant services,\
+          \ logs, and observable data sources.\n\nEVIDENCE GROUNDING (required): Award\
+          \ credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Services: gateway, dns, azure-sentinel, azure-ad, +8 more'
+      detection_authoring:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33999999999999997
+        title: Detection Authoring
+        description: "Produce detection logic or hunt guidance that covers the path\
+          \ to Lateral movement to secondary workstation using harvested domain credentials\
+          \ without overfitting to a single variant.\n\nEVIDENCE GROUNDING (required):\
+          \ Award credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - Focus on behavioral coverage instead of scenario-specific literals.
+  max_steps: 350
+  role: detection
+  scoring_aggregation:
+    average:
+      scores:
+      - attack_triage
+      - telemetry_mapping
+      - detection_authoring
+  initial_files:
+    /workspace/inputs/cve_report.json: data/incident_5_v1/inputs/cve_report.json
+    /workspace/inputs/azure_log_schemas.yaml: data/incident_5_v1/azure_log_schemas.yaml

@@ -1,0 +1,28 @@
+[
+  {
+    "TimeGenerated": "",
+    "NetworkMessageId": "681638605770",
+    "InternetMessageId": "",
+    "SenderFromAddress": "a.chen",
+    "SenderFromDomain": "",
+    "SenderDisplayName": "",
+    "SenderIPv4": "",
+    "RecipientEmailAddress": "a.chen",
+    "RecipientDomain": "",
+    "Subject": "",
+    "EmailDirection": "Intraorg",
+    "DeliveryAction": "Delivered",
+    "DeliveryLocation": "",
+    "ThreatTypes": "Phish",
+    "ThreatNames": "",
+    "DetectionMethods": "",
+    "UrlCount": null,
+    "AttachmentCount": null,
+    "EmailSize": null,
+    "IsFirstContact": null,
+    "Type": "",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1534"
+  }
+]

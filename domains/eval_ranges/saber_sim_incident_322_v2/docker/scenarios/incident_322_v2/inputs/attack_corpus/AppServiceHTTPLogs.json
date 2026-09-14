@@ -1,0 +1,25 @@
+[
+  {
+    "TimeGenerated": "",
+    "CIp": "",
+    "CsMethod": "",
+    "CsUriStem": "",
+    "CsUriQuery": "",
+    "CsHost": "",
+    "ScStatus": null,
+    "ScBytes": null,
+    "CsBytes": null,
+    "TimeTaken": null,
+    "Result": "",
+    "UserAgent": "",
+    "Cookie": "",
+    "Referer": "",
+    "ComputerName": "",
+    "SPort": "",
+    "Protocol": "",
+    "_ResourceId": "",
+    "source": "",
+    "collectedAt": "2026-07-01T10:45:08.361035Z",
+    "AttackTechnique": "T1190"
+  }
+]

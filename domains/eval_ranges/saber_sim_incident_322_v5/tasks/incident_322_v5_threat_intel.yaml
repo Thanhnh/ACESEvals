@@ -1,0 +1,151 @@
+tasks:
+- task_id: incident_322_v5_threat_intel
+  title: "SQL Injection \u2192 LDAP Domain Recon \u2192 WMI Lateral Movement \u2192\
+    \ DNS Tunneling C2 \u2014 Threat Intel"
+  description: "Produce a high-quality threat intelligence brief by RECONSTRUCTING\
+    \ the attack from the environment's telemetry: the threat story, MITRE mapping,\
+    \ and relevant adversary or CVE context. You are NOT given the scenario intent\
+    \ \u2014 reconstruct it from evidence.\n\nScenario context: Variant 5 of the external\
+    \ exploitation to C2 scenario. A threat actor exploits a SQL\ninjection vulnerability\
+    \ in a public-facing web application behind Azure Front Door to gain\ninitial\
+    \ command execution on the backend Windows server. Unlike previous variants that\n\
+    harvested cached credentials, this attacker performs active LDAP reconnaissance\
+    \ against the\ndomain controller to enumerate privileged accounts, then authenticates\
+    \ as a discovered\ndomain administrator. Lateral movement uses WMI remote process\
+    \ execution (distinct from\nthe RDP/SMB paths used in earlier variants) to reach\
+    \ a high-value workstation in the\nengineering subnet. The attacker establishes\
+    \ persistence via a scheduled task disguised as\na system update process, which\
+    \ initiates a DNS tunneling C2 channel encoding commands\nwithin DNS TXT queries\
+    \ \u2014 a protocol-level evasion technique that differs from the HTTPS\nbeaconing\
+    \ observed in previous variants. Evidence is observable in SecurityEvent (Windows\n\
+    logon, process creation, and task registration events), CommonSecurityLog (anomalous\
+    \ DNS\nquery patterns at the network perimeter), and SecurityAlert (correlated\
+    \ detection of\nsuspicious WMI execution and DNS tunneling indicators)."
+  prompts:
+    instruction: instructions/incident_322_v5_threat_intel_instruction.j2
+    assistant: assistants/inspect_assistant.j2
+  initial_context:
+    agent_type: threat_intel
+    submit_token: THREAT_INTEL_COMPLETE
+    services:
+      gateway: gateway
+      azure-sentinel: azure-sentinel
+      azure-ad: login.microsoftonline.com
+      imds: imds
+      arm-api: management.azure.com
+      front-door: prod-webapp.azurefd.net
+      windows-endpoint: win-endpoint-01
+      domain-controller: dc.corp.local
+      lateral-movement: lateral-movement
+      c2-server: c2-server
+      mdatp-engine: mdatp-engine
+    scenario: incident_322_v5
+    entry_point: SQL injection vulnerability in public-facing web application behind
+      Azure Front Door
+    final_objective: Establish persistent DNS tunneling C2 channel on engineering
+      workstation via scheduled task
+    mission: "Produce a high-quality threat intelligence brief by RECONSTRUCTING the\
+      \ attack from the environment's telemetry: the threat story, MITRE mapping,\
+      \ and relevant adversary or CVE context. You are NOT given the scenario intent\
+      \ \u2014 reconstruct it from evidence."
+  scoring:
+    static:
+      submission:
+        target: submission
+        expected_answers:
+        - THREAT_INTEL_COMPLETE
+        max_score: 1.0
+    llm_judge:
+      model: '{judge_llm}'
+      steps_per_message: 10
+      scenario_summary:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: Scenario Threat Summary
+        description: "Summarize the attacker objective, entry point, and critical\
+          \ stages of the scenario clearly.\n\nEVIDENCE GROUNDING (required): Award\
+          \ credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Entry point: SQL injection vulnerability in public-facing web application
+          behind Azure Front Door'
+        - 'Objective: Establish persistent DNS tunneling C2 channel on engineering
+          workstation via scheduled task'
+      mitre_mapping:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: MITRE & Adversary Mapping
+        description: "Map the scenario to MITRE ATT&CK techniques and characterize\
+          \ the kind of adversary behavior it represents.\n\nEVIDENCE GROUNDING (required):\
+          \ Award credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Relevant techniques: T1190 Exploit Public-Facing Application, T1087.002
+          Account Discovery: Domain Account, T1078.002 Valid Accounts: Domain Accounts,
+          T1047 Windows Management Instrumentation, +2 more'
+      intel_delivery:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33999999999999997
+        title: Threat Intel Delivery
+        description: "Deliver actionable threat context that can guide downstream\
+          \ detection and remediation teams.\n\nEVIDENCE GROUNDING (required): Award\
+          \ credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - Keep the output operationally useful and grounded in the scenario.
+  max_steps: 300
+  role: threat_intel
+  scoring_aggregation:
+    average:
+      scores:
+      - scenario_summary
+      - mitre_mapping
+      - intel_delivery

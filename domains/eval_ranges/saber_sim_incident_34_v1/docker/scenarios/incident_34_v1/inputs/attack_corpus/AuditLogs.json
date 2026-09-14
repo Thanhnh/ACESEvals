@@ -1,0 +1,130 @@
+[
+  {
+    "AADOperationType": "",
+    "AADTenantId": "",
+    "ActivityDateTime": "",
+    "ActivityDisplayName": "",
+    "AdditionalDetails": null,
+    "Category": "AuditLogs",
+    "CorrelationId": "",
+    "DurationMs": 0,
+    "Id": "",
+    "Identity": "",
+    "InitiatedBy": {
+      "user": {
+        "id": "7892ed6d-9f54-8f5e-ddeb-f47b01f207e1",
+        "ipAddress": "172.30.30.1",
+        "userPrincipalName": "j.martinez@contoso.com"
+      }
+    },
+    "Level": "",
+    "Location": "",
+    "LoggedByService": "",
+    "OperationName": "List users",
+    "OperationVersion": "",
+    "Resource": "",
+    "ResourceGroup": "",
+    "ResourceId": "",
+    "ResourceProvider": "",
+    "Result": "",
+    "ResultDescription": "",
+    "ResultReason": "",
+    "ResultSignature": "",
+    "ResultType": "Success",
+    "SourceSystem": "",
+    "TargetResources": null,
+    "TenantId": "",
+    "TimeGenerated": "2026-07-01T08:32:28.4345072Z",
+    "Type": "AuditLogs",
+    "source": "",
+    "collectedAt": "2026-07-01T08:32:29.177398Z",
+    "AttackTechnique": "T1087.004"
+  },
+  {
+    "AADOperationType": "",
+    "AADTenantId": "",
+    "ActivityDateTime": "",
+    "ActivityDisplayName": "",
+    "AdditionalDetails": null,
+    "Category": "AuditLogs",
+    "CorrelationId": "",
+    "DurationMs": 0,
+    "Id": "",
+    "Identity": "",
+    "InitiatedBy": "j.martinez",
+    "Level": "",
+    "Location": "",
+    "LoggedByService": "",
+    "OperationName": "Add service principal credentials",
+    "OperationVersion": "",
+    "Resource": "",
+    "ResourceGroup": "",
+    "ResourceId": "",
+    "ResourceProvider": "",
+    "Result": "",
+    "ResultDescription": "",
+    "ResultReason": "",
+    "ResultSignature": "",
+    "ResultType": "Success",
+    "SourceSystem": "",
+    "TargetResources": [
+      {
+        "DisplayName": "backdoor",
+        "Id": "22222222-3333-4444-5555-666666666666"
+      }
+    ],
+    "TenantId": "",
+    "TimeGenerated": "2026-07-01T08:32:28.3185887Z",
+    "Type": "AuditLogs",
+    "source": "",
+    "collectedAt": "2026-07-01T08:32:29.177416Z",
+    "AttackTechnique": "T1098.001"
+  },
+  {
+    "AADOperationType": "",
+    "AADTenantId": "",
+    "ActivityDateTime": "",
+    "ActivityDisplayName": "",
+    "AdditionalDetails": null,
+    "Category": "AuditLogs",
+    "CorrelationId": "",
+    "DurationMs": 0,
+    "Id": "",
+    "Identity": "",
+    "InitiatedBy": {
+      "user": {
+        "id": "7892ed6d-9f54-8f5e-ddeb-f47b01f207e1",
+        "ipAddress": "172.30.30.1",
+        "userPrincipalName": "j.martinez@contoso.com"
+      }
+    },
+    "Level": "",
+    "Location": "",
+    "LoggedByService": "",
+    "OperationName": "Add user",
+    "OperationVersion": "",
+    "Resource": "",
+    "ResourceGroup": "",
+    "ResourceId": "",
+    "ResourceProvider": "",
+    "Result": "",
+    "ResultDescription": "",
+    "ResultReason": "",
+    "ResultSignature": "",
+    "ResultType": "Success",
+    "SourceSystem": "",
+    "TargetResources": [
+      {
+        "id": "46b994c4-c83e-5bd1-928b-fd9efba3100c",
+        "type": "User",
+        "userPrincipalName": "svc-backup@contoso.com"
+      }
+    ],
+    "TenantId": "",
+    "TimeGenerated": "2026-07-01T08:32:28.9045248Z",
+    "Type": "AuditLogs",
+    "source": "",
+    "collectedAt": "2026-07-01T08:32:29.177430Z",
+    "AttackTechnique": "T1136.003"
+  }
+]
