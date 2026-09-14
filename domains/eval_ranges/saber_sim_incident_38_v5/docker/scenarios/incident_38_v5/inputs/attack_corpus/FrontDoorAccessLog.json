@@ -1,0 +1,169 @@
+[
+  {
+    "time": "2026-06-25T17:45:15.767Z",
+    "resourceId": "/SUBSCRIPTIONS/12345678-1234-1234-1234-123456789abc/RESOURCEGROUPS/production-rg/PROVIDERS/MICROSOFT.CDN/PROFILES/prod-frontdoor",
+    "category": "FrontDoorWebApplicationFirewallLog",
+    "operationName": "Microsoft.Network/FrontDoorWebApplicationFirewallLog/Write",
+    "properties": {
+      "action": "Log",
+      "clientIP": "172.30.20.1",
+      "clientPort": "49750",
+      "details": {
+        "matches": [
+          {
+            "matchVariableName": "RequestBody",
+            "matchVariableValue": "__proto__"
+          }
+        ]
+      },
+      "host": "prod-webapp.azurefd.net",
+      "policy": "React2ShellWAFPolicy",
+      "policyMode": "detection",
+      "requestUri": "http://prod-webapp.azurefd.net/_next/rsc",
+      "ruleName": "Prototype Pollution Attempt-CUSTOM-001",
+      "socketIP": "172.30.20.1",
+      "trackingReference": "03D6CB4BE8291470C8934"
+    },
+    "source": "",
+    "collectedAt": "2026-06-25T17:45:27.250382Z",
+    "AttackTechnique": "T1190"
+  },
+  {
+    "time": "2026-06-25T17:45:15.767Z",
+    "resourceId": "/SUBSCRIPTIONS/12345678-1234-1234-1234-123456789abc/RESOURCEGROUPS/production-rg/PROVIDERS/MICROSOFT.CDN/PROFILES/prod-frontdoor",
+    "category": "FrontDoorWebApplicationFirewallLog",
+    "operationName": "Microsoft.Network/FrontDoorWebApplicationFirewallLog/Write",
+    "properties": {
+      "action": "Log",
+      "clientIP": "172.30.20.1",
+      "clientPort": "49750",
+      "details": {
+        "matches": [
+          {
+            "matchVariableName": "UserAgent",
+            "matchVariableValue": "curl"
+          }
+        ]
+      },
+      "host": "prod-webapp.azurefd.net",
+      "policy": "React2ShellWAFPolicy",
+      "policyMode": "detection",
+      "requestUri": "http://prod-webapp.azurefd.net/_next/rsc",
+      "ruleName": "Suspicious User-Agent - Scripting Tool-920360",
+      "socketIP": "172.30.20.1",
+      "trackingReference": "03D6CB4BE8291470C8934"
+    },
+    "source": "",
+    "collectedAt": "2026-06-25T17:45:27.250411Z",
+    "AttackTechnique": "T1190"
+  },
+  {
+    "time": "2026-06-25T17:45:15.845Z",
+    "resourceId": "/SUBSCRIPTIONS/12345678-1234-1234-1234-123456789abc/RESOURCEGROUPS/production-rg/PROVIDERS/MICROSOFT.CDN/PROFILES/prod-frontdoor",
+    "category": "FrontDoorWebApplicationFirewallLog",
+    "operationName": "Microsoft.Network/FrontDoorWebApplicationFirewallLog/Write",
+    "properties": {
+      "action": "Log",
+      "clientIP": "172.30.20.1",
+      "clientPort": "49752",
+      "details": {
+        "matches": [
+          {
+            "matchVariableName": "UserAgent",
+            "matchVariableValue": "curl"
+          }
+        ]
+      },
+      "host": "prod-webapp.azurefd.net",
+      "policy": "React2ShellWAFPolicy",
+      "policyMode": "detection",
+      "requestUri": "http://prod-webapp.azurefd.net/web/shell",
+      "ruleName": "Suspicious User-Agent - Scripting Tool-920360",
+      "socketIP": "172.30.20.1",
+      "trackingReference": "0567582F8161148599E81"
+    },
+    "source": "",
+    "collectedAt": "2026-06-25T17:45:27.250427Z",
+    "AttackTechnique": "T1505.003"
+  },
+  {
+    "time": "2026-06-25T17:45:15.779Z",
+    "resourceId": "/SUBSCRIPTIONS/12345678-1234-1234-1234-123456789abc/RESOURCEGROUPS/production-rg/PROVIDERS/MICROSOFT.CDN/PROFILES/prod-frontdoor",
+    "category": "FrontDoorAccessLog",
+    "operationName": "Microsoft.Cdn/Profiles/FrontDoorAccessLog/Write",
+    "properties": {
+      "clientPort": 49750,
+      "requestUri": "http://prod-webapp.azurefd.net/_next/rsc",
+      "trackingReference": "03D6CB4BE8291470C8934",
+      "cacheStatus": "MISS",
+      "clientIp": "172.30.20.1",
+      "endpoint": "prod-webapp.azurefd.net",
+      "errorInfo": "NoError",
+      "hostName": "prod-webapp.azurefd.net",
+      "httpMethod": "POST",
+      "httpStatusCode": 200,
+      "httpVersion": "HTTP/1.1",
+      "matchedRulesSetName": "",
+      "originIp": "172.30.20.10",
+      "originName": "app-service-origin",
+      "originUrl": "http://172.30.20.10:8080/_next/rsc",
+      "pop": "EUS",
+      "referrer": "",
+      "requestBytes": 50,
+      "requestProtocol": "HTTP",
+      "responseBytes": 646,
+      "result": "",
+      "routeName": "default-route",
+      "securityCipher": null,
+      "securityProtocol": null,
+      "sni": null,
+      "socketIp": "172.30.20.1",
+      "timeTaken": 0.015,
+      "timeToFirstByte": 0.012,
+      "userAgent": "curl/8.14.1"
+    },
+    "source": "",
+    "collectedAt": "2026-06-25T17:45:27.250454Z",
+    "AttackTechnique": "T1190"
+  },
+  {
+    "time": "2026-06-25T17:45:15.850Z",
+    "resourceId": "/SUBSCRIPTIONS/12345678-1234-1234-1234-123456789abc/RESOURCEGROUPS/production-rg/PROVIDERS/MICROSOFT.CDN/PROFILES/prod-frontdoor",
+    "category": "FrontDoorAccessLog",
+    "operationName": "Microsoft.Cdn/Profiles/FrontDoorAccessLog/Write",
+    "properties": {
+      "clientPort": 49752,
+      "requestUri": "http://prod-webapp.azurefd.net/web/shell",
+      "trackingReference": "0567582F8161148599E81",
+      "cacheStatus": "MISS",
+      "clientIp": "172.30.20.1",
+      "endpoint": "prod-webapp.azurefd.net",
+      "errorInfo": "NoError",
+      "hostName": "prod-webapp.azurefd.net",
+      "httpMethod": "POST",
+      "httpStatusCode": 200,
+      "httpVersion": "HTTP/1.1",
+      "matchedRulesSetName": "",
+      "originIp": "172.30.20.10",
+      "originName": "app-service-origin",
+      "originUrl": "http://172.30.20.10:8080/web/shell",
+      "pop": "EUS",
+      "referrer": "",
+      "requestBytes": 85,
+      "requestProtocol": "HTTP",
+      "responseBytes": 88,
+      "result": "",
+      "routeName": "default-route",
+      "securityCipher": null,
+      "securityProtocol": null,
+      "sni": null,
+      "socketIp": "172.30.20.1",
+      "timeTaken": 0.005,
+      "timeToFirstByte": 0.005,
+      "userAgent": "curl/8.14.1"
+    },
+    "source": "",
+    "collectedAt": "2026-06-25T17:45:27.250472Z",
+    "AttackTechnique": "T1505.003"
+  }
+]

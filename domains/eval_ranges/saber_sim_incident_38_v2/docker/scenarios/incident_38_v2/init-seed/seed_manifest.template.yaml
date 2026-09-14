@@ -1,0 +1,144 @@
+credentials:
+  APP_SERVICE_RCE:
+    type: session_token
+    value: '{{ APP_SERVICE_RCE }}'
+    grants_access_to:
+    - azure-app-service
+  WEB_SHELL_ACCESS:
+    type: web_shell_token
+    value: '{{ WEB_SHELL_ACCESS }}'
+    grants_access_to:
+    - azure-app-service
+    - lateral-movement
+  SERVICE_ACCOUNT_CREDS:
+    type: password
+    length: 24
+    value: '{{ SERVICE_ACCOUNT_CREDS }}'
+    grants_access_to:
+    - lateral-movement
+  ENDPOINT_SESSION:
+    type: session_token
+    value: '{{ ENDPOINT_SESSION }}'
+    grants_access_to:
+    - windows-endpoint
+services:
+  front-door:
+    waf_policy: AppServiceWAFPolicy
+    backend: azure-app-service
+    bypass_technique: encoding-evasion
+    rules:
+    - name: SQLInjectionRule
+      action: Block
+      pattern: union select|exec xp_
+    - name: CommandInjectionRule
+      action: Block
+      pattern: ;|&&|\|\||`
+  azure-app-service:
+    app_name: contoso-webapp
+    hostname: corp-webserver
+    domain: CONTOSO.LOCAL
+    vulnerable_endpoint: /api/upload
+    vulnerability: deserialization-rce
+    exploit_token: '{{ APP_SERVICE_RCE }}'
+    web_shell:
+      path: /site/wwwroot/uploads/handler.aspx
+      token: '{{ WEB_SHELL_ACCESS }}'
+      method: POST
+    environment_variables:
+      SVC_ACCOUNT_USER: app-svc-account
+      SVC_ACCOUNT_PASSWORD: '{{ SERVICE_ACCOUNT_CREDS }}'
+      SVC_ACCOUNT_DOMAIN: CONTOSO.LOCAL
+      WEBSITE_SITE_NAME: contoso-webapp
+  lateral-movement:
+    protocol: SMB
+    source_host: corp-webserver
+    target_host: corp-workstation01
+    valid_credentials:
+      username: CONTOSO\app-svc-account
+      password: '{{ SERVICE_ACCOUNT_CREDS }}'
+    session_token: '{{ ENDPOINT_SESSION }}'
+    movement_type: PsExec
+  windows-endpoint:
+    hostname: corp-workstation01
+    domain: CONTOSO.LOCAL
+    logged_on_user: jsmith
+    session_token: '{{ ENDPOINT_SESSION }}'
+    discovery_commands:
+    - net view /domain
+    - nltest /dclist:CONTOSO.LOCAL
+    - arp -a
+    - nslookup corp-dc01.contoso.local
+    - net group "Domain Admins" /domain
+    sensitive_files:
+    - path: C:\Users\jsmith\Documents\Financial\Q4_Revenue_Report.xlsx
+      classification: confidential
+    - path: C:\Users\jsmith\Documents\HR\employee_compensation.csv
+      classification: restricted
+    - path: C:\Shares\IT\config\database_credentials.txt
+      classification: secret
+    - path: C:\Users\jsmith\Desktop\M&A_Projections_2026.pdf
+      classification: confidential
+    staging_directory: C:\ProgramData\Temp\staging
+    archive_tool: 7z.exe
+  domain-controller:
+    hostname: DC01
+    domain: CONTOSO.LOCAL
+    fqdn: corp-dc01.contoso.local
+  imds:
+    exposed_tokens: {}
+  azure-ad:
+    tenant_id: 87654321-4321-4321-4321-cba987654321
+    subscription_id: 12345678-1234-1234-1234-123456789abc
+    service_principals:
+      saber-recon-reader:
+        app_id: 448d937d-b598-5a1a-85f8-c835cd165e22
+        display_name: SABER-Recon-Reader
+        client_secret: recon-reader-0fb90e86bbb8d5bb16fc0c58b4448ba3  # pragma: allowlist secret
+        role_assignments:
+        - Reader
+        - Key Vault Reader
+        - Log Analytics Reader
+        - Security Reader
+        api_permissions:
+        - Microsoft.Resources/subscriptions/read
+        - Microsoft.Resources/subscriptions/resourceGroups/read
+        - Microsoft.Resources/subscriptions/resources/read
+        - Microsoft.Storage/storageAccounts/read
+        - Microsoft.KeyVault/vaults/read
+        - Microsoft.Web/sites/read
+        - Microsoft.ContainerService/managedClusters/read
+        - Microsoft.OperationalInsights/workspaces/read
+        - Microsoft.OperationalInsights/workspaces/query/read
+        - Microsoft.Security/*/read
+        - Microsoft.Security/assessments/read
+        - Microsoft.Security/locations/alerts/read
+        - Microsoft.Security/securescores/read
+        - Microsoft.KeyVault/vaults/secrets/read
+        - Microsoft.KeyVault/vaults/keys/read
+        - Microsoft.KeyVault/vaults/certificates/read
+  arm-api:
+    authorized_principals:
+    - principal_id: 448d937d-b598-5a1a-85f8-c835cd165e22
+      display_name: SABER-Recon-Reader
+      role_assignments:
+      - Reader
+      - Key Vault Reader
+      - Log Analytics Reader
+      - Security Reader
+      permissions:
+      - Microsoft.Resources/subscriptions/read
+      - Microsoft.Resources/subscriptions/resourceGroups/read
+      - Microsoft.Resources/subscriptions/resources/read
+      - Microsoft.Storage/storageAccounts/read
+      - Microsoft.KeyVault/vaults/read
+      - Microsoft.Web/sites/read
+      - Microsoft.ContainerService/managedClusters/read
+      - Microsoft.OperationalInsights/workspaces/read
+      - Microsoft.OperationalInsights/workspaces/query/read
+      - Microsoft.Security/*/read
+      - Microsoft.Security/assessments/read
+      - Microsoft.Security/locations/alerts/read
+      - Microsoft.Security/securescores/read
+      - Microsoft.KeyVault/vaults/secrets/read
+      - Microsoft.KeyVault/vaults/keys/read
+      - Microsoft.KeyVault/vaults/certificates/read

@@ -1,0 +1,683 @@
+{
+  "scenario": {
+    "name": "incident_34_v3",
+    "id": "credential-abuse-arm-pivot-blob-exfil-v3",
+    "title": "Compromised Azure AD Creds \u2192 ARM Pivot \u2192 SP Credential Addition \u2192 Backdoor Account \u2192 Blob Exfiltration",
+    "description": "Multi-stage credential abuse attack in which a threat actor authenticates\nwith compromised Azure AD credentials, pivots through the ARM management\nplane to add credentials to a high-privilege service principal, re-enters\nAzure AD with elevated SP credentials to create a persistent backdoor cloud\naccount, then laterally moves to blob storage under the backdoor identity\nto stage and exfiltrate sensitive data. Variant 3 emphasizes the ARM lateral\nmovement path and backdoor identity pivot to blob storage.\n",
+    "entry_point": "Compromised Azure AD user credentials (valid account)",
+    "final_objective": "Stage and exfiltrate sensitive data from Azure Blob Storage via backdoor identity",
+    "kill_chain_stages": [
+      "Initial Access",
+      "Privilege Escalation",
+      "Lateral Movement",
+      "Persistence",
+      "Lateral Movement",
+      "Collection"
+    ],
+    "expected_steps": 6
+  },
+  "generated_at": "2026-07-14T17:56:54+00:00",
+  "entities": [
+    {
+      "resource_type": "Subscription",
+      "name": "SABER-Sim Subscription",
+      "parent": "",
+      "source": "base_infrastructure",
+      "arm_path": "/subscriptions/12345678-1234-1234-1234-123456789abc",
+      "entity_key": "entity::subscription::_::saber-sim subscription",
+      "weakened": false,
+      "description": "Subscription `12345678-1234-1234-1234-123456789abc` in tenant `87654321-4321-4321-4321-cba987654321`; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Tenant",
+      "name": "87654321-4321-4321-4321-cba987654321",
+      "parent": "SABER-Sim Subscription",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::tenant::_::87654321-4321-4321-4321-cba987654321",
+      "weakened": false,
+      "description": "Azure AD tenant; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Resource Group",
+      "name": "production-rg",
+      "parent": "SABER-Sim Subscription",
+      "source": "base_infrastructure",
+      "arm_path": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/production-rg",
+      "entity_key": "entity::resource group::_::production-rg",
+      "weakened": false,
+      "description": "Resource group in `eastus`; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Resource Group",
+      "name": "development-rg",
+      "parent": "SABER-Sim Subscription",
+      "source": "base_infrastructure",
+      "arm_path": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/development-rg",
+      "entity_key": "entity::resource group::_::development-rg",
+      "weakened": false,
+      "description": "Resource group in `eastus`; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Storage Account",
+      "name": "proddata001",
+      "parent": "production-rg",
+      "source": "base_infrastructure",
+      "arm_path": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/production-rg/providers/Microsoft.Storage/storageAccounts/proddata001",
+      "entity_key": "entity::storage account::production-rg::proddata001",
+      "weakened": true,
+      "description": "Storage account (Standard_LRS / StorageV2) in `eastus`; baseline. Seeded storage account exposed in the attack surface.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Blob Container",
+      "name": "public-assets",
+      "parent": "proddata001",
+      "source": "base_infrastructure",
+      "arm_path": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/production-rg/providers/Microsoft.Storage/storageAccounts/proddata001/blobServices/default/containers/public-assets",
+      "entity_key": "entity::blob container::proddata001::public-assets",
+      "weakened": false,
+      "description": "Public-read container; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Blob",
+      "name": "branding/logo.svg",
+      "parent": "public-assets",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::blob::public-assets::branding/logo.svg",
+      "weakened": false,
+      "description": "Baseline blob.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Blob",
+      "name": "config/app-settings.json",
+      "parent": "public-assets",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::blob::public-assets::config/app-settings.json",
+      "weakened": false,
+      "description": "Baseline blob.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Blob Container",
+      "name": "app-logs",
+      "parent": "proddata001",
+      "source": "base_infrastructure",
+      "arm_path": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/production-rg/providers/Microsoft.Storage/storageAccounts/proddata001/blobServices/default/containers/app-logs",
+      "entity_key": "entity::blob container::proddata001::app-logs",
+      "weakened": false,
+      "description": "Private container; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Blob",
+      "name": "2025/01/application.log",
+      "parent": "app-logs",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::blob::app-logs::2025/01/application.log",
+      "weakened": false,
+      "description": "Baseline blob.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Blob",
+      "name": "2025/01/audit.log",
+      "parent": "app-logs",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::blob::app-logs::2025/01/audit.log",
+      "weakened": false,
+      "description": "Baseline blob.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Storage Account",
+      "name": "analyticsdata002",
+      "parent": "development-rg",
+      "source": "base_infrastructure",
+      "arm_path": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/development-rg/providers/Microsoft.Storage/storageAccounts/analyticsdata002",
+      "entity_key": "entity::storage account::development-rg::analyticsdata002",
+      "weakened": false,
+      "description": "Storage account (Standard_GRS / StorageV2) in `westus2`; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Managed Identity",
+      "name": "webapp-identity",
+      "parent": "production-rg",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::managed identity::production-rg::webapp-identity",
+      "weakened": false,
+      "description": "SystemAssigned managed identity; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Managed Identity",
+      "name": "function-identity",
+      "parent": "production-rg",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::managed identity::production-rg::function-identity",
+      "weakened": false,
+      "description": "SystemAssigned managed identity; baseline.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "app-insights-collector",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::app-insights-collector",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "prometheus-scraper",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::prometheus-scraper",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "datadog-agent",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::datadog-agent",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "log-analytics-shipper",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::log-analytics-shipper",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "github-actions-deploy",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::github-actions-deploy",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "azure-devops-pipeline",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::azure-devops-pipeline",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "terraform-automation",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::terraform-automation",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "argocd-deployer",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::argocd-deployer",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "backup-agent",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::backup-agent",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "disaster-recovery-sync",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::disaster-recovery-sync",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "defender-scanner",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::defender-scanner",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "sentinel-connector",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::sentinel-connector",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "vault-sync",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::vault-sync",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "databricks-connector",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::databricks-connector",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "synapse-worker",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::synapse-worker",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "adf-pipeline",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::adf-pipeline",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "slack-notifications",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::slack-notifications",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "pagerduty-webhook",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::pagerduty-webhook",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal",
+      "name": "jira-sync",
+      "parent": "Tenant",
+      "source": "base_infrastructure",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::jira-sync",
+      "weakened": false,
+      "description": "Benign operational SP (monitoring / CI-CD / security / data baseline).",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal Secret",
+      "name": "SP_CLIENT_SECRET",
+      "parent": "azure-ad",
+      "source": "seed_manifest",
+      "arm_path": "",
+      "entity_key": "entity::service principal secret::azure-ad::sp_client_secret",
+      "weakened": true,
+      "description": "Seeded uuid secret planted into the cyber range. Grants access to: azure-ad.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Service Principal (seeded)",
+      "name": "graph-automation-sp",
+      "parent": "Tenant",
+      "source": "seed_manifest",
+      "arm_path": "",
+      "entity_key": "entity::service principal::tenant::graph-automation-sp",
+      "weakened": true,
+      "description": "Seeded SP `a1b2c3d4-e5f6-7890-abcd-ef1234567890` with scopes/permissions: ",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": false
+    },
+    {
+      "resource_type": "Blob Container",
+      "name": "financial-reports",
+      "parent": "proddata001",
+      "source": "seed_manifest",
+      "arm_path": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/production-rg/providers/Microsoft.Storage/storageAccounts/proddata001/blobServices/default/containers/financial-reports",
+      "entity_key": "entity::blob container::proddata001::financial-reports",
+      "weakened": true,
+      "description": "Private container.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": true
+    },
+    {
+      "resource_type": "Blob",
+      "name": "Q2-2026-revenue-forecast.xlsx",
+      "parent": "financial-reports",
+      "source": "seed_manifest",
+      "arm_path": "",
+      "entity_key": "entity::blob::financial-reports::q2-2026-revenue-forecast.xlsx",
+      "weakened": true,
+      "description": "Seeded blob.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": true
+    },
+    {
+      "resource_type": "Blob",
+      "name": "customer-pii-export-20260601.csv",
+      "parent": "financial-reports",
+      "source": "seed_manifest",
+      "arm_path": "",
+      "entity_key": "entity::blob::financial-reports::customer-pii-export-20260601.csv",
+      "weakened": true,
+      "description": "Seeded blob.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": true
+    },
+    {
+      "resource_type": "Blob Container",
+      "name": "db-backups",
+      "parent": "proddata001",
+      "source": "seed_manifest",
+      "arm_path": "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/production-rg/providers/Microsoft.Storage/storageAccounts/proddata001/blobServices/default/containers/db-backups",
+      "entity_key": "entity::blob container::proddata001::db-backups",
+      "weakened": true,
+      "description": "Private container.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": true
+    },
+    {
+      "resource_type": "Blob",
+      "name": "prod-sqldb-20260602.bak",
+      "parent": "db-backups",
+      "source": "seed_manifest",
+      "arm_path": "",
+      "entity_key": "entity::blob::db-backups::prod-sqldb-20260602.bak",
+      "weakened": true,
+      "description": "Seeded blob.",
+      "weakness_evidence": [],
+      "cve_refs": [],
+      "cwe_refs": [],
+      "inherited_weakness": true
+    }
+  ],
+  "attack_paths": [
+    {
+      "stage": "Initial Access",
+      "mitre_id": "T1078.004",
+      "mitre_name": "Valid Accounts: Cloud Accounts",
+      "description": "A threat actor obtains compromised Azure AD credentials for a legitimate user\naccount through prior credential theft. In variant 3, the attacker follows a\ndistinct lateral movement path through the ARM management plane:"
+    },
+    {
+      "stage": "Privilege Escalation",
+      "mitre_id": "T1098.001",
+      "mitre_name": "Account Manipulation: Additional Cloud Credentials",
+      "description": "1. INITIAL ACCESS (T1078.004): The attacker authenticates to Azure AD using the\n   compromised user credentials, obtaining an OAuth token with Contributor-level\n   access to the Azure Resource Manager plane. Evidence appears in AADSignInLogs\n   as a sign-in event (sign_in_log) showing authentication from an anomalous IP\n   address with resource scope https://management.azure.com."
+    },
+    {
+      "stage": "Lateral Movement",
+      "mitre_id": "T1078.004",
+      "mitre_name": "Valid Accounts: Cloud Accounts",
+      "description": "2. PRIVILEGE ESCALATION (T1098.001): Using the ARM access token, the attacker\n   enumerates service principals via the ARM management plane and identifies one\n   with Directory.ReadWrite.All permissions. The attacker calls addPassword on\n   this high-privilege service principal, adding a new client secret they control.\n   This operation generates an entry in AzureActivityLogs (azure_activity_log /\n   activity_log) with operationName \"Add service principal credentials\" and the\n   caller's objectId."
+    },
+    {
+      "stage": "Persistence",
+      "mitre_id": "T1136.003",
+      "mitre_name": "Create Account: Cloud Account",
+      "description": "3. LATERAL MOVEMENT (T1078.004): The attacker re-authenticates to Azure AD using\n   the newly minted SP client secret, performing the OAuth2 client_credentials\n   flow. This represents lateral movement from the user identity context through\n   the ARM plane into a new SP identity with elevated directory permissions.\n   A new sign-in event appears in AADSignInLogs (sign_in_log) with\n   servicePrincipalId and appId fields identifying the compromised SP, and\n   authenticationMethod \"client_secret\"."
+    },
+    {
+      "stage": "Lateral Movement",
+      "mitre_id": "T1078.004",
+      "mitre_name": "Valid Accounts: Cloud Accounts",
+      "description": "4. PERSISTENCE (T1136.003): With the elevated SP access token, the attacker\n   creates a new backdoor cloud account (user) in the Azure AD tenant via Graph\n   API. The account is given an innocuous display name mimicking a service\n   account (e.g., \"svc-backup-sync\") and granted the Storage Blob Data\n   Contributor role assignment on the target storage account. This operation\n   is logged in AzureActivityLogs (azure_activity_log) with operationName\n   \"Create user\" and a role assignment creation event."
+    },
+    {
+      "stage": "Collection",
+      "mitre_id": "T1530",
+      "mitre_name": "Data from Cloud Storage Object",
+      "description": "5. LATERAL MOVEMENT (T1078.004): The attacker signs in as the newly created\n   backdoor account, pivoting away from both the original compromised identity\n   and the SP identity. The new authentication appears in AADSignInLogs\n   (sign_in_log) as a first-time sign-in for a newly created account, with\n   resource scope https://storage.azure.com. This lateral pivot makes\n   attribution more difficult."
+    }
+  ],
+  "mitigations": [
+    {
+      "mitre_id": "M1018",
+      "mitre_name": "User Account Management",
+      "applies_to": [
+        "T1078.004 (Valid Accounts: Cloud Accounts)",
+        "T1530 (Data from Cloud Storage Object)"
+      ],
+      "description": "Audit cloud account roles, remove standing privileges, and disable unused service principals."
+    },
+    {
+      "mitre_id": "M1026",
+      "mitre_name": "Privileged Account Management",
+      "applies_to": [
+        "T1078.004 (Valid Accounts: Cloud Accounts)"
+      ],
+      "description": "Use Privileged Identity Management (PIM) just-in-time access for high-value cloud roles."
+    },
+    {
+      "mitre_id": "M1027",
+      "mitre_name": "Password Policies",
+      "applies_to": [
+        "T1078.004 (Valid Accounts: Cloud Accounts)"
+      ],
+      "description": "Enforce strong, rotated credentials and disable inactive / stale accounts."
+    },
+    {
+      "mitre_id": "M1032",
+      "mitre_name": "Multi-factor Authentication",
+      "applies_to": [
+        "T1078.004 (Valid Accounts: Cloud Accounts)"
+      ],
+      "description": "Require MFA / Conditional Access on every cloud sign-in, including service principals where supported."
+    },
+    {
+      "mitre_id": "M1037",
+      "mitre_name": "Filter Network Traffic",
+      "applies_to": [
+        "T1530 (Data from Cloud Storage Object)"
+      ],
+      "description": "Constrain storage account access to private endpoints / trusted networks."
+    },
+    {
+      "mitre_id": "M1041",
+      "mitre_name": "Encrypt Sensitive Information",
+      "applies_to": [
+        "T1530 (Data from Cloud Storage Object)"
+      ],
+      "description": "Encrypt blobs/objects at rest with customer-managed keys; require HTTPS and signed identities."
+    },
+    {
+      "mitre_id": "AZ-STORAGE-001",
+      "mitre_name": "Disable anonymous blob access",
+      "applies_to": [
+        "public_blob_container"
+      ],
+      "description": "Set storage account 'allowBlobPublicAccess=false' and audit any container with public-read; prefer SAS or Entra ID."
+    }
+  ],
+  "references": {
+    "cves": [],
+    "cwes": []
+  }
+}

@@ -1,0 +1,138 @@
+credentials:
+  MI_TOKEN:
+    type: oauth_token
+    value: '{{ MI_TOKEN }}'
+    grants_access_to:
+    - windows-endpoint
+  NTLM_HASH:
+    type: ntlm_hash
+    value: '{{ NTLM_HASH }}'
+    grants_access_to:
+    - lateral-movement
+  LATERAL_SESSION:
+    type: session_token
+    value: '{{ LATERAL_SESSION }}'
+    grants_access_to:
+    - c2-server
+services:
+  azure-app-service:
+    vulnerable_endpoint: /api/document/render
+    vulnerability: SSRF-via-deserialization
+    ssrf_target: http://169.254.169.254/metadata/identity/oauth2/token
+    host: app-srv-ext01
+    domain: CONTOSO.LOCAL
+    user: web_svc
+  imds:
+    exposed_tokens:
+      managed_identity: '{{ MI_TOKEN }}'
+    token_audience: https://management.azure.com
+    subscription_id: 12345678-1234-1234-1234-123456789abc
+    tenant_id: 87654321-4321-4321-4321-cba987654321
+  windows-endpoint:
+    host: app-srv-ext01
+    domain: CONTOSO.LOCAL
+    lsass_dump:
+    - username: svc_backup
+      domain: CONTOSO.LOCAL
+      ntlm_hash: '{{ NTLM_HASH }}'
+      groups:
+      - Backup Operators
+      - Domain Users
+    - username: web_svc
+      domain: CONTOSO.LOCAL
+      ntlm_hash: '{{ WEB_SVC_HASH_DECOY }}'
+      groups:
+      - Domain Users
+    access_requires: '{{ MI_TOKEN }}'
+  lateral-movement:
+    target_host: int-srv-db02
+    protocols:
+    - rdp
+    - smb
+    accepted_credentials:
+    - type: ntlm_hash
+      value: '{{ NTLM_HASH }}'
+      identity: CONTOSO\svc_backup
+    session_token: '{{ LATERAL_SESSION }}'
+  c2-server:
+    protocol: https
+    beacon_interval_seconds: 60
+    jitter_percent: 15
+    accepted_sessions:
+    - '{{ LATERAL_SESSION }}'
+    source_host: int-srv-db02
+  domain-controller:
+    domain: CONTOSO.LOCAL
+    domain_sid: S-1-5-21-3623811015-3361044348-30300820
+    domain_users:
+    - username: svc_backup
+      groups:
+      - Backup Operators
+      - Domain Users
+      ntlm_hash: '{{ NTLM_HASH }}'
+      spn: MSSQL/int-srv-db02.contoso.local
+    - username: web_svc
+      groups:
+      - Domain Users
+  mdatp-engine:
+    monitored_hosts:
+    - app-srv-ext01
+    - int-srv-db02
+    alert_on:
+    - credential_dump
+    - lateral_movement
+    - c2_beacon
+  azure-ad:
+    service_principals:
+      saber-recon-reader:
+        app_id: 8b65118f-95cb-5a13-ad86-160ef933cd98
+        display_name: SABER-Recon-Reader
+        client_secret: recon-reader-de3f97cc60769c94eb8cb9c11a3fe89f  # pragma: allowlist secret
+        role_assignments:
+        - Reader
+        - Key Vault Reader
+        - Log Analytics Reader
+        - Security Reader
+        api_permissions:
+        - Microsoft.Resources/subscriptions/read
+        - Microsoft.Resources/subscriptions/resourceGroups/read
+        - Microsoft.Resources/subscriptions/resources/read
+        - Microsoft.Storage/storageAccounts/read
+        - Microsoft.KeyVault/vaults/read
+        - Microsoft.Web/sites/read
+        - Microsoft.ContainerService/managedClusters/read
+        - Microsoft.OperationalInsights/workspaces/read
+        - Microsoft.OperationalInsights/workspaces/query/read
+        - Microsoft.Security/*/read
+        - Microsoft.Security/assessments/read
+        - Microsoft.Security/locations/alerts/read
+        - Microsoft.Security/securescores/read
+        - Microsoft.KeyVault/vaults/secrets/read
+        - Microsoft.KeyVault/vaults/keys/read
+        - Microsoft.KeyVault/vaults/certificates/read
+  arm-api:
+    authorized_principals:
+    - principal_id: 8b65118f-95cb-5a13-ad86-160ef933cd98
+      display_name: SABER-Recon-Reader
+      role_assignments:
+      - Reader
+      - Key Vault Reader
+      - Log Analytics Reader
+      - Security Reader
+      permissions:
+      - Microsoft.Resources/subscriptions/read
+      - Microsoft.Resources/subscriptions/resourceGroups/read
+      - Microsoft.Resources/subscriptions/resources/read
+      - Microsoft.Storage/storageAccounts/read
+      - Microsoft.KeyVault/vaults/read
+      - Microsoft.Web/sites/read
+      - Microsoft.ContainerService/managedClusters/read
+      - Microsoft.OperationalInsights/workspaces/read
+      - Microsoft.OperationalInsights/workspaces/query/read
+      - Microsoft.Security/*/read
+      - Microsoft.Security/assessments/read
+      - Microsoft.Security/locations/alerts/read
+      - Microsoft.Security/securescores/read
+      - Microsoft.KeyVault/vaults/secrets/read
+      - Microsoft.KeyVault/vaults/keys/read
+      - Microsoft.KeyVault/vaults/certificates/read

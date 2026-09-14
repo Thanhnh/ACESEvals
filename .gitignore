@@ -88,6 +88,9 @@ MANIFEST
 !domains/*/docker/wheels/
 !domains/*/docker/wheels/.gitkeep
 domains/*/docker/wheels/*.whl
+!domains/eval_ranges/*/docker/wheels/
+!domains/eval_ranges/*/docker/wheels/.gitkeep
+domains/eval_ranges/*/docker/wheels/*.whl
 
 # -------------------------------------------------------------------------
 # Testing & Coverage
@@ -198,6 +201,17 @@ pip-delete-this-directory.txt
 
 # Ignore data folders to not track large raw files
 **/data/
+
+# ...except the saber_sim range domains' agent context files, which are small
+# (~13MB total) and must ship: they are the tasks' initial_files. The bulk
+# telemetry under docker/scenarios/*/logs/ stays ignored by the **/logs rule.
+!domains/eval_ranges/saber_sim_*/data/
+!domains/eval_ranges/saber_sim_*/data/**
+
+# Rendered at seed time from init-seed/seed_manifest.template.yaml. They carry
+# mock JWTs, so keep them out of a repo that mirrors publicly.
+domains/eval_ranges/saber_sim_*/docker/scenarios/*/credentials.env
+domains/eval_ranges/saber_sim_*/docker/scenarios/*/seed_manifest.yaml
 
 **/.archive
 

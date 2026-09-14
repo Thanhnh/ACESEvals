@@ -1,0 +1,624 @@
+# Static Seed Data for Azure Sentinel
+# Loaded at startup and ingested into Kusto tables.
+# These tables don't have a corresponding mock service — they represent
+# static device inventory, EASM asset data, and attack path results
+# that are always present for agents to query.
+
+DeviceInfo:
+  - TimeGenerated: "2026-01-28T08:00:00.0000000Z"
+    DeviceId: "d1a2b3c4-e5f6-7890-abcd-111111111111"
+    DeviceName: "aks-nodepool1-12345678-vmss000000"
+    OSPlatform: "Linux"
+    OSVersion: "Ubuntu 22.04.3 LTS"
+    OSDistribution: "Ubuntu"
+    OSVersionInfo: "22.04.3"
+    OSBuild: 2204
+    MachineGroup: "AKS Nodes"
+    DeviceType: "Server"
+    PublicIP: "48.216.135.20"
+    IsAzureADJoined: true
+    LoggedOnUsers: []
+    RegistryDeviceTag: "production"
+    ExposureLevel: "High"
+    DeviceCategory: "Server"
+    OnboardingStatus: "Onboarded"
+    SensorHealthState: "Active"
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    ResourceGroup: "production-rg"
+    AzureResourceId: "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/production-rg/providers/Microsoft.ContainerService/managedClusters/prod-aks-cluster"
+    category: "DeviceInfo"
+
+  - TimeGenerated: "2026-01-28T08:00:00.0000000Z"
+    DeviceId: "d1a2b3c4-e5f6-7890-abcd-222222222222"
+    DeviceName: "aks-nodepool1-12345678-vmss000001"
+    OSPlatform: "Linux"
+    OSVersion: "Ubuntu 22.04.3 LTS"
+    OSDistribution: "Ubuntu"
+    OSVersionInfo: "22.04.3"
+    OSBuild: 2204
+    MachineGroup: "AKS Nodes"
+    DeviceType: "Server"
+    PublicIP: "48.216.135.21"
+    IsAzureADJoined: true
+    LoggedOnUsers: []
+    RegistryDeviceTag: "production"
+    ExposureLevel: "Medium"
+    DeviceCategory: "Server"
+    OnboardingStatus: "Onboarded"
+    SensorHealthState: "Active"
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    ResourceGroup: "production-rg"
+    AzureResourceId: "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/production-rg/providers/Microsoft.ContainerService/managedClusters/prod-aks-cluster"
+    category: "DeviceInfo"
+
+  - TimeGenerated: "2026-01-28T08:00:00.0000000Z"
+    DeviceId: "d1a2b3c4-e5f6-7890-abcd-333333333333"
+    DeviceName: "aks-nodepool1-12345678-vmss000002"
+    OSPlatform: "Linux"
+    OSVersion: "Ubuntu 22.04.3 LTS"
+    OSDistribution: "Ubuntu"
+    OSVersionInfo: "22.04.3"
+    OSBuild: 2204
+    MachineGroup: "AKS Nodes"
+    DeviceType: "Server"
+    PublicIP: "48.216.135.22"
+    IsAzureADJoined: true
+    LoggedOnUsers: []
+    RegistryDeviceTag: "production"
+    ExposureLevel: "Medium"
+    DeviceCategory: "Server"
+    OnboardingStatus: "Onboarded"
+    SensorHealthState: "Active"
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    ResourceGroup: "production-rg"
+    AzureResourceId: "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/production-rg/providers/Microsoft.ContainerService/managedClusters/prod-aks-cluster"
+    category: "DeviceInfo"
+
+  - TimeGenerated: "2026-01-28T08:00:00.0000000Z"
+    DeviceId: "d1a2b3c4-e5f6-7890-abcd-444444444444"
+    DeviceName: "DEV-WS-001"
+    OSPlatform: "Windows"
+    OSVersion: "Windows 11 Enterprise 23H2"
+    OSDistribution: "Windows"
+    OSVersionInfo: "23H2"
+    OSBuild: 22631
+    MachineGroup: "Developer Workstations"
+    DeviceType: "Workstation"
+    PublicIP: "40.76.162.100"
+    IsAzureADJoined: true
+    LoggedOnUsers:
+      - UserName: "jsmith"
+        DomainName: "contoso.com"
+        LogonType: "Interactive"
+    RegistryDeviceTag: "developer"
+    ExposureLevel: "Low"
+    DeviceCategory: "Endpoint"
+    OnboardingStatus: "Onboarded"
+    SensorHealthState: "Active"
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    ResourceGroup: "workstations-rg"
+    AzureResourceId: "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/workstations-rg/providers/Microsoft.Compute/virtualMachines/DEV-WS-001"
+    category: "DeviceInfo"
+
+  - TimeGenerated: "2026-01-28T08:00:00.0000000Z"
+    DeviceId: "d1a2b3c4-e5f6-7890-abcd-555555555555"
+    DeviceName: "DEV-WS-002"
+    OSPlatform: "Windows"
+    OSVersion: "Windows 11 Enterprise 23H2"
+    OSDistribution: "Windows"
+    OSVersionInfo: "23H2"
+    OSBuild: 22631
+    MachineGroup: "Developer Workstations"
+    DeviceType: "Workstation"
+    PublicIP: "40.76.162.101"
+    IsAzureADJoined: true
+    LoggedOnUsers:
+      - UserName: "agarcia"
+        DomainName: "contoso.com"
+        LogonType: "Interactive"
+    RegistryDeviceTag: "developer"
+    ExposureLevel: "Low"
+    DeviceCategory: "Endpoint"
+    OnboardingStatus: "Onboarded"
+    SensorHealthState: "Active"
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    ResourceGroup: "workstations-rg"
+    AzureResourceId: "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/workstations-rg/providers/Microsoft.Compute/virtualMachines/DEV-WS-002"
+    category: "DeviceInfo"
+
+  - TimeGenerated: "2026-01-28T08:00:00.0000000Z"
+    DeviceId: "d1a2b3c4-e5f6-7890-abcd-666666666666"
+    DeviceName: "EXCH-SVR-01"
+    OSPlatform: "Windows"
+    OSVersion: "Windows Server 2022 Datacenter"
+    OSDistribution: "Windows Server"
+    OSVersionInfo: "21H2"
+    OSBuild: 20348
+    MachineGroup: "Exchange Servers"
+    DeviceType: "Server"
+    PublicIP: "40.76.162.110"
+    IsAzureADJoined: true
+    LoggedOnUsers: []
+    RegistryDeviceTag: "exchange"
+    ExposureLevel: "High"
+    DeviceCategory: "Server"
+    OnboardingStatus: "Onboarded"
+    SensorHealthState: "Active"
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    ResourceGroup: "production-rg"
+    AzureResourceId: "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/production-rg/providers/Microsoft.Compute/virtualMachines/EXCH-SVR-01"
+    category: "DeviceInfo"
+
+TenantConfig:
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    ConfigCategory: "organization"
+    ConfigKey: "name"
+    ConfigValue: "Contoso Financial Services"
+    Details: "{}"
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    TenantId: "87654321-4321-4321-4321-cba987654321"
+    category: "TenantConfig"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    ConfigCategory: "organization"
+    ConfigKey: "industry"
+    ConfigValue: "Financial Services"
+    Details: '{"sub_industry": "Investment Banking & Asset Management", "region": "East US"}'
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    TenantId: "87654321-4321-4321-4321-cba987654321"
+    category: "TenantConfig"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    ConfigCategory: "compliance"
+    ConfigKey: "frameworks"
+    ConfigValue: "SOC2 Type II, PCI-DSS v4.0, NIST CSF 2.0"
+    Details: '{"data_classification": "Confidential", "regulated_data": ["PII", "Financial data", "Authentication credentials"]}'
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    TenantId: "87654321-4321-4321-4321-cba987654321"
+    category: "TenantConfig"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    ConfigCategory: "compute"
+    ConfigKey: "aks_cluster"
+    ConfigValue: "prod-aks-cluster"
+    Details: '{"node_count": 3, "node_os": "Ubuntu 22.04 LTS", "resource_group": "production-rg", "workloads": [{"name": "hr-app", "image": "contoso.azurecr.io/hr-app:v2.3.1", "namespace": "production", "internet_facing": true, "packages": ["react-server-dom-webpack@19.1.0", "next@15.2.0"]}]}'
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    TenantId: "87654321-4321-4321-4321-cba987654321"
+    category: "TenantConfig"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    ConfigCategory: "compute"
+    ConfigKey: "app_service"
+    ConfigValue: "prod-webapp"
+    Details: '{"runtime": "Node.js 20", "resource_group": "production-rg"}'
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    TenantId: "87654321-4321-4321-4321-cba987654321"
+    category: "TenantConfig"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    ConfigCategory: "compute"
+    ConfigKey: "function_app"
+    ConfigValue: "prod-data-processor"
+    Details: '{"runtime": "Python 3.11", "resource_group": "production-rg"}'
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    TenantId: "87654321-4321-4321-4321-cba987654321"
+    category: "TenantConfig"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    ConfigCategory: "identity"
+    ConfigKey: "managed_identity"
+    ConfigValue: "webapp-identity"
+    Details: '{"principal_id": "11111111-2222-3333-4444-555555555555", "assigned_to": "prod-aks-cluster", "roles": ["Key Vault Secrets User", "Reader (subscription-level)", "Azure Kubernetes Service Cluster User Role"]}'
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    TenantId: "87654321-4321-4321-4321-cba987654321"
+    category: "TenantConfig"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    ConfigCategory: "identity"
+    ConfigKey: "service_principal"
+    ConfigValue: "Exchange Mail Reader"
+    Details: '{"app_id": "exchange-mail-reader-app-id", "permissions": ["Mail.Read", "User.Read"]}'
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    TenantId: "87654321-4321-4321-4321-cba987654321"
+    category: "TenantConfig"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    ConfigCategory: "secrets"
+    ConfigKey: "key_vault"
+    ConfigValue: "prod-secrets-kv"
+    Details: '{"stored_secrets": ["exchange-sp-client-id", "exchange-sp-client-secret"]}'
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    TenantId: "87654321-4321-4321-4321-cba987654321"
+    category: "TenantConfig"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    ConfigCategory: "email"
+    ConfigKey: "exchange_online"
+    ConfigValue: "Exchange Online"
+    Details: '{"sensitive_mailboxes": ["cfo@contoso.com"]}'
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    TenantId: "87654321-4321-4321-4321-cba987654321"
+    category: "TenantConfig"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    ConfigCategory: "networking"
+    ConfigKey: "network_config"
+    ConfigValue: "aks-vnet"
+    Details: '{"subnet": "aks-subnet", "nsg": "aks-subnet-nsg", "public_exposure": ["hr-app via AKS ingress (internet-facing)", "Exchange Online (cloud SaaS)"]}'
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    TenantId: "87654321-4321-4321-4321-cba987654321"
+    category: "TenantConfig"
+
+ExternalAttackSurfaceInsight:
+  # AKS nodes with CVE-2025-55182 (React2Shell)
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    AssetName: "aks-nodepool1-12345678-vmss000000"
+    AssetType: "Host"
+    IpAddress: "48.216.135.20"
+    Port: 443
+    Protocol: "HTTPS"
+    HostName: "hr-app.contoso.com"
+    State: "Confirmed"
+    CveId: "CVE-2025-55182"
+    CveSeverity: "Critical"
+    CvssScore: 10.0
+    Software: "react-server-dom-webpack 19.1.0"
+    FirstSeen: "2025-12-10T00:00:00Z"
+    LastSeen: "2026-02-01T00:00:00Z"
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    ResourceGroup: "production-rg"
+    AzureResourceId: "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/production-rg/providers/Microsoft.ContainerService/managedClusters/prod-aks-cluster"
+    category: "ExternalAttackSurfaceInsight"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    AssetName: "aks-nodepool1-12345678-vmss000001"
+    AssetType: "Host"
+    IpAddress: "48.216.135.21"
+    Port: 443
+    Protocol: "HTTPS"
+    HostName: "hr-app.contoso.com"
+    State: "Confirmed"
+    CveId: "CVE-2025-55182"
+    CveSeverity: "Critical"
+    CvssScore: 10.0
+    Software: "react-server-dom-webpack 19.1.0"
+    FirstSeen: "2025-12-10T00:00:00Z"
+    LastSeen: "2026-02-01T00:00:00Z"
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    ResourceGroup: "production-rg"
+    AzureResourceId: "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/production-rg/providers/Microsoft.ContainerService/managedClusters/prod-aks-cluster"
+    category: "ExternalAttackSurfaceInsight"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    AssetName: "aks-nodepool1-12345678-vmss000002"
+    AssetType: "Host"
+    IpAddress: "48.216.135.22"
+    Port: 443
+    Protocol: "HTTPS"
+    HostName: "hr-app.contoso.com"
+    State: "Confirmed"
+    CveId: "CVE-2025-55182"
+    CveSeverity: "Critical"
+    CvssScore: 10.0
+    Software: "react-server-dom-webpack 19.1.0"
+    FirstSeen: "2025-12-10T00:00:00Z"
+    LastSeen: "2026-02-01T00:00:00Z"
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    ResourceGroup: "production-rg"
+    AzureResourceId: "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/production-rg/providers/Microsoft.ContainerService/managedClusters/prod-aks-cluster"
+    category: "ExternalAttackSurfaceInsight"
+
+  # AKS nodes also exposed to HTTP/2 Rapid Reset
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    AssetName: "aks-nodepool1-12345678-vmss000000"
+    AssetType: "Host"
+    IpAddress: "48.216.135.20"
+    Port: 443
+    Protocol: "HTTPS"
+    HostName: "hr-app.contoso.com"
+    State: "Confirmed"
+    CveId: "CVE-2023-44487"
+    CveSeverity: "High"
+    CvssScore: 7.5
+    Software: "Node.js 20"
+    FirstSeen: "2025-06-01T00:00:00Z"
+    LastSeen: "2026-02-01T00:00:00Z"
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    ResourceGroup: "production-rg"
+    AzureResourceId: "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/production-rg/providers/Microsoft.ContainerService/managedClusters/prod-aks-cluster"
+    category: "ExternalAttackSurfaceInsight"
+
+  # Windows workstations with CVE-2024-49138
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    AssetName: "DEV-WS-001"
+    AssetType: "Host"
+    IpAddress: "40.76.162.100"
+    Port: 3389
+    Protocol: "RDP"
+    HostName: "DEV-WS-001.contoso.com"
+    State: "Confirmed"
+    CveId: "CVE-2024-49138"
+    CveSeverity: "High"
+    CvssScore: 7.8
+    Software: "Windows 11 Enterprise 23H2"
+    FirstSeen: "2025-01-15T00:00:00Z"
+    LastSeen: "2026-02-01T00:00:00Z"
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    ResourceGroup: "workstations-rg"
+    AzureResourceId: "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/workstations-rg/providers/Microsoft.Compute/virtualMachines/DEV-WS-001"
+    category: "ExternalAttackSurfaceInsight"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    AssetName: "DEV-WS-002"
+    AssetType: "Host"
+    IpAddress: "40.76.162.101"
+    Port: 3389
+    Protocol: "RDP"
+    HostName: "DEV-WS-002.contoso.com"
+    State: "Confirmed"
+    CveId: "CVE-2024-49138"
+    CveSeverity: "High"
+    CvssScore: 7.8
+    Software: "Windows 11 Enterprise 23H2"
+    FirstSeen: "2025-01-15T00:00:00Z"
+    LastSeen: "2026-02-01T00:00:00Z"
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    ResourceGroup: "workstations-rg"
+    AzureResourceId: "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/workstations-rg/providers/Microsoft.Compute/virtualMachines/DEV-WS-002"
+    category: "ExternalAttackSurfaceInsight"
+
+  # Exchange server with CVE-2023-23397
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    AssetName: "EXCH-SVR-01"
+    AssetType: "Host"
+    IpAddress: "40.76.162.110"
+    Port: 443
+    Protocol: "HTTPS"
+    HostName: "mail.contoso.com"
+    State: "Confirmed"
+    CveId: "CVE-2023-23397"
+    CveSeverity: "Critical"
+    CvssScore: 9.8
+    Software: "Microsoft Exchange Server 2019"
+    FirstSeen: "2024-06-01T00:00:00Z"
+    LastSeen: "2026-02-01T00:00:00Z"
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    ResourceGroup: "production-rg"
+    AzureResourceId: "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/production-rg/providers/Microsoft.Compute/virtualMachines/EXCH-SVR-01"
+    category: "ExternalAttackSurfaceInsight"
+
+  # Clean assets — no CVEs (noise)
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    AssetName: "prod-webapp"
+    AssetType: "Host"
+    IpAddress: "48.216.135.50"
+    Port: 443
+    Protocol: "HTTPS"
+    HostName: "webapp.contoso.com"
+    State: "Confirmed"
+    CveId: ""
+    CveSeverity: ""
+    CvssScore: 0
+    Software: "Node.js 20"
+    FirstSeen: "2025-03-01T00:00:00Z"
+    LastSeen: "2026-02-01T00:00:00Z"
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    ResourceGroup: "production-rg"
+    AzureResourceId: "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/production-rg/providers/Microsoft.Web/sites/prod-webapp"
+    category: "ExternalAttackSurfaceInsight"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    AssetName: "prod-data-processor"
+    AssetType: "Host"
+    IpAddress: "48.216.135.60"
+    Port: 443
+    Protocol: "HTTPS"
+    HostName: "functions.contoso.com"
+    State: "Confirmed"
+    CveId: ""
+    CveSeverity: ""
+    CvssScore: 0
+    Software: "Python 3.11"
+    FirstSeen: "2025-04-01T00:00:00Z"
+    LastSeen: "2026-02-01T00:00:00Z"
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    ResourceGroup: "production-rg"
+    AzureResourceId: "/subscriptions/12345678-1234-1234-1234-123456789abc/resourceGroups/production-rg/providers/Microsoft.Web/sites/prod-data-processor"
+    category: "ExternalAttackSurfaceInsight"
+
+AttackPathResult:
+  # Path 1: Internet -> React RCE -> IMDS -> KeyVault -> Exchange SP -> Mailbox (Critical)
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    PathId: "AP-001"
+    PathName: "Internet to Executive Mailbox via React RCE"
+    RiskScore: 98
+    RiskLevel: "Critical"
+    StepOrder: 1
+    SourceNode: "Internet"
+    SourceNodeType: "ExternalNetwork"
+    Relationship: "exploits_cve"
+    TargetNode: "hr-app-pod"
+    TargetNodeType: "KubernetesPod"
+    Description: "Attacker exploits CVE-2025-55182 on internet-facing React Server Components app"
+    CveId: "CVE-2025-55182"
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    category: "AttackPathResult"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    PathId: "AP-001"
+    PathName: "Internet to Executive Mailbox via React RCE"
+    RiskScore: 98
+    RiskLevel: "Critical"
+    StepOrder: 2
+    SourceNode: "hr-app-pod"
+    SourceNodeType: "KubernetesPod"
+    Relationship: "ssrf_to"
+    TargetNode: "IMDS (169.254.169.254)"
+    TargetNodeType: "MetadataService"
+    Description: "SSRF from compromised pod reaches Azure Instance Metadata Service to steal managed identity token"
+    CveId: ""
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    category: "AttackPathResult"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    PathId: "AP-001"
+    PathName: "Internet to Executive Mailbox via React RCE"
+    RiskScore: 98
+    RiskLevel: "Critical"
+    StepOrder: 3
+    SourceNode: "webapp-identity (MI)"
+    SourceNodeType: "ManagedIdentity"
+    Relationship: "has_access_to"
+    TargetNode: "prod-secrets-kv"
+    TargetNodeType: "KeyVault"
+    Description: "Managed identity has Key Vault Secrets User role granting access to all secrets"
+    CveId: ""
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    category: "AttackPathResult"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    PathId: "AP-001"
+    PathName: "Internet to Executive Mailbox via React RCE"
+    RiskScore: 98
+    RiskLevel: "Critical"
+    StepOrder: 4
+    SourceNode: "prod-secrets-kv"
+    SourceNodeType: "KeyVault"
+    Relationship: "contains_credential_for"
+    TargetNode: "Exchange Mail Reader (SP)"
+    TargetNodeType: "ServicePrincipal"
+    Description: "Key Vault stores client ID and client secret for Exchange Mail Reader service principal"
+    CveId: ""
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    category: "AttackPathResult"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    PathId: "AP-001"
+    PathName: "Internet to Executive Mailbox via React RCE"
+    RiskScore: 98
+    RiskLevel: "Critical"
+    StepOrder: 5
+    SourceNode: "Exchange Mail Reader (SP)"
+    SourceNodeType: "ServicePrincipal"
+    Relationship: "has_permission"
+    TargetNode: "cfo@contoso.com"
+    TargetNodeType: "Mailbox"
+    Description: "Service principal has Mail.Read permission enabling access to CFO mailbox with financial data"
+    CveId: ""
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    category: "AttackPathResult"
+
+  # Path 2: Internet -> React RCE -> IMDS -> ARM subscription enumeration (High)
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    PathId: "AP-002"
+    PathName: "Internet to Subscription Enumeration via React RCE"
+    RiskScore: 78
+    RiskLevel: "High"
+    StepOrder: 1
+    SourceNode: "Internet"
+    SourceNodeType: "ExternalNetwork"
+    Relationship: "exploits_cve"
+    TargetNode: "hr-app-pod"
+    TargetNodeType: "KubernetesPod"
+    Description: "Attacker exploits CVE-2025-55182 to gain code execution in AKS pod"
+    CveId: "CVE-2025-55182"
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    category: "AttackPathResult"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    PathId: "AP-002"
+    PathName: "Internet to Subscription Enumeration via React RCE"
+    RiskScore: 78
+    RiskLevel: "High"
+    StepOrder: 2
+    SourceNode: "hr-app-pod"
+    SourceNodeType: "KubernetesPod"
+    Relationship: "ssrf_to"
+    TargetNode: "IMDS (169.254.169.254)"
+    TargetNodeType: "MetadataService"
+    Description: "SSRF reaches IMDS to acquire managed identity token"
+    CveId: ""
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    category: "AttackPathResult"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    PathId: "AP-002"
+    PathName: "Internet to Subscription Enumeration via React RCE"
+    RiskScore: 78
+    RiskLevel: "High"
+    StepOrder: 3
+    SourceNode: "webapp-identity (MI)"
+    SourceNodeType: "ManagedIdentity"
+    Relationship: "has_role"
+    TargetNode: "Subscription (Reader)"
+    TargetNodeType: "AzureSubscription"
+    Description: "Managed identity has subscription-level Reader role allowing full resource enumeration"
+    CveId: ""
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    category: "AttackPathResult"
+
+  # Path 3: DEV-WS-001 -> CLFS escalation -> Domain Controller (Medium)
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    PathId: "AP-003"
+    PathName: "Workstation to Domain Controller via CLFS Privilege Escalation"
+    RiskScore: 65
+    RiskLevel: "Medium"
+    StepOrder: 1
+    SourceNode: "DEV-WS-001"
+    SourceNodeType: "Workstation"
+    Relationship: "exploits_cve"
+    TargetNode: "DEV-WS-001 (SYSTEM)"
+    TargetNodeType: "Workstation"
+    Description: "Attacker exploits CVE-2024-49138 CLFS driver vulnerability to escalate to SYSTEM on developer workstation"
+    CveId: "CVE-2024-49138"
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    category: "AttackPathResult"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    PathId: "AP-003"
+    PathName: "Workstation to Domain Controller via CLFS Privilege Escalation"
+    RiskScore: 65
+    RiskLevel: "Medium"
+    StepOrder: 2
+    SourceNode: "DEV-WS-001 (SYSTEM)"
+    SourceNodeType: "Workstation"
+    Relationship: "lateral_movement"
+    TargetNode: "DC (Domain Controller)"
+    TargetNodeType: "DomainController"
+    Description: "SYSTEM-level access enables credential dumping and lateral movement to domain controller"
+    CveId: ""
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    category: "AttackPathResult"
+
+  # Path 4: Exchange server -> credential relay -> Domain Controller (Medium)
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    PathId: "AP-004"
+    PathName: "Exchange Server to Domain Controller via Outlook Credential Relay"
+    RiskScore: 62
+    RiskLevel: "Medium"
+    StepOrder: 1
+    SourceNode: "Internet"
+    SourceNodeType: "ExternalNetwork"
+    Relationship: "exploits_cve"
+    TargetNode: "EXCH-SVR-01"
+    TargetNodeType: "ExchangeServer"
+    Description: "Attacker sends crafted Outlook meeting invite exploiting CVE-2023-23397 to relay NTLM credentials"
+    CveId: "CVE-2023-23397"
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    category: "AttackPathResult"
+
+  - TimeGenerated: "2026-02-01T00:00:00.0000000Z"
+    PathId: "AP-004"
+    PathName: "Exchange Server to Domain Controller via Outlook Credential Relay"
+    RiskScore: 62
+    RiskLevel: "Medium"
+    StepOrder: 2
+    SourceNode: "EXCH-SVR-01"
+    SourceNodeType: "ExchangeServer"
+    Relationship: "credential_relay"
+    TargetNode: "DC (Domain Controller)"
+    TargetNodeType: "DomainController"
+    Description: "Relayed NTLM hash authenticates against domain controller for privileged access"
+    CveId: ""
+    SubscriptionId: "12345678-1234-1234-1234-123456789abc"
+    category: "AttackPathResult"

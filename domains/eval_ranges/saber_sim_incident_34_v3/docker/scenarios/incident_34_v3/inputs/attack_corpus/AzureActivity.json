@@ -1,0 +1,20 @@
+[
+  {
+    "time": "",
+    "resourceId": "",
+    "operationName": "",
+    "category": "",
+    "resultType": "",
+    "resultSignature": "",
+    "durationMs": null,
+    "callerIpAddress": "",
+    "correlationId": "",
+    "level": "",
+    "properties": null,
+    "authorization": null,
+    "claims": null,
+    "source": "arm",
+    "collectedAt": "2026-06-25T03:52:58.189192Z",
+    "AttackTechnique": "T1530"
+  }
+]

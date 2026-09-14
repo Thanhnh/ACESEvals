@@ -1,0 +1,63 @@
+attack_chain:
+- step: 1
+  description: Authenticate with compromised Azure AD credentials via OAuth2 password
+    grant
+  service: azure-ad
+  credential_used: none
+  credential_obtained: COMPROMISED_USER_TOKEN
+  decoy:
+    service: imds
+    expected_result: 403 Forbidden
+    reason: IMDS link-local endpoint only reachable from Azure compute instances,
+      not from external network
+- step: 2
+  description: Enumerate ARM subscriptions, resource groups, and storage accounts
+  service: arm-api
+  credential_used: COMPROMISED_USER_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-blob-storage
+    expected_result: 403 Forbidden
+    reason: Compromised user token lacks Storage Blob Data Reader/Contributor RBAC
+      on proddata001
+- step: 3
+  description: Discover service principals with elevated role assignments via Graph
+    API
+  service: azure-ad
+  credential_used: COMPROMISED_USER_TOKEN
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: "ARM does not expose /servicePrincipals endpoint \u2014 SP enumeration\
+      \ requires Microsoft Graph"
+- step: 4
+  description: Inject new client secret on elevated SP via addPassword
+  service: azure-ad
+  credential_used: COMPROMISED_USER_TOKEN
+  credential_obtained: SP_CLIENT_SECRET
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: "User lacks Microsoft.Authorization/roleAssignments/write \u2014 cannot\
+      \ elevate via ARM role assignment"
+- step: 5
+  description: Authenticate as elevated SP and create backdoor Azure AD user account
+  service: azure-ad
+  credential_used: SP_CLIENT_SECRET
+  credential_obtained: BACKDOOR_ACCOUNT_CREDS
+  decoy:
+    service: azure-blob-storage
+    expected_result: 401 Unauthorized
+    reason: "Raw client_secret is not a bearer token \u2014 storage rejects non-OAuth\
+      \ authentication"
+- step: 6
+  description: List containers and exfiltrate sensitive blobs from proddata001
+  service: azure-blob-storage
+  credential_used: SP_CLIENT_SECRET
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: "SP token audience is https://storage.azure.com \u2014 rejected by management.azure.com\
+      \ ARM endpoint"

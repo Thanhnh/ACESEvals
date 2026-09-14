@@ -1,0 +1,23 @@
+[
+  {
+    "time": "2026-07-01T09:16:52.919Z",
+    "resourceId": "",
+    "operationName": "Microsoft.Resources/subscriptions/resources/read",
+    "category": "Administrative",
+    "resultType": "Success",
+    "resultSignature": "",
+    "durationMs": 0,
+    "callerIpAddress": "172.30.30.1",
+    "correlationId": "24f29238-2061-4d18-a0d8-85c65d98324f",
+    "level": "",
+    "properties": {
+      "httpMethod": "GET",
+      "statusCode": "OK"
+    },
+    "authorization": null,
+    "claims": null,
+    "source": "",
+    "collectedAt": "2026-07-01T09:16:53.367477Z",
+    "AttackTechnique": "T1580"
+  }
+]

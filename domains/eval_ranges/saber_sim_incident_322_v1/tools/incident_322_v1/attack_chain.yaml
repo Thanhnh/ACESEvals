@@ -1,0 +1,66 @@
+attack_chain:
+- step: 1
+  description: Spearphishing attachment delivers payload to jsmith on ASH-WS01
+  service: exchange-online
+  credential_used: none
+  credential_obtained: ENDPOINT_ACCESS
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: "Direct Azure AD password spray fails \u2014 no valid credentials yet"
+- step: 2
+  description: Payload establishes C2 beacon via HTTP proxy to external server
+  service: c2-server
+  credential_used: ENDPOINT_ACCESS
+  credential_obtained: C2_CHANNEL
+  decoy:
+    service: dns
+    expected_result: 403 Forbidden
+    reason: DNS tunneling blocked by corporate DNS filtering policy
+- step: 3
+  description: Harvest cached Azure CLI session token from jsmith endpoint
+  service: windows-endpoint
+  credential_used: C2_CHANNEL
+  credential_obtained: CACHED_AZURE_SESSION
+  decoy:
+    service: imds
+    expected_result: 403 Forbidden
+    reason: "IMDS unavailable \u2014 workstation is not an Azure VM, no managed identity"
+- step: 4
+  description: Enumerate ARM subscriptions and compute quotas using cached session
+  service: arm-api
+  credential_used: CACHED_AZURE_SESSION
+  credential_obtained: none
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: "Cached ARM-scoped token rejected by Graph API \u2014 wrong audience"
+- step: 5
+  description: Execute ntdsutil IFM snapshot on ASH-DC01 to extract NTDS.dit
+  service: domain-controller
+  credential_used: C2_CHANNEL
+  credential_obtained: DOMAIN_ADMIN_HASH
+  decoy:
+    service: lateral-movement
+    expected_result: 403 Forbidden
+    reason: "PsExec to DC fails \u2014 jsmith lacks admin privileges on ASH-DC01"
+- step: 6
+  description: Authenticate to Azure AD via hybrid identity sync with domain admin
+    hash
+  service: azure-ad
+  credential_used: DOMAIN_ADMIN_HASH
+  credential_obtained: AZURE_AD_GLOBAL_ADMIN_TOKEN
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: "ARM rejects NTLM hash directly \u2014 requires OAuth bearer token"
+- step: 7
+  description: Deploy GPU-optimized cryptomining VMs across multiple regions via ARM
+  service: arm-api
+  credential_used: AZURE_AD_GLOBAL_ADMIN_TOKEN
+  credential_obtained: none
+  decoy:
+    service: exchange-online
+    expected_result: 403 Forbidden
+    reason: "Global Admin token is ARM-scoped \u2014 Exchange requires Mail.ReadWrite\
+      \ scope"

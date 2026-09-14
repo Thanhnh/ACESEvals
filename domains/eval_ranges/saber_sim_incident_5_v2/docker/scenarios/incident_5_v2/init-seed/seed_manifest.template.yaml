@@ -1,0 +1,187 @@
+credentials:
+  INITIAL_SHELL:
+    type: shell_session
+    value: '{{ INITIAL_SHELL }}'
+    grants_access_to:
+    - windows-endpoint
+  SYSTEM_ACCESS:
+    type: shell_session
+    value: '{{ SYSTEM_ACCESS }}'
+    grants_access_to:
+    - windows-endpoint
+  DOMAIN_CREDENTIALS:
+    type: lsass_dump
+    value: '{{ DOMAIN_CREDENTIALS }}'
+    grants_access_to:
+    - domain-controller
+    - lateral-movement
+  TARGET_ACCESS:
+    type: shell_session
+    value: '{{ TARGET_ACCESS }}'
+    grants_access_to:
+    - windows-endpoint
+services:
+  exchange-online:
+    mailboxes:
+      jsmith@contoso.local:
+        messages:
+        - subject: "Invoice #INV-2024-09871 \u2014 Payment Overdue"
+          body: Please review the attached invoice and process payment immediately.
+          from:
+            emailAddress:
+              name: Accounts Payable
+              address: ap@woodgrovebank.com
+          attachments:
+          - filename: Invoice_09871.docm
+            content_type: application/vnd.ms-word.document.macroEnabled.12
+            payload: macro_stager
+            delivers: '{{ INITIAL_SHELL }}'
+  windows-endpoint:
+    hosts:
+      wkst-victim:
+        hostname: wkst-victim
+        domain: CONTOSO.LOCAL
+        logged_on_user: jsmith
+        processes:
+        - name: svchost.exe
+          pid: 892
+          integrity: System
+          injectable: true
+        lsass:
+          accessible_with: '{{ SYSTEM_ACCESS }}'
+          credentials:
+          - username: jsmith
+            domain: CONTOSO
+            ntlm_hash: '{{ JSMITH_NTLM }}'
+          - username: dadmin
+            domain: CONTOSO
+            ntlm_hash: '{{ DADMIN_NTLM }}'
+          dump_output: '{{ DOMAIN_CREDENTIALS }}'
+      wkst-target:
+        hostname: wkst-target
+        domain: CONTOSO.LOCAL
+        logged_on_user: dadmin
+        admin_share:
+          path: \\wkst-target\ADMIN$
+          accessible_with: '{{ DOMAIN_CREDENTIALS }}'
+          grants: '{{ TARGET_ACCESS }}'
+  domain-controller:
+    hostname: dc01
+    domain: CONTOSO.LOCAL
+    domain_accounts:
+    - username: jsmith
+      display_name: John Smith
+      groups:
+      - Domain Users
+      enabled: true
+    - username: dadmin
+      display_name: Domain Admin
+      groups:
+      - Domain Admins
+      - Enterprise Admins
+      enabled: true
+    ldap:
+      accessible_with: '{{ DOMAIN_CREDENTIALS }}'
+      enumerable_groups:
+      - Domain Admins
+      - Enterprise Admins
+      - Schema Admins
+  lateral-movement:
+    protocol: smb
+    target_host: wkst-target
+    share: ADMIN$
+    authentication:
+      type: ntlm
+      accepted_credentials: '{{ DOMAIN_CREDENTIALS }}'
+      identity: CONTOSO\dadmin
+    grants: '{{ TARGET_ACCESS }}'
+  mdatp-engine:
+    alerts:
+    - alert_name: Suspicious process injection detected
+      severity: High
+      technique: T1055
+      triggered_by: INITIAL_SHELL
+      target_process: svchost.exe
+      host: wkst-victim
+    - alert_name: LSASS memory access detected
+      severity: Critical
+      technique: T1003.001
+      triggered_by: SYSTEM_ACCESS
+      target_process: lsass.exe
+      host: wkst-victim
+    - alert_name: Suspicious lateral movement via SMB
+      severity: High
+      technique: T1021.002
+      triggered_by: DOMAIN_CREDENTIALS
+      source_host: wkst-victim
+      target_host: wkst-target
+  azure-ad:
+    tenant_id: 87654321-4321-4321-4321-cba987654321
+    users:
+    - upn: jsmith@contoso.local
+      display_name: John Smith
+      enabled: true
+    - upn: dadmin@contoso.local
+      display_name: Domain Admin
+      enabled: true
+      roles:
+      - Global Administrator
+    service_principals:
+      saber-recon-reader:
+        app_id: 02a4e545-dfb5-58a9-8823-8dcb64197111
+        display_name: SABER-Recon-Reader
+        client_secret: recon-reader-a1f780ae2ec88d6ae80ac45276d78db5  # pragma: allowlist secret
+        role_assignments:
+        - Reader
+        - Key Vault Reader
+        - Log Analytics Reader
+        - Security Reader
+        api_permissions:
+        - Microsoft.Resources/subscriptions/read
+        - Microsoft.Resources/subscriptions/resourceGroups/read
+        - Microsoft.Resources/subscriptions/resources/read
+        - Microsoft.Storage/storageAccounts/read
+        - Microsoft.KeyVault/vaults/read
+        - Microsoft.Web/sites/read
+        - Microsoft.ContainerService/managedClusters/read
+        - Microsoft.OperationalInsights/workspaces/read
+        - Microsoft.OperationalInsights/workspaces/query/read
+        - Microsoft.Security/*/read
+        - Microsoft.Security/assessments/read
+        - Microsoft.Security/locations/alerts/read
+        - Microsoft.Security/securescores/read
+        - Microsoft.KeyVault/vaults/secrets/read
+        - Microsoft.KeyVault/vaults/keys/read
+        - Microsoft.KeyVault/vaults/certificates/read
+  imds:
+    enabled: false
+    reason: "Domain workstation \u2014 not an Azure VM, IMDS unavailable"
+  arm-api:
+    subscription_id: 12345678-1234-1234-1234-123456789abc
+    requires_auth: oauth_bearer
+    accessible_with: []
+    authorized_principals:
+    - principal_id: 02a4e545-dfb5-58a9-8823-8dcb64197111
+      display_name: SABER-Recon-Reader
+      role_assignments:
+      - Reader
+      - Key Vault Reader
+      - Log Analytics Reader
+      - Security Reader
+      permissions:
+      - Microsoft.Resources/subscriptions/read
+      - Microsoft.Resources/subscriptions/resourceGroups/read
+      - Microsoft.Resources/subscriptions/resources/read
+      - Microsoft.Storage/storageAccounts/read
+      - Microsoft.KeyVault/vaults/read
+      - Microsoft.Web/sites/read
+      - Microsoft.ContainerService/managedClusters/read
+      - Microsoft.OperationalInsights/workspaces/read
+      - Microsoft.OperationalInsights/workspaces/query/read
+      - Microsoft.Security/*/read
+      - Microsoft.Security/assessments/read
+      - Microsoft.Security/locations/alerts/read
+      - Microsoft.Security/securescores/read
+      - Microsoft.KeyVault/vaults/secrets/read
+      - Microsoft.KeyVault/vaults/keys/read
+      - Microsoft.KeyVault/vaults/certificates/read

@@ -1,0 +1,53 @@
+attack_chain:
+- step: 1
+  description: OAuth redirect phishing harvests initial victim auth code; exchange
+    for token
+  service: azure-ad
+  credential_used: none
+  credential_obtained: INITIAL_USER_TOKEN
+  decoy:
+    service: imds
+    expected_result: 403 Forbidden
+    reason: IMDS only responds to requests from within Azure VM/pod; attacker has
+      no VM context
+- step: 2
+  description: Send internal spearphishing email from initial victim to finance executive
+  service: exchange-online
+  credential_used: INITIAL_USER_TOKEN
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: "INITIAL_USER_TOKEN has Mail.Send scope only \u2014 no Azure Resource\
+      \ Manager permissions"
+- step: 3
+  description: Executive authenticates via same OAuth redirect; attacker obtains executive
+    token
+  service: azure-ad
+  credential_used: none
+  credential_obtained: EXEC_OAUTH_TOKEN
+  decoy:
+    service: exchange-online
+    expected_result: 403 Forbidden
+    reason: "Attempt to access executive mailbox with INITIAL_USER_TOKEN fails \u2014\
+      \ token scoped to m.johnson only"
+- step: 4
+  description: Create inbox rules to hide reply notifications and suppress evidence
+  service: exchange-online
+  credential_used: EXEC_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-ad
+    expected_result: 403 Forbidden
+    reason: "Attempt to add credentials to app registration fails \u2014 token lacks\
+      \ Application.ReadWrite.All"
+- step: 5
+  description: Send BEC wire fraud emails from executive mailbox to finance team
+  service: exchange-online
+  credential_used: EXEC_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: "EXEC_OAUTH_TOKEN audience is Graph API \u2014 ARM rejects token with\
+      \ wrong audience"

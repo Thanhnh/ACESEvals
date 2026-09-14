@@ -1,0 +1,53 @@
+attack_chain:
+- step: 1
+  description: "Device code phishing \u2014 victim User A authorizes attacker session,\
+    \ yielding OAuth token"
+  service: azure-ad
+  credential_used: none
+  credential_obtained: USER_A_OAUTH_TOKEN
+  decoy:
+    service: exchange-online
+    expected_result: 401 Unauthorized
+    reason: Exchange requires OAuth bearer token, cannot authenticate with device
+      code directly
+- step: 2
+  description: "Cloud account discovery via ARM API \u2014 enumerate users to identify\
+    \ high-value targets"
+  service: arm-api
+  credential_used: USER_A_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: imds
+    expected_result: 403 Forbidden
+    reason: IMDS is only accessible from Azure VM/AKS compute, not from cloud identity
+      sessions
+- step: 3
+  description: "Internal spearphishing \u2014 send credential harvester from User\
+    \ A mailbox to User B"
+  service: exchange-online
+  credential_used: USER_A_OAUTH_TOKEN
+  credential_obtained: USER_B_CREDENTIALS
+  decoy:
+    service: azure-sentinel
+    expected_result: 403 Forbidden
+    reason: User A lacks Security Reader role required to access Sentinel workspace
+- step: 4
+  description: "Authenticate as User B \u2014 redeem harvested credentials for OAuth\
+    \ token"
+  service: azure-ad
+  credential_used: USER_B_CREDENTIALS
+  credential_obtained: USER_B_OAUTH_TOKEN
+  decoy:
+    service: exchange-online
+    expected_result: 401 Unauthorized
+    reason: Exchange rejects raw password credentials, requires OAuth bearer token
+- step: 5
+  description: "Remote email collection \u2014 exfiltrate sensitive emails from User\
+    \ B mailbox via Graph API"
+  service: exchange-online
+  credential_used: USER_B_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: User B finance account has no ARM RBAC role assignments

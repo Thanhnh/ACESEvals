@@ -1,0 +1,51 @@
+attack_chain:
+- step: 1
+  description: "Kerberos AS-REQ with stolen credentials for jmorales@CONTOSO.LOCAL\
+    \ \u2014 DC issues TGT"
+  service: domain-controller
+  credential_used: none
+  credential_obtained: KERBEROS_TGT
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: Azure AD cloud authentication rejects on-prem domain password without
+      hybrid sync configured
+- step: 2
+  description: LDAP enumeration of domain-joined servers (objectClass=computer) on
+    contoso-dc01
+  service: domain-controller
+  credential_used: KERBEROS_TGT
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: ARM API requires Azure OAuth bearer token, Kerberos TGT has no Azure scope
+- step: 3
+  description: WMI Win32_Process.Create lateral movement from ws-entry-04 to srv-critical-01
+  service: lateral-movement
+  credential_used: KERBEROS_TGT
+  credential_obtained: REMOTE_ADMIN_SESSION
+  decoy:
+    service: windows-endpoint
+    expected_result: 401 Unauthorized
+    reason: "Direct RDP to srv-critical-01 rejected \u2014 NLA requires interactive\
+      \ credential prompt"
+- step: 4
+  description: Disable Microsoft Defender on srv-critical-01 via Set-MpPreference
+    and sc.exe stop
+  service: windows-endpoint
+  credential_used: REMOTE_ADMIN_SESSION
+  credential_obtained: UNRESTRICTED_ENDPOINT_ACCESS
+  decoy:
+    service: mdatp-engine
+    expected_result: 403 Forbidden
+    reason: MDE cloud API requires Global Admin OAuth token, local admin session insufficient
+- step: 5
+  description: Ransomware deployment encrypting critical file shares on srv-critical-01
+  service: windows-endpoint
+  credential_used: UNRESTRICTED_ENDPOINT_ACCESS
+  credential_obtained: none
+  decoy:
+    service: lateral-movement
+    expected_result: 403 Forbidden
+    reason: WMI DCOM port blocked by host firewall policy to non-enumerated targets

@@ -1,0 +1,55 @@
+attack_chain:
+- step: 1
+  description: Exploit public-facing web application behind Azure Front Door WAF to
+    gain code execution on web-srv-01
+  service: front-door
+  credential_used: none
+  credential_obtained: WEBSHELL_ACCESS
+  decoy:
+    service: imds
+    expected_result: 401 Unauthorized
+    reason: IMDS is only reachable from within Azure VM mgmt_net, not from external
+      front-door network path
+- step: 2
+  description: Dump LSASS on compromised web-srv-01 to recover cached domain administrator
+    credentials
+  service: windows-endpoint
+  credential_used: WEBSHELL_ACCESS
+  credential_obtained: DOMAIN_ADMIN_CREDS
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: Azure AD requires OAuth client credentials grant, webshell context provides
+      no bearer token
+- step: 3
+  description: Authenticate to domain controller with domain admin credentials and
+    enumerate AD computer objects
+  service: domain-controller
+  credential_used: DOMAIN_ADMIN_CREDS
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: Azure ARM API requires OAuth bearer token, domain NTLM credentials are
+      not valid for management plane
+- step: 4
+  description: Initiate RDP session from CONTOSO-DC01 to data-srv-01, routing lateral
+    movement through DC infrastructure
+  service: lateral-movement
+  credential_used: DOMAIN_ADMIN_CREDS
+  credential_obtained: TARGET_HOST_ACCESS
+  decoy:
+    service: windows-endpoint
+    expected_result: 403 Forbidden
+    reason: Direct endpoint-to-endpoint RDP blocked by network segmentation; must
+      route through DC
+- step: 5
+  description: Deploy C2 implant on data-srv-01 that registers HTTPS beacon with external
+    C2 infrastructure
+  service: c2-server
+  credential_used: TARGET_HOST_ACCESS
+  credential_obtained: C2_CHANNEL
+  decoy:
+    service: dns
+    expected_result: 403 Forbidden
+    reason: DNS-based C2 tunneling blocked by DNS security filtering and anomaly detection

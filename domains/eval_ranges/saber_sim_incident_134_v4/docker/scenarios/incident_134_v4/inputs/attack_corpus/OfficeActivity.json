@@ -1,0 +1,62 @@
+[
+  {
+    "TimeGenerated": "",
+    "OfficeWorkload": "",
+    "Operation": "Send",
+    "RecordType": "2",
+    "UserId": "m.johnson",
+    "UserType": "",
+    "ClientIP": "",
+    "ResultStatus": "Succeeded",
+    "OrganizationId": "org-12345678-1234-1234-1234-123456789abc",
+    "Type": "OfficeActivity",
+    "source": "exchange_online",
+    "collectedAt": "2026-07-01T09:27:35.814448Z",
+    "AttackTechnique": "T1534"
+  },
+  {
+    "TimeGenerated": "",
+    "OfficeWorkload": "",
+    "Operation": "New-InboxRule",
+    "RecordType": "6",
+    "UserId": "m.johnson",
+    "UserType": "",
+    "ClientIP": "",
+    "ResultStatus": "Succeeded",
+    "OrganizationId": "org-12345678-1234-1234-1234-123456789abc",
+    "Type": "OfficeActivity",
+    "source": "exchange_online",
+    "collectedAt": "2026-07-01T09:27:35.814458Z",
+    "AttackTechnique": "T1564.008"
+  },
+  {
+    "TimeGenerated": "",
+    "OfficeWorkload": "",
+    "Operation": "Send",
+    "RecordType": "2",
+    "UserId": "m.johnson",
+    "UserType": "",
+    "ClientIP": "",
+    "ResultStatus": "Succeeded",
+    "OrganizationId": "org-12345678-1234-1234-1234-123456789abc",
+    "Type": "OfficeActivity",
+    "source": "exchange_online",
+    "collectedAt": "2026-07-01T09:27:35.814460Z",
+    "AttackTechnique": "T1534"
+  },
+  {
+    "TimeGenerated": "",
+    "OfficeWorkload": "",
+    "Operation": "Send",
+    "RecordType": "2",
+    "UserId": "m.johnson",
+    "UserType": "",
+    "ClientIP": "",
+    "ResultStatus": "Succeeded",
+    "OrganizationId": "org-12345678-1234-1234-1234-123456789abc",
+    "Type": "",
+    "source": "exchange_online",
+    "collectedAt": "2026-07-01T09:27:35.814448Z",
+    "AttackTechnique": "T1534"
+  }
+]

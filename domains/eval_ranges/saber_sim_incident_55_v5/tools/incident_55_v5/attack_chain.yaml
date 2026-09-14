@@ -1,0 +1,55 @@
+attack_chain:
+- step: 1
+  description: Authenticate to domain controller with externally-compromised credentials
+    for jsmith (T1078)
+  service: domain-controller
+  credential_used: none
+  credential_obtained: KERBEROS_TGT
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: Azure AD is cloud identity provider; on-prem domain auth requires the
+      domain controller, not Azure AD
+- step: 2
+  description: Dump LSASS process memory on corp-ws-055 to extract svc-admin NTLM
+    hash (T1003.001)
+  service: windows-endpoint
+  credential_used: KERBEROS_TGT
+  credential_obtained: NTLM_HASH
+  decoy:
+    service: domain-controller
+    expected_result: 403 Forbidden
+    reason: DCSync requires Replicating Directory Changes privilege; jsmith is a standard
+      user without replication rights
+- step: 3
+  description: SMB pass-the-hash lateral movement from corp-ws-055 to srv-file-012
+    (T1021.002)
+  service: lateral-movement
+  credential_used: NTLM_HASH
+  credential_obtained: none
+  decoy:
+    service: windows-endpoint
+    expected_result: 401 Unauthorized
+    reason: Direct RDP with NTLM hash fails; interactive logon requires plaintext
+      password or Kerberos ticket, not raw hash
+- step: 4
+  description: Disable Windows Defender real-time monitoring on srv-file-012 (T1562.001)
+  service: windows-endpoint
+  credential_used: NTLM_HASH
+  credential_obtained: none
+  decoy:
+    service: mdatp-engine
+    expected_result: 403 Forbidden
+    reason: MDATP cloud management API requires Azure AD Global Admin token; domain
+      admin NTLM hash has no cloud authority
+- step: 5
+  description: "Deploy ransomware \u2014 delete VSS snapshots and encrypt files on\
+    \ srv-file-012 (T1486)"
+  service: windows-endpoint
+  credential_used: NTLM_HASH
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: ARM API requires OAuth bearer token; NTLM hash cannot authenticate to
+      Azure Resource Manager

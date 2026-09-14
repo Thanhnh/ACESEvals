@@ -1,0 +1,36 @@
+[
+  {
+    "AlertId": "alert-1",
+    "AttackTechniques": "T1003.001",
+    "Category": "CredentialAccess",
+    "DetectionSource": "EDR",
+    "ServiceSource": "Microsoft Defender for Endpoint",
+    "Severity": "High",
+    "SourceSystem": "",
+    "TenantId": "",
+    "TimeGenerated": "2026-07-01T02:49:00.615Z",
+    "Timestamp": "2026-07-01T02:49:00.615Z",
+    "Title": "Suspicious LSASS memory access",
+    "Type": "AlertInfo",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1003.001"
+  },
+  {
+    "AlertId": "alert-2",
+    "AttackTechniques": "T1570",
+    "Category": "LateralMovement",
+    "DetectionSource": "EDR",
+    "ServiceSource": "Microsoft Defender for Endpoint",
+    "Severity": "High",
+    "SourceSystem": "",
+    "TenantId": "",
+    "TimeGenerated": "2026-07-01T02:49:00.746Z",
+    "Timestamp": "2026-07-01T02:49:00.746Z",
+    "Title": "Hands-on-keyboard lateral movement (PsExec)",
+    "Type": "AlertInfo",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1021.002"
+  }
+]

@@ -1,0 +1,55 @@
+attack_chain:
+- step: 1
+  description: "Exploit public-facing application via Front Door WAF bypass \u2014\
+    \ gain code execution on App Service"
+  service: front-door
+  credential_used: none
+  credential_obtained: CODE_EXECUTION
+  decoy:
+    service: imds
+    expected_result: 403 Forbidden
+    reason: IMDS is only reachable from within the compute instance, not externally
+      through Front Door
+- step: 2
+  description: Deploy web shell on App Service for persistent command-and-control
+    access
+  service: azure-app-service
+  credential_used: CODE_EXECUTION
+  credential_obtained: WEB_SHELL_ACCESS
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: Azure AD requires valid client credentials or tokens, code execution alone
+      is insufficient
+- step: 3
+  description: Network service scanning and discovery of service account credentials
+    in application environment variables
+  service: azure-app-service
+  credential_used: WEB_SHELL_ACCESS
+  credential_obtained: INTERNAL_SERVICE_CREDENTIALS
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: ARM API requires a valid OAuth bearer token, web shell session does not
+      provide one
+- step: 4
+  description: Lateral movement via WMI remote services to internal Windows server
+    using discovered credentials
+  service: lateral-movement
+  credential_used: INTERNAL_SERVICE_CREDENTIALS
+  credential_obtained: SERVER_ADMIN_ACCESS
+  decoy:
+    service: windows-endpoint
+    expected_result: 401 Unauthorized
+    reason: "Direct RDP/SMB connection rejected \u2014 server requires WMI auth with\
+      \ valid service account"
+- step: 5
+  description: Collect sensitive data from compromised Windows server local file system
+  service: windows-endpoint
+  credential_used: SERVER_ADMIN_ACCESS
+  credential_obtained: none
+  decoy:
+    service: azure-sentinel
+    expected_result: 403 Forbidden
+    reason: Sentinel workspace requires Log Analytics contributor role, not local
+      admin credentials

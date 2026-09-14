@@ -1,0 +1,43 @@
+[
+  {
+    "AADOperationType": "",
+    "AADTenantId": "",
+    "ActivityDateTime": "",
+    "ActivityDisplayName": "",
+    "AdditionalDetails": null,
+    "Category": "AuditLogs",
+    "CorrelationId": "",
+    "DurationMs": 0,
+    "Id": "",
+    "Identity": "",
+    "InitiatedBy": {
+      "user": {
+        "id": "2ee93e54-2594-5e86-4c8e-8299af04982a",
+        "ipAddress": "172.30.30.1",
+        "userPrincipalName": "j.harrison@contoso.com"
+      }
+    },
+    "Level": "",
+    "Location": "",
+    "LoggedByService": "",
+    "OperationName": "List users",
+    "OperationVersion": "",
+    "Resource": "",
+    "ResourceGroup": "",
+    "ResourceId": "",
+    "ResourceProvider": "",
+    "Result": "",
+    "ResultDescription": "",
+    "ResultReason": "",
+    "ResultSignature": "",
+    "ResultType": "Success",
+    "SourceSystem": "",
+    "TargetResources": null,
+    "TenantId": "",
+    "TimeGenerated": "2026-07-01T09:08:59.1894162Z",
+    "Type": "AuditLogs",
+    "source": "",
+    "collectedAt": "2026-07-01T09:09:00.132540Z",
+    "AttackTechnique": "T1087.004"
+  }
+]

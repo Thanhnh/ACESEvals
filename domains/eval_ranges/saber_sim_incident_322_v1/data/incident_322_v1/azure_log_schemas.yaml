@@ -1,0 +1,4440 @@
+# Azure Log Schemas Reference
+# Based on official Microsoft Azure documentation
+# Use these schemas to generate realistic detection logs
+
+# ============================================
+# KEY VAULT AUDIT LOG (AuditEvent)
+# Source: https://learn.microsoft.com/en-us/azure/key-vault/general/logging
+# ============================================
+key_vault_audit_event:
+  example: |
+    {
+      "time": "2024-12-16T10:30:45.1234567Z",
+      "resourceId": "/SUBSCRIPTIONS/00000000-0000-0000-baf9-d9af542441b0/RESOURCEGROUPS/PRODUCTION-RG/PROVIDERS/MICROSOFT.KEYVAULT/VAULTS/PROD-SECRETS-KV",
+      "operationName": "SecretGet",
+      "operationVersion": "7.4",
+      "category": "AuditEvent",
+      "resultType": "Success",
+      "resultSignature": "OK",
+      "resultDescription": "",
+      "durationMs": 78,
+      "callerIpAddress": "172.30.0.100",
+      "correlationId": "00000000-0000-0000-bee2-6747bdfce306",
+      "identity": {
+        "claim": {
+          "http://schemas.microsoft.com/identity/claims/objectidentifier": "00000000-0000-0000-4629-592fe47ff156",
+          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn": "user@contoso.com",
+          "appid": "00000000-0000-0000-9620-c3d50095e00e"
+        }
+      },
+      "properties": {
+        "clientInfo": "azsdk-python-keyvault/4.7.0",
+        "requestUri": "https://prod-secrets-kv.vault.azure.net/secrets/db-password?api-version=7.4",
+        "id": "https://prod-secrets-kv.vault.azure.net/secrets/db-password",
+        "httpStatusCode": 200,
+        "isAccessPolicyMatch": true
+      }
+    }
+
+  fields:
+    - name: time
+      type: datetime
+      description: "UTC timestamp in ISO 8601 format with nanoseconds"
+      format: "YYYY-MM-DDTHH:MM:SS.fffffffZ"
+
+    - name: resourceId
+      type: string
+      description: "Azure Resource Manager resource ID (UPPERCASE)"
+      format: "/SUBSCRIPTIONS/{subscriptionId}/RESOURCEGROUPS/{resourceGroup}/PROVIDERS/MICROSOFT.KEYVAULT/VAULTS/{vaultName}"
+
+    - name: operationName
+      type: string
+      description: "Operation in ObjectVerb format"
+      values:
+        - SecretGet
+        - SecretSet
+        - SecretDelete
+        - SecretList
+        - SecretListVersions
+        - KeySign
+        - KeyDecrypt
+        - KeyEncrypt
+        - KeyGet
+        - KeyCreate
+        - VaultGet
+        - VaultPut
+        - VaultDelete
+
+    - name: operationVersion
+      type: string
+      description: "API version used"
+      example: "7.4"
+
+    - name: category
+      type: string
+      description: "Always 'AuditEvent' for Key Vault"
+      value: "AuditEvent"
+
+    - name: resultType
+      type: string
+      values: ["Success", "Failure"]
+
+    - name: resultSignature
+      type: string
+      description: "HTTP status text"
+      values: ["OK", "Not Found", "Unauthorized", "Forbidden"]
+
+    - name: durationMs
+      type: integer
+      description: "Request duration in milliseconds"
+
+    - name: callerIpAddress
+      type: string
+      description: "Client IP address"
+
+    - name: correlationId
+      type: guid
+      description: "GUID for correlating logs across services"
+
+    - name: identity.claim
+      type: object
+      description: "Claims from the authentication token"
+      fields:
+        - "http://schemas.microsoft.com/identity/claims/objectidentifier"
+        - "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn"
+        - "appid"
+
+    - name: properties
+      type: object
+      fields:
+        - clientInfo: "SDK/client identifier string"
+        - requestUri: "Full request URI"
+        - id: "Resource URI accessed"
+        - httpStatusCode: "HTTP response code"
+        - isAccessPolicyMatch: "Whether access policy matched"
+
+# ============================================
+# STORAGE BLOB LOG (StorageBlobLogs)
+# Source: https://learn.microsoft.com/en-us/azure/storage/blobs/monitor-blob-storage-reference
+# ============================================
+storage_blob_log:
+  example: |
+    {
+      "time": "2024-12-16T10:30:45.1234567Z",
+      "resourceId": "/subscriptions/00000000-0000-0000-baf9-d9af542441b0/resourceGroups/production-rg/providers/Microsoft.Storage/storageAccounts/proddata001/blobServices/default",
+      "category": "StorageRead",
+      "operationName": "GetBlob",
+      "operationVersion": "2021-06-08",
+      "schemaVersion": "1.0",
+      "statusCode": 200,
+      "statusText": "Success",
+      "durationMs": 5,
+      "callerIpAddress": "172.30.0.100:54321",
+      "correlationId": "00000000-0000-0000-bee2-6747bdfce306",
+      "location": "eastus",
+      "uri": "https://proddata001.blob.core.windows.net/uploads/customer-data.csv",
+      "protocol": "HTTPS",
+      "identity": {
+        "type": "SAS",
+        "tokenHash": "key1(SHA256hash),SasSignature(SHA256hash)",
+        "requester": {
+          "appId": "00000000-0000-0000-9620-c3d50095e00e",
+          "objectId": "00000000-0000-0000-1498-2b249422673c",
+          "tenantId": "87654321-4321-4321-4321-cba987654321"
+        }
+      },
+      "properties": {
+        "accountName": "proddata001",
+        "requestUrl": "https://proddata001.blob.core.windows.net/uploads/customer-data.csv?sv=2021-06-08&st=2024-12-01&se=2025-01-01&sr=c&sp=rl&sig=xxx",
+        "userAgentHeader": "azsdk-python-storage-blob/12.19.0 Python/3.11.0",
+        "clientRequestId": "00000000-0000-0000-3aea-6073c901b345",
+        "etag": "0x8DC123456789ABC",
+        "serverLatencyMs": 3,
+        "serviceType": "blob",
+        "requestHeaderSize": 512,
+        "responseHeaderSize": 256,
+        "responseBodySize": 1048576,
+        "objectKey": "/proddata001/uploads/customer-data.csv",
+        "tlsVersion": "TLS 1.2"
+      }
+    }
+
+  fields:
+    - name: category
+      type: string
+      values: ["StorageRead", "StorageWrite", "StorageDelete"]
+
+    - name: operationName
+      type: string
+      description: "REST operation name"
+      values:
+        - GetBlob
+        - PutBlob
+        - DeleteBlob
+        - ListBlobs
+        - GetContainerProperties
+        - ListContainers
+        - CopyBlob
+        - GetBlobProperties
+        - SetBlobMetadata
+
+    - name: statusCode
+      type: integer
+      description: "HTTP status code"
+
+    - name: statusText
+      type: string
+      values: ["Success", "AnonymousSuccess", "SASSuccess", "ThrottlingError", "AuthorizationError"]
+
+    - name: identity.type
+      type: string
+      values: ["OAuth", "SAS", "AccountKey", "Anonymous"]
+
+    - name: identity.tokenHash
+      type: string
+      description: "SHA-256 hash of the authentication token/key"
+
+# ============================================
+# AZURE AD SIGN-IN LOG (SigninLogs)
+# Source: https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/signinlogs
+# ============================================
+sign_in_log:
+  example: |
+    {
+      "TimeGenerated": "2024-12-16T10:30:45.1234567Z",
+      "OperationName": "Sign-in activity",
+      "Category": "SignInLogs",
+      "ResultType": "0",
+      "ResultDescription": "Success",
+      "CorrelationId": "00000000-0000-0000-bee2-6747bdfce306",
+      "Id": "sign-in-event-id-guid",
+      "UserDisplayName": "John Doe",
+      "UserPrincipalName": "john.doe@contoso.com",
+      "UserId": "00000000-0000-0000-1498-2b249422673c",
+      "AppDisplayName": "Azure Portal",
+      "AppId": "00000000-0000-0000-8608-af63360b29f3",
+      "IPAddress": "172.30.0.100",
+      "Location": "US",
+      "LocationDetails": {
+        "city": "Seattle",
+        "state": "Washington",
+        "countryOrRegion": "US",
+        "geoCoordinates": {
+          "latitude": 47.6062,
+          "longitude": -122.3321
+        }
+      },
+      "ClientAppUsed": "Browser",
+      "DeviceDetail": {
+        "deviceId": "",
+        "operatingSystem": "Windows 10",
+        "browser": "Chrome 120.0.0"
+      },
+      "ConditionalAccessStatus": "success",
+      "IsInteractive": true,
+      "RiskLevelAggregated": "none",
+      "RiskLevelDuringSignIn": "none",
+      "RiskState": "none",
+      "Status": {
+        "errorCode": 0
+      },
+      "AuthenticationMethodsUsed": ["Password"],
+      "AuthenticationRequirement": "singleFactorAuthentication",
+      "TokenIssuerType": "AzureAD",
+      "ResourceDisplayName": "Microsoft Graph",
+      "ResourceId": "00000003-0000-0000-c000-000000000000",
+      "HomeTenantId": "87654321-4321-4321-4321-cba987654321",
+      "UserType": "Member"
+    }
+
+  fields:
+    - name: ResultType
+      type: string
+      description: "Error code - '0' means success"
+      examples: ["0", "50126", "50074", "53003"]
+
+    - name: RiskLevelAggregated
+      type: string
+      values: ["none", "low", "medium", "high", "hidden"]
+
+    - name: ConditionalAccessStatus
+      type: string
+      values: ["success", "failure", "notApplied"]
+
+    - name: AuthenticationRequirement
+      type: string
+      values: ["singleFactorAuthentication", "multiFactorAuthentication"]
+
+# ============================================
+# AZURE ACTIVITY LOG (Control Plane Operations)
+# For ARM operations like listKeys
+# ============================================
+activity_log:
+  example: |
+    {
+      "time": "2024-12-16T10:30:45.1234567Z",
+      "resourceId": "/subscriptions/00000000-0000-0000-baf9-d9af542441b0/resourceGroups/production-rg/providers/Microsoft.Storage/storageAccounts/proddata001",
+      "operationName": "Microsoft.Storage/storageAccounts/listKeys/action",
+      "category": "Administrative",
+      "resultType": "Success",
+      "resultSignature": "Succeeded.OK",
+      "durationMs": 150,
+      "callerIpAddress": "172.30.0.100",
+      "correlationId": "00000000-0000-0000-bee2-6747bdfce306",
+      "identity": {
+        "authorization": {
+          "scope": "/subscriptions/00000000-0000-0000-baf9-d9af542441b0/resourceGroups/production-rg/providers/Microsoft.Storage/storageAccounts/proddata001",
+          "action": "Microsoft.Storage/storageAccounts/listKeys/action",
+          "evidence": {
+            "role": "Owner",
+            "roleDefinitionId": "8e3af657a8ff443ca75c2fe8c4bcb635"
+          }
+        },
+        "claims": {
+          "aud": "https://management.azure.com/",
+          "iss": "https://sts.windows.net/87654321-4321-4321-4321-cba987654321/",
+          "iat": "1702725600",
+          "nbf": "1702725600",
+          "exp": "1702729200",
+          "appid": "00000000-0000-0000-9620-c3d50095e00e",
+          "oid": "00000000-0000-0000-1498-2b249422673c"
+        }
+      },
+      "level": "Information",
+      "properties": {
+        "statusCode": "OK",
+        "serviceRequestId": "00000000-0000-0000-3aea-6073c901b345",
+        "statusMessage": "{\"key1\":\"***\",\"key2\":\"***\"}"
+      }
+    }
+
+  fields:
+    - name: operationName
+      type: string
+      description: "ARM operation in provider/resource/action format"
+      examples:
+        - "Microsoft.Storage/storageAccounts/listKeys/action"
+        - "Microsoft.Storage/storageAccounts/write"
+        - "Microsoft.KeyVault/vaults/read"
+        - "Microsoft.Compute/virtualMachines/start/action"
+
+    - name: category
+      type: string
+      values: ["Administrative", "Security", "ServiceHealth", "Alert", "Policy"]
+
+    - name: level
+      type: string
+      values: ["Critical", "Error", "Warning", "Informational"]
+
+# ============================================
+# IMDS ACCESS (Custom - No standard log)
+# Note: Real Azure doesn't have external IMDS logs
+# This is for simulation purposes
+# ============================================
+imds_access_log:
+  description: |
+    Azure IMDS doesn't produce external audit logs in real Azure.
+    However, for threat hunting simulation, we generate synthetic logs
+    that would be useful for detecting credential theft.
+
+  example: |
+    {
+      "time": "2024-12-16T10:30:45.1234567Z",
+      "resourceId": "/SUBSCRIPTIONS/00000000-0000-0000-baf9-d9af542441b0/RESOURCEGROUPS/PRODUCTION-RG/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/WEBAPP-VM-001",
+      "operationName": "IMDS.GetToken",
+      "category": "InstanceMetadata",
+      "resultType": "Success",
+      "callerIpAddress": "10.0.0.4",
+      "correlationId": "00000000-0000-0000-bee2-6747bdfce306",
+      "properties": {
+        "endpoint": "/metadata/identity/oauth2/token",
+        "resource": "https://management.azure.com/",
+        "vmName": "webapp-vm-001",
+        "clientId": "00000000-0000-0000-9620-c3d50095e00e",
+        "userAgent": "azsdk-python-identity/1.14.0"
+      }
+    }
+
+# ============================================
+# AZURE FUNCTIONS LOG (FunctionAppLogs)
+# ============================================
+function_app_log:
+  example: |
+    {
+      "time": "2024-12-16T10:30:45.1234567Z",
+      "resourceId": "/SUBSCRIPTIONS/00000000-0000-0000-baf9-d9af542441b0/RESOURCEGROUPS/PRODUCTION-RG/PROVIDERS/MICROSOFT.WEB/SITES/PROD-DATA-PROCESSOR",
+      "operationName": "Microsoft.Web/sites/functions/invoke/action",
+      "category": "FunctionAppLogs",
+      "resultType": "Success",
+      "durationMs": 125,
+      "callerIpAddress": "172.30.0.100",
+      "correlationId": "00000000-0000-0000-bee2-6747bdfce306",
+      "properties": {
+        "functionName": "BlobProcessor",
+        "invocationId": "inv-12345678",
+        "triggerType": "blobTrigger",
+        "functionInvocationId": "00000000-0000-0000-43a6-109a282b8f74",
+        "blobPath": "uploads/customer-data.csv",
+        "executionStage": "Succeeded",
+        "hostInstanceId": "host-instance-id"
+      }
+    }
+
+# ============================================
+# EVENT GRID LOG (EventGridPublisherLogs)
+# ============================================
+event_grid_log:
+  example: |
+    {
+      "time": "2024-12-16T10:30:45.1234567Z",
+      "resourceId": "/SUBSCRIPTIONS/00000000-0000-0000-baf9-d9af542441b0/RESOURCEGROUPS/PRODUCTION-RG/PROVIDERS/MICROSOFT.EVENTGRID/TOPICS/STORAGE-EVENTS",
+      "operationName": "Microsoft.EventGrid/events/send",
+      "category": "PublishEvents",
+      "resultType": "Succeeded",
+      "durationMs": 15,
+      "callerIpAddress": "172.30.0.10",
+      "correlationId": "00000000-0000-0000-bee2-6747bdfce306",
+      "properties": {
+        "eventType": "Microsoft.Storage.BlobCreated",
+        "subject": "/blobServices/default/containers/uploads/blobs/data.csv",
+        "eventCount": 1,
+        "topicName": "storage-events"
+      }
+    }
+
+# ============================================
+# APP SERVICE HTTP LOGS (AppServiceHTTPLogs)
+# Source: https://learn.microsoft.com/en-us/azure/app-service/troubleshoot-diagnostic-logs
+# ============================================
+app_service_http_logs:
+  example: |
+    {
+      "TimeGenerated": "2024-12-16T10:30:45.1234567Z",
+      "CIp": "198.51.100.106",
+      "CsMethod": "POST",
+      "CsUriStem": "/_next/rsc",
+      "CsUriQuery": "",
+      "CsHost": "prod-webapp.azurewebsites.net",
+      "ScStatus": 200,
+      "ScBytes": 1234,
+      "CsBytes": 567,
+      "TimeTaken": 150,
+      "Result": "Success",
+      "UserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+      "Cookie": "-",
+      "Referer": "-",
+      "ComputerName": "RD00155D123456",
+      "SPort": "443",
+      "Protocol": "HTTP/1.1",
+      "_ResourceId": "/SUBSCRIPTIONS/00000000-0000-0000-baf9-d9af542441b0/RESOURCEGROUPS/PRODUCTION-RG/PROVIDERS/MICROSOFT.WEB/SITES/PROD-WEBAPP"
+    }
+
+  fields:
+    - name: time
+      type: datetime
+      description: "UTC timestamp in ISO 8601 format"
+      format: "YYYY-MM-DDTHH:MM:SS.fffffffZ"
+
+    - name: resourceId
+      type: string
+      description: "Azure Resource Manager resource ID (UPPERCASE)"
+      format: "/SUBSCRIPTIONS/{subscriptionId}/RESOURCEGROUPS/{resourceGroup}/PROVIDERS/MICROSOFT.WEB/SITES/{siteName}"
+
+    - name: category
+      type: string
+      description: "Log category"
+      value: "AppServiceHTTPLogs"
+
+    - name: operationName
+      type: string
+      description: "Operation name"
+      value: "Microsoft.Web/sites/log"
+
+    - name: CIp
+      type: string
+      description: "Client IP address"
+
+    - name: CsMethod
+      type: string
+      description: "HTTP method"
+      values: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"]
+
+    - name: CsUriStem
+      type: string
+      description: "Request URI path"
+      suspicious_patterns:
+        - "/_next/rsc"
+        - "/.env"
+        - "/api/debug"
+        - "/scm/"
+        - "/admin/"
+        - "/.git/"
+
+    - name: CsHost
+      type: string
+      description: "Host header value"
+
+    - name: ScStatus
+      type: integer
+      description: "HTTP status code"
+
+    - name: TimeTaken
+      type: integer
+      description: "Request time in milliseconds"
+
+    - name: UserAgent
+      type: string
+      description: "User-Agent header"
+      suspicious_patterns:
+        - "curl/"
+        - "python-requests"
+        - "wget"
+        - "nuclei"
+        - "nikto"
+
+    - name: Result
+      type: string
+      description: "Request result"
+      values: ["Success", "Failure"]
+
+  detection_patterns:
+    - name: "React2Shell RCE Attempt"
+      description: "Potential React Server Components RCE (CVE-2025-55182)"
+      indicators:
+        - "CsUriStem contains '/_next/rsc'"
+        - "CsMethod = 'POST'"
+        - "Large CsBytes (payload injection)"
+
+    - name: "Environment Exposure"
+      description: "Access to sensitive environment endpoints"
+      indicators:
+        - "CsUriStem contains '.env' or 'debug/env'"
+        - "ScStatus = 200"
+
+    - name: "Kudu/SCM Access"
+      description: "Access to App Service management endpoints"
+      indicators:
+        - "CsUriStem contains '/scm/'"
+        - "CsHost contains '.scm.'"
+
+# ============================================
+# LOG ANALYTICS QUERY LOGS (LAQueryLogs)
+# Source: https://learn.microsoft.com/en-us/azure/azure-monitor/logs/query-audit
+# ============================================
+la_query_logs:
+  description: |
+    Logs of queries executed against Log Analytics workspace.
+    Used for auditing who queried what data and when.
+
+  example: |
+    {
+      "time": "2024-12-16T10:30:45.1234567Z",
+      "category": "LAQueryLogs",
+      "operationName": "Query",
+      "resultType": "Success",
+      "correlationId": "00000000-0000-0000-bee2-6747bdfce306",
+      "properties": {
+        "queryText": "AuditEvent | where operationName contains 'listKeys' | summarize count() by callerIpAddress",
+        "timespan": "PT24H",
+        "resultCount": 5,
+        "durationMs": 250,
+        "workspaceId": "00000000-0000-0000-baf9-d9af542441b0",
+        "queryId": "q-a1b2c3d4-e5f6-7890",
+        "errorMessage": null
+      }
+    }
+
+  fields:
+    - name: time
+      type: datetime
+      description: "UTC timestamp in ISO 8601 format"
+      format: "YYYY-MM-DDTHH:MM:SS.fffffffZ"
+
+    - name: category
+      type: string
+      description: "Always 'LAQueryLogs' for query audit"
+      value: "LAQueryLogs"
+
+    - name: operationName
+      type: string
+      description: "Always 'Query' for query operations"
+      value: "Query"
+
+    - name: resultType
+      type: string
+      description: "Query execution result"
+      values: ["Success", "Failed", "PartialSuccess"]
+
+    - name: correlationId
+      type: guid
+      description: "GUID for correlating operations"
+
+    - name: properties.queryText
+      type: string
+      description: "KQL query text executed"
+
+    - name: properties.timespan
+      type: string
+      description: "Query time range (ISO 8601 duration)"
+      examples: ["PT1H", "PT24H", "P7D"]
+
+    - name: properties.resultCount
+      type: integer
+      description: "Number of rows returned"
+
+    - name: properties.durationMs
+      type: integer
+      description: "Query execution time in milliseconds"
+
+    - name: properties.workspaceId
+      type: guid
+      description: "Log Analytics workspace ID"
+
+    - name: properties.errorMessage
+      type: string
+      description: "Error message if query failed (null on success)"
+
+  detection_patterns:
+    - name: "Excessive Query Activity"
+      description: "Unusual volume of queries from single source"
+      indicators:
+        - "High query count in short time period"
+        - "Multiple failed queries (reconnaissance)"
+
+    - name: "Sensitive Data Query"
+      description: "Queries accessing sensitive log categories"
+      indicators:
+        - "queryText contains 'SignInLogs' or 'AuditEvent'"
+        - "Large result counts (data exfiltration)"
+
+# ============================================
+# AZURE FRONT DOOR ACCESS LOG (FrontDoorAccessLog)
+# Source: https://learn.microsoft.com/en-us/azure/frontdoor/front-door-diagnostics
+# ============================================
+front_door_access_log:
+  table: "FrontDoorAccessLog"
+  description: |
+    Azure Front Door access logs capture all HTTP requests processed by Front Door.
+    Used for monitoring traffic patterns, debugging routing issues, and correlating with WAF logs.
+
+  example: |
+    {
+      "time": "2026-01-13T10:30:00.0000000Z",
+      "resourceId": "/SUBSCRIPTIONS/00000000-0000-0000-baf9-d9af542441b0/RESOURCEGROUPS/PRODUCTION-RG/PROVIDERS/MICROSOFT.CDN/PROFILES/PROD-FRONTDOOR",
+      "category": "FrontDoorAccessLog",
+      "operationName": "Microsoft.Cdn/Profiles/FrontDoorAccessLog/Write",
+      "properties": {
+        "trackingReference": "0WE123abc456DEF789ghi",
+        "httpMethod": "POST",
+        "httpVersion": "HTTP/1.1",
+        "requestUri": "https://prod-webapp.azurefd.net:443/_next/rsc",
+        "hostName": "prod-webapp.azurefd.net",
+        "requestBytes": 256,
+        "responseBytes": 1024,
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        "referrer": "",
+        "clientIp": "198.51.100.106",
+        "socketIp": "198.51.100.106",
+        "clientPort": 54321,
+        "timeTaken": 0.045,
+        "timeToFirstByte": 0.023,
+        "requestProtocol": "HTTPS",
+        "securityProtocol": "TLSv1.2",
+        "securityCipher": "ECDHE-RSA-AES256-GCM-SHA384",
+        "sni": "prod-webapp.azurefd.net",
+        "endpoint": "prod-webapp.azurefd.net",
+        "httpStatusCode": 200,
+        "pop": "EUS",
+        "cacheStatus": "MISS",
+        "routeName": "default-route",
+        "matchedRulesSetName": "",
+        "originUrl": "http://172.30.20.10:8080/_next/rsc",
+        "originIp": "172.30.20.10",
+        "originName": "app-service-origin",
+        "errorInfo": "NoError",
+        "result": ""
+      }
+    }
+
+  fields:
+    - name: time
+      type: datetime
+      description: "UTC timestamp when Front Door edge delivered content"
+      format: "YYYY-MM-DDTHH:MM:SS.fffffffZ"
+
+    - name: resourceId
+      type: string
+      description: "Azure Resource Manager resource ID"
+      format: "/SUBSCRIPTIONS/{id}/RESOURCEGROUPS/{rg}/PROVIDERS/MICROSOFT.CDN/PROFILES/{profile}"
+
+    - name: category
+      type: string
+      value: "FrontDoorAccessLog"
+
+    - name: operationName
+      type: string
+      value: "Microsoft.Cdn/Profiles/FrontDoorAccessLog/Write"
+
+    - name: properties.trackingReference
+      type: string
+      description: "Unique reference string (sent in X-Azure-Ref header)"
+
+    - name: properties.httpMethod
+      type: string
+      values: ["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"]
+
+    - name: properties.httpVersion
+      type: string
+      values: ["HTTP/1.0", "HTTP/1.1", "HTTP/2.0"]
+
+    - name: properties.requestUri
+      type: string
+      description: "Full URI including scheme, port, domain, path, query string"
+
+    - name: properties.hostName
+      type: string
+      description: "Host name from request"
+
+    - name: properties.clientIp
+      type: string
+      description: "Client IP (from X-Forwarded-For if present)"
+
+    - name: properties.socketIp
+      type: string
+      description: "IP of direct connection to Azure Front Door"
+
+    - name: properties.httpStatusCode
+      type: integer
+      description: "HTTP status code (0 = timeout, 499 = client closed)"
+
+    - name: properties.timeTaken
+      type: float
+      description: "Duration in seconds from request received to last response byte"
+
+    - name: properties.timeToFirstByte
+      type: float
+      description: "Duration in seconds to first response byte"
+
+    - name: properties.requestProtocol
+      type: string
+      values: ["HTTP", "HTTPS", "WS", "WSS"]
+
+    - name: properties.securityProtocol
+      type: string
+      values: ["SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3", null]
+
+    - name: properties.pop
+      type: string
+      description: "Point of Presence that served the request"
+
+    - name: properties.cacheStatus
+      type: string
+      values: ["HIT", "MISS", "REMOTE_HIT", "PARTIAL_HIT", "CACHE_NOCONFIG", "PRIVATE_NOSTORE", "N/A"]
+
+    - name: properties.originUrl
+      type: string
+      description: "Full URL sent to origin (N/A if cached)"
+
+    - name: properties.originIp
+      type: string
+      description: "Origin IP (N/A if cached)"
+
+    - name: properties.errorInfo
+      type: string
+      values:
+        - "NoError"
+        - "CertificateError"
+        - "CertificateNameCheckFailed"
+        - "ClientDisconnected"
+        - "ClientGeoBlocked"
+        - "DNSFailure"
+        - "DNSTimeout"
+        - "OriginConnectionAborted"
+        - "OriginConnectionError"
+        - "OriginConnectionRefused"
+        - "OriginError"
+        - "OriginTimeout"
+        - "SSLHandshakeError"
+        - "SSLInvalidRootCA"
+        - "UnspecifiedError"
+
+  detection_patterns:
+    - name: "Suspicious RSC Endpoint Access"
+      description: "Access to React Server Components endpoint"
+      indicators:
+        - "requestUri contains '/_next/rsc'"
+        - "httpMethod = 'POST'"
+
+    - name: "High Error Rate from Origin"
+      description: "Backend connectivity issues"
+      indicators:
+        - "errorInfo != 'NoError'"
+        - "httpStatusCode >= 500"
+
+# ============================================
+# AZURE FRONT DOOR WAF LOG (FrontDoorWebApplicationFirewallLog)
+# Source: https://learn.microsoft.com/en-us/azure/web-application-firewall/afds/waf-front-door-monitor
+# ============================================
+front_door_waf_log:
+  description: |
+    Azure Front Door WAF logs capture requests that match WAF rules.
+    Critical for detecting and investigating web application attacks.
+    Use trackingReference to correlate with FrontDoorAccessLog.
+
+  example: |
+    {
+      "time": "2026-01-13T10:30:00.0000000Z",
+      "resourceId": "/SUBSCRIPTIONS/00000000-0000-0000-baf9-d9af542441b0/RESOURCEGROUPS/PRODUCTION-RG/PROVIDERS/MICROSOFT.CDN/PROFILES/PROD-FRONTDOOR",
+      "category": "FrontDoorWebApplicationFirewallLog",
+      "operationName": "Microsoft.Network/FrontDoorWebApplicationFirewallLog/Write",
+      "properties": {
+        "trackingReference": "0WE123abc456DEF789ghi",
+        "clientIP": "198.51.100.106",
+        "clientPort": "54321",
+        "socketIP": "198.51.100.106",
+        "requestUri": "https://prod-webapp.azurefd.net:443/_next/rsc",
+        "ruleName": "CUSTOM-001-PrototypePollution",
+        "policy": "React2ShellWAFPolicy",
+        "policyMode": "detection",
+        "action": "Log",
+        "host": "prod-webapp.azurefd.net",
+        "details": {
+          "matches": [
+            {
+              "matchVariableName": "RequestBody",
+              "matchVariableValue": "__proto__"
+            }
+          ]
+        }
+      }
+    }
+
+  fields:
+    - name: time
+      type: datetime
+      description: "UTC timestamp of WAF evaluation"
+      format: "YYYY-MM-DDTHH:MM:SS.fffffffZ"
+
+    - name: resourceId
+      type: string
+      description: "Azure Resource Manager resource ID"
+
+    - name: category
+      type: string
+      value: "FrontDoorWebApplicationFirewallLog"
+
+    - name: operationName
+      type: string
+      value: "Microsoft.Network/FrontDoorWebApplicationFirewallLog/Write"
+
+    - name: properties.trackingReference
+      type: string
+      description: "Links to corresponding FrontDoorAccessLog entry"
+
+    - name: properties.clientIP
+      type: string
+      description: "Client IP (from X-Forwarded-For if present)"
+
+    - name: properties.clientPort
+      type: string
+      description: "Client port number"
+
+    - name: properties.socketIP
+      type: string
+      description: "Source IP seen by WAF (TCP session)"
+
+    - name: properties.requestUri
+      type: string
+      description: "Full request URI"
+
+    - name: properties.ruleName
+      type: string
+      description: "WAF rule name (e.g., Microsoft_DefaultRuleSet-1.1-SQLI-942100)"
+
+    - name: properties.policy
+      type: string
+      description: "WAF policy name"
+
+    - name: properties.policyMode
+      type: string
+      values: ["prevention", "detection"]
+
+    - name: properties.action
+      type: string
+      values:
+        - "Allow"
+        - "Block"
+        - "Log"
+        - "AnomalyScoring"
+        - "JSChallengeIssued"
+        - "JSChallengePass"
+        - "JSChallengeValid"
+        - "JSChallengeBlock"
+
+    - name: properties.host
+      type: string
+      description: "Host header value"
+
+    - name: properties.details
+      type: object
+      fields:
+        - matches: "Array of matched patterns"
+
+    - name: properties.details.matches[].matchVariableName
+      type: string
+      description: "HTTP parameter matched (max 100 chars)"
+      examples:
+        - "RequestBody"
+        - "RequestUri"
+        - "QueryString"
+        - "RequestHeaders"
+        - "UserAgent"
+        - "QueryParamValue:q"
+
+    - name: properties.details.matches[].matchVariableValue
+      type: string
+      description: "Value that triggered the match (max 100 chars)"
+
+  detection_patterns:
+    - name: "Prototype Pollution Attempt"
+      description: "CVE-2025-55182 React2Shell attack"
+      indicators:
+        - "matchVariableValue contains '__proto__' or 'constructor'"
+        - "requestUri contains '/_next/rsc'"
+
+    - name: "SQL Injection Attack"
+      description: "SQL injection attempt detected by WAF"
+      indicators:
+        - "ruleName contains '942' (OWASP SQLI rules)"
+        - "action = 'Block'"
+
+    - name: "Scanner Activity"
+      description: "Automated scanning tools detected"
+      indicators:
+        - "ruleName contains '920' (Scanner detection rules)"
+        - "Multiple WAF matches from same clientIP"
+
+    - name: "Attack Chain Correlation"
+      description: "Correlate WAF detection with post-exploitation"
+      kql_query: |
+        let waf_events = AzureDiagnostics
+        | where Category == "FrontDoorWebApplicationFirewallLog"
+        | where action_s in ("Block", "Log")
+        | project trackingReference_s, clientIP_s, ruleName_s;
+        let access_events = AzureDiagnostics
+        | where Category == "FrontDoorAccessLog"
+        | project trackingReference_s, httpStatusCode_d, originUrl_s;
+        waf_events
+        | join kind=inner access_events on trackingReference_s
+
+# ============================================
+# AKS AUDIT LOG (AKSAudit)
+# Source: https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/aksaudit
+# ============================================
+aks_audit_log:
+  description: |
+    Contains all Kubernetes API Server audit logs including get and list verbs.
+    Captures control plane operations on the AKS cluster.
+
+  example: |
+    {
+      "TimeGenerated": "2025-10-31T14:30:45.123Z",
+      "AuditId": "00000000-0000-0000-bee2-6747bdfce306",
+      "Level": "RequestResponse",
+      "Stage": "ResponseComplete",
+      "Verb": "get",
+      "RequestUri": "/api/v1/namespaces/default/pods/nginx-deployment-66b6c48dd5-abc12",
+      "User": {
+        "username": "admin",
+        "uid": "admin-user-123",
+        "groups": ["system:masters"]
+      },
+      "SourceIps": ["192.168.1.100", "10.0.0.50"],
+      "UserAgent": "kubectl/v1.24.0",
+      "ObjectRef": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "namespace": "default",
+        "name": "nginx-deployment-66b6c48dd5-abc12",
+        "uid": "00000000-0000-0000-502b-16624e4c1cb1"
+      },
+      "ResponseStatus": {
+        "code": 200,
+        "message": "OK"
+      },
+      "RequestReceivedTime": "2025-10-31T14:30:45.123Z",
+      "StageReceivedTime": "2025-10-31T14:30:45.456Z",
+      "Annotations": {
+        "authorization.k8s.io/decision": "allow",
+        "authorization.k8s.io/reason": ""
+      }
+    }
+
+  fields:
+    - name: TimeGenerated
+      type: datetime
+      description: "Event generation time"
+
+    - name: AuditId
+      type: string
+      description: "Unique audit ID generated for each request"
+
+    - name: Level
+      type: string
+      values: ["None", "Metadata", "Request", "RequestResponse"]
+      description: "Audit level of the event"
+
+    - name: Stage
+      type: string
+      values: ["RequestReceived", "ResponseStarted", "ResponseComplete", "Panic"]
+      description: "Request handling stage"
+
+    - name: Verb
+      type: string
+      description: "Kubernetes verb (lowercase HTTP method)"
+      values: ["get", "list", "create", "update", "patch", "delete", "watch"]
+
+    - name: RequestUri
+      type: string
+      description: "URI as sent by client to server"
+
+    - name: User
+      type: object
+      description: "Authenticated user metadata"
+      fields:
+        - username: "string"
+        - uid: "string"
+        - groups: "array of strings"
+
+    - name: SourceIps
+      type: array
+      description: "Source IP addresses including intermediate proxies"
+
+    - name: UserAgent
+      type: string
+      description: "User agent from originating client"
+
+    - name: ObjectRef
+      type: object
+      description: "Kubernetes object reference"
+      fields:
+        - apiVersion: "string"
+        - kind: "string (Pod, Deployment, Secret, etc.)"
+        - namespace: "string"
+        - name: "string"
+        - uid: "string"
+
+    - name: ResponseStatus
+      type: object
+      fields:
+        - code: "integer (HTTP status code)"
+        - message: "string"
+
+    - name: Annotations
+      type: object
+      description: "Key-value map for additional context"
+
+# ============================================
+# KUBERNETES API AUDIT LOG (audit.k8s.io/v1)
+# Source: https://kubernetes.io/docs/tasks/debug/debug-cluster/audit/
+# ============================================
+kubernetes_api_audit_log:
+  description: |
+    Standard Kubernetes API server audit events.
+    Follows the audit.k8s.io/v1 Event schema.
+
+  example: |
+    {
+      "apiVersion": "audit.k8s.io/v1",
+      "kind": "Event",
+      "level": "RequestResponse",
+      "timestamp": "2024-01-15T10:30:45.123456Z",
+      "verb": "create",
+      "user": {
+        "username": "system:serviceaccount:production:hr-app-sa",
+        "uid": "sa-uid-12345",
+        "groups": ["system:serviceaccounts", "system:serviceaccounts:production"]
+      },
+      "sourceIPs": ["10.244.0.15"],
+      "userAgent": "python-requests/2.28.0",
+      "objectRef": {
+        "apiVersion": "v1",
+        "kind": "Secret",
+        "namespace": "production",
+        "name": "keyvault-credentials",
+        "uid": "87654321-abcd-1234-efgh-567890ijklmn"
+      },
+      "requestReceivedTimestamp": "2024-01-15T10:30:45.111111Z",
+      "stageTimestamp": "2024-01-15T10:30:45.123456Z",
+      "stage": "ResponseComplete",
+      "requestObject": {
+        "apiVersion": "v1",
+        "kind": "Secret",
+        "metadata": {"name": "keyvault-credentials", "namespace": "production"},
+        "type": "Opaque",
+        "data": {}
+      },
+      "responseObject": {
+        "apiVersion": "v1",
+        "kind": "Secret",
+        "metadata": {
+          "name": "keyvault-credentials",
+          "namespace": "production",
+          "uid": "87654321-abcd-1234-efgh-567890ijklmn",
+          "creationTimestamp": "2024-01-15T10:30:45Z"
+        }
+      }
+    }
+
+  fields:
+    - name: apiVersion
+      type: string
+      value: "audit.k8s.io/v1"
+
+    - name: kind
+      type: string
+      value: "Event"
+
+    - name: level
+      type: string
+      values: ["None", "Metadata", "Request", "RequestResponse"]
+
+    - name: timestamp
+      type: datetime
+      format: "RFC3339 with nanoseconds"
+
+    - name: verb
+      type: string
+      description: "HTTP verb or Kubernetes operation"
+      values: ["get", "list", "create", "update", "patch", "delete", "watch", "deletecollection"]
+
+    - name: user.username
+      type: string
+      description: "Username authenticated by the API server"
+
+    - name: user.groups
+      type: array
+      description: "Groups the user is a member of"
+
+    - name: sourceIPs
+      type: array
+      description: "Source IP addresses"
+
+    - name: objectRef
+      type: object
+      description: "Target Kubernetes resource"
+
+    - name: stage
+      type: string
+      values: ["RequestReceived", "ResponseStarted", "ResponseComplete", "Panic"]
+
+# ============================================
+# EXCHANGE ONLINE AUDIT LOG (ExchangeAdmin/ExchangeItem)
+# Source: https://learn.microsoft.com/en-us/purview/audit-log-activities
+# ============================================
+exchange_online_audit_log:
+  description: |
+    Exchange Online audit logs from Microsoft 365 Unified Audit Log.
+    RecordType: ExchangeAdmin (1) for admin operations, ExchangeItem (2) for mailbox actions.
+
+  example: |
+    {
+      "CreationTime": "2024-01-15T14:30:45.123Z",
+      "Id": "00000000-0000-0000-b773-315caf18da53",
+      "Operation": "MailItemsAccessed",
+      "OrganizationId": "00000000-0000-0000-4ccc-18d0da65623d",
+      "RecordType": 2,
+      "RecordTypeName": "ExchangeItem",
+      "ResultStatus": "Succeeded",
+      "UserKey": "user@contoso.com",
+      "UserId": "user@contoso.com",
+      "UserType": 0,
+      "Version": 1,
+      "Workload": "Exchange",
+      "ClientIP": "192.168.1.100",
+      "ClientIPAddress": "192.168.1.100",
+      "ClientInfoString": "Client=OWA;Action=ViaProxy",
+      "ObjectId": "cfo@contoso.com",
+      "Folder": {
+        "Path": "\\Inbox",
+        "Id": "AAMkADExM..."
+      },
+      "MailboxOwnerUPN": "cfo@contoso.com",
+      "MailboxOwnerSid": "S-1-5-21-...",
+      "InternetMessageId": "<msg001@contoso.com>",
+      "Subject": "Q4 Financial Results - CONFIDENTIAL",
+      "OperationCount": 1,
+      "LogonType": "Owner"
+    }
+
+  fields:
+    - name: CreationTime
+      type: datetime
+      description: "UTC timestamp when activity occurred"
+      format: "YYYY-MM-DDTHH:MM:SS.fffZ"
+
+    - name: Id
+      type: guid
+      description: "Unique ID for the audit record"
+
+    - name: Operation
+      type: string
+      description: "Activity name"
+      values: ["MailItemsAccessed", "Send", "SendAs", "SendOnBehalf", "Set-Mailbox", "New-MailboxExportRequest"]
+
+    - name: RecordType
+      type: integer
+      description: "Type of operation"
+      values:
+        1: "ExchangeAdmin"
+        2: "ExchangeItem"
+        3: "ExchangeItemGroup"
+
+    - name: Workload
+      type: string
+      value: "Exchange"
+
+    - name: UserId
+      type: string
+      description: "UPN of user who performed the action"
+
+    - name: ClientIP
+      type: string
+      description: "IP address of the device"
+
+    - name: ObjectId
+      type: string
+      description: "Mailbox or object affected"
+
+    - name: MailboxOwnerUPN
+      type: string
+      description: "UPN of the mailbox owner"
+
+    - name: Subject
+      type: string
+      description: "Email subject line (for MailItemsAccessed)"
+
+    - name: InternetMessageId
+      type: string
+      description: "Message-ID header value"
+
+    - name: LogonType
+      type: string
+      values: ["Owner", "Admin", "Delegate"]
+
+# ============================================
+# AZURE ACTIVITY LOG (AzureActivity)
+# Source: https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/azureactivity
+# ============================================
+azure_activity_log:
+  description: |
+    Entries from the Azure Activity log that provides insight into subscription-level events.
+    Includes ARM operations like resource creation, modification, and deletion.
+
+  example: |
+    {
+      "time": "2024-12-16T10:30:45.1234567Z",
+      "resourceId": "/subscriptions/00000000-0000-0000-baf9-d9af542441b0/resourceGroups/production-rg/providers/Microsoft.Storage/storageAccounts/proddata001",
+      "operationName": "Microsoft.Storage/storageAccounts/listKeys/action",
+      "category": "Administrative",
+      "resultType": "Success",
+      "resultSignature": "Succeeded",
+      "durationMs": 150,
+      "callerIpAddress": "172.30.0.100",
+      "correlationId": "00000000-0000-0000-bee2-6747bdfce306",
+      "level": "Informational",
+      "properties": {
+        "statusCode": "OK",
+        "serviceRequestId": "00000000-0000-0000-3aea-6073c901b345",
+        "eventCategory": "Administrative",
+        "entity": "/subscriptions/00000000-0000-0000-baf9-d9af542441b0/resourceGroups/production-rg/providers/Microsoft.Storage/storageAccounts/proddata001",
+        "message": "Microsoft.Storage/storageAccounts/listKeys/action",
+        "hierarchy": "00000000-0000-0000-baf9-d9af542441b0"
+      },
+      "authorization": {
+        "scope": "/subscriptions/00000000-0000-0000-baf9-d9af542441b0/resourceGroups/production-rg/providers/Microsoft.Storage/storageAccounts/proddata001",
+        "action": "Microsoft.Storage/storageAccounts/listKeys/action",
+        "evidence": {
+          "role": "Owner",
+          "roleAssignmentScope": "/subscriptions/00000000-0000-0000-baf9-d9af542441b0",
+          "roleDefinitionId": "8e3af657a8ff443ca75c2fe8c4bcb635"
+        }
+      },
+      "claims": {
+        "aud": "https://management.azure.com/",
+        "iss": "https://sts.windows.net/87654321-4321-4321-4321-cba987654321/",
+        "iat": "1702725600",
+        "nbf": "1702725600",
+        "exp": "1702729200",
+        "appid": "00000000-0000-0000-9620-c3d50095e00e",
+        "oid": "00000000-0000-0000-1498-2b249422673c"
+      }
+    }
+
+  fields:
+    - name: operationName
+      type: string
+      description: "ARM operation in Provider/ResourceType/action format"
+      examples:
+        - "Microsoft.Storage/storageAccounts/listKeys/action"
+        - "Microsoft.Storage/storageAccounts/write"
+        - "Microsoft.KeyVault/vaults/read"
+        - "Microsoft.Compute/virtualMachines/start/action"
+        - "Microsoft.Resources/subscriptions/resourceGroups/read"
+
+    - name: category
+      type: string
+      values: ["Administrative", "Security", "ServiceHealth", "Alert", "Policy", "Recommendation", "Autoscale"]
+
+    - name: resultType
+      type: string
+      values: ["Success", "Failure", "Start", "Accept"]
+
+    - name: level
+      type: string
+      values: ["Critical", "Error", "Warning", "Informational"]
+
+# ============================================
+# NETWORK SECURITY GROUP FLOW LOGS (AzureNetworkAnalytics_CL)
+# Source: https://learn.microsoft.com/en-us/azure/network-watcher/nsg-flow-logs-overview
+# ============================================
+nsg_flow_log:
+  description: |
+    Network Security Group (NSG) flow logs capture information about IP traffic.
+    Used for network forensics and threat detection.
+
+  example: |
+    {
+      "time": "2024-01-15T10:30:45.123Z",
+      "systemId": "00000000-0000-0000-baf9-d9af542441b0",
+      "macAddress": "00155D123456",
+      "category": "NetworkSecurityGroupFlowEvent",
+      "resourceId": "/SUBSCRIPTIONS/00000000-0000-0000-baf9-d9af542441b0/RESOURCEGROUPS/PRODUCTION-RG/PROVIDERS/MICROSOFT.NETWORK/NETWORKSECURITYGROUPS/PROD-NSG",
+      "operationName": "NetworkSecurityGroupFlowEvents",
+      "properties": {
+        "Version": 2,
+        "flows": [
+          {
+            "rule": "AllowVNetInBound",
+            "flows": [
+              {
+                "mac": "00155D123456",
+                "flowTuples": [
+                  "1702725045,172.30.10.20,172.30.20.10,443,8080,T,I,A,C,10,5120,5,2048"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+
+  fields:
+    - name: flowTuples
+      type: string
+      description: "Comma-separated flow data"
+      format: "timestamp,srcIP,dstIP,srcPort,dstPort,protocol,direction,decision,flowState,packets,bytes,packetsFromDst,bytesFromDst"
+
+    - name: rule
+      type: string
+      description: "NSG rule name that allowed/denied the flow"
+
+    - name: direction
+      type: string
+      values: ["I (Inbound)", "O (Outbound)"]
+
+    - name: decision
+      type: string
+      values: ["A (Allow)", "D (Deny)"]
+
+# ============================================
+# KUBERNETES POD LOGS (Container Logs)
+# For aks_pod mock service
+# ============================================
+aks_pod_http_log:
+  description: |
+    HTTP access logs from containers running in AKS pods.
+    Custom format for tracking web application activity.
+
+  example: |
+    {
+      "timestamp": "2024-12-16T10:30:45.123Z",
+      "pod": "hr-app-pod",
+      "namespace": "production",
+      "container": "hr-app",
+      "method": "POST",
+      "path": "/api/document/preview",
+      "status_code": 200,
+      "client_ip": "198.51.100.106",
+      "user_agent": "curl/7.68.0",
+      "request_id": "req-a1b2c3d4",
+      "duration_ms": 125,
+      "request_body_size": 256,
+      "response_body_size": 1024
+    }
+
+  fields:
+    - name: timestamp
+      type: datetime
+      format: "YYYY-MM-DDTHH:MM:SS.fffZ"
+
+    - name: pod
+      type: string
+      description: "Pod name"
+
+    - name: namespace
+      type: string
+      description: "Kubernetes namespace"
+
+    - name: method
+      type: string
+      values: ["GET", "POST", "PUT", "DELETE", "PATCH"]
+
+    - name: path
+      type: string
+      description: "HTTP request path"
+      suspicious_patterns:
+        - "/api/document/preview (SSRF vulnerability)"
+        - "/exec (RCE endpoint)"
+        - "/admin/* (admin endpoints)"
+
+    - name: status_code
+      type: integer
+      description: "HTTP response status"
+
+# ============================================
+# CONTAINER LOGS (ContainerLogs)
+# Source: https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/containerlog
+# ============================================
+container_logs:
+  description: |
+    Log lines collected from stdout and stderr streams for containers.
+    Used for application-level debugging and security monitoring of AKS workloads.
+
+  example: |
+    {
+      "TimeGenerated": "2024-12-16T10:30:45.1234567Z",
+      "Computer": "aks-nodepool1-12345678-vmss000000",
+      "ContainerId": "abc123def456789",
+      "ContainerName": "hr-app",
+      "PodName": "hr-app-deployment-7d8f9b6c5d-abc12",
+      "PodNamespace": "production",
+      "LogEntry": "INFO: Processing request from 172.30.0.100",
+      "LogEntrySource": "stdout",
+      "SourceSystem": "Containers",
+      "Image": "contoso.azurecr.io/hr-app:v1.2.3",
+      "ImageTag": "v1.2.3",
+      "Repository": "contoso.azurecr.io/hr-app",
+      "Name": "hr-app",
+      "Namespace": "production",
+      "PodUid": "00000000-0000-0000-baf9-d9af542441b0",
+      "PodLabel": "app=hr-app,version=v1",
+      "PodStatus": "Running",
+      "ClusterName": "prod-aks-cluster",
+      "ClusterId": "/subscriptions/00000000-0000-0000-baf9-d9af542441b0/resourceGroups/production-rg/providers/Microsoft.ContainerService/managedClusters/prod-aks-cluster"
+    }
+
+  fields:
+    - name: TimeGenerated
+      type: datetime
+      description: "UTC timestamp when log was generated"
+
+    - name: Computer
+      type: string
+      description: "AKS node hostname"
+
+    - name: ContainerId
+      type: string
+      description: "Docker container ID"
+
+    - name: ContainerName
+      type: string
+      description: "Container name within the pod"
+
+    - name: PodName
+      type: string
+      description: "Full pod name including deployment suffix"
+
+    - name: PodNamespace
+      type: string
+      description: "Kubernetes namespace"
+
+    - name: LogEntry
+      type: string
+      description: "Actual log line content"
+
+    - name: LogEntrySource
+      type: string
+      values: ["stdout", "stderr"]
+
+    - name: Image
+      type: string
+      description: "Full container image URL with tag"
+
+    - name: ClusterName
+      type: string
+      description: "AKS cluster name"
+
+    - name: ClusterId
+      type: string
+      description: "Azure resource ID of the AKS cluster"
+
+  detection_patterns:
+    - name: "Suspicious Command Execution"
+      indicators:
+        - "LogEntry contains '/bin/sh' or '/bin/bash'"
+        - "LogEntry contains 'curl' or 'wget'"
+
+    - name: "Credential Access Attempt"
+      indicators:
+        - "LogEntry contains 'IMDS' or '169.254.169.254'"
+        - "LogEntry contains 'token' or 'secret'"
+
+# ============================================
+# KUBE AUDIT LOGS (KubeAuditLogs)
+# Source: https://learn.microsoft.com/en-us/azure/aks/monitor-aks-reference#resource-logs
+# ============================================
+kube_audit_logs:
+  description: |
+    Kubernetes API server audit logs from AKS clusters.
+    Captures all API requests including authentication, authorization, and resource operations.
+
+  example: |
+    {
+      "TimeGenerated": "2024-12-16T10:30:45.1234567Z",
+      "Category": "kube-audit",
+      "OperationName": "Microsoft.ContainerService/managedClusters/audit/write",
+      "Level": "RequestResponse",
+      "AuditId": "00000000-0000-0000-bee2-6747bdfce306",
+      "Stage": "ResponseComplete",
+      "Verb": "create",
+      "RequestUri": "/api/v1/namespaces/production/secrets",
+      "User": {
+        "username": "system:serviceaccount:production:hr-app-sa",
+        "uid": "sa-uid-12345",
+        "groups": ["system:serviceaccounts", "system:serviceaccounts:production"]
+      },
+      "SourceIps": ["10.244.0.15"],
+      "UserAgent": "python-requests/2.28.0",
+      "ObjectRef": {
+        "apiVersion": "v1",
+        "kind": "Secret",
+        "namespace": "production",
+        "name": "stolen-credentials"
+      },
+      "ResponseStatus": {
+        "code": 201,
+        "message": "Created"
+      },
+      "RequestReceivedTime": "2024-12-16T10:30:45.111111Z",
+      "StageReceivedTime": "2024-12-16T10:30:45.123456Z",
+      "ClusterName": "prod-aks-cluster",
+      "ClusterId": "/subscriptions/00000000-0000-0000-baf9-d9af542441b0/resourceGroups/production-rg/providers/Microsoft.ContainerService/managedClusters/prod-aks-cluster"
+    }
+
+  fields:
+    - name: TimeGenerated
+      type: datetime
+      description: "Event generation time"
+
+    - name: Category
+      type: string
+      value: "kube-audit"
+
+    - name: AuditId
+      type: string
+      description: "Unique audit ID for request correlation"
+
+    - name: Level
+      type: string
+      values: ["None", "Metadata", "Request", "RequestResponse"]
+
+    - name: Stage
+      type: string
+      values: ["RequestReceived", "ResponseStarted", "ResponseComplete", "Panic"]
+
+    - name: Verb
+      type: string
+      description: "Kubernetes API verb"
+      values: ["get", "list", "create", "update", "patch", "delete", "watch", "deletecollection"]
+
+    - name: RequestUri
+      type: string
+      description: "Kubernetes API request path"
+
+    - name: User.username
+      type: string
+      description: "Authenticated username (user or service account)"
+
+    - name: User.groups
+      type: array
+      description: "Groups the user belongs to"
+
+    - name: SourceIps
+      type: array
+      description: "Source IP addresses"
+
+    - name: UserAgent
+      type: string
+      description: "Client user agent"
+
+    - name: ObjectRef.kind
+      type: string
+      description: "Resource type"
+      values: ["Pod", "Deployment", "Secret", "ConfigMap", "ServiceAccount", "Role", "RoleBinding"]
+
+    - name: ObjectRef.namespace
+      type: string
+      description: "Target namespace"
+
+    - name: ObjectRef.name
+      type: string
+      description: "Resource name"
+
+    - name: ResponseStatus.code
+      type: integer
+      description: "HTTP status code"
+
+    - name: ClusterName
+      type: string
+      description: "AKS cluster name"
+
+  detection_patterns:
+    - name: "Secret Access"
+      description: "Kubernetes secret read/create operations"
+      indicators:
+        - "ObjectRef.kind == 'Secret'"
+        - "Verb in ('get', 'list', 'create')"
+
+    - name: "Privilege Escalation"
+      description: "Role/RoleBinding modifications"
+      indicators:
+        - "ObjectRef.kind in ('Role', 'RoleBinding', 'ClusterRole', 'ClusterRoleBinding')"
+        - "Verb in ('create', 'update', 'patch')"
+
+    - name: "Pod Exec"
+      description: "Interactive shell access to pods"
+      indicators:
+        - "RequestUri contains '/exec'"
+        - "Verb == 'create'"
+
+# ============================================
+# MDE: DEVICE PROCESS EVENTS
+# Source: Microsoft Defender for Endpoint
+# Table: DeviceProcessEvents
+# ============================================
+device_process_events:
+  table: DeviceProcessEvents
+  description: |
+    DeviceProcessEvents — auto-generated from captured tenant schema (73 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AccountDomain, type: string}
+    - {name: AccountName, type: string}
+    - {name: AccountObjectId, type: string}
+    - {name: AccountSid, type: string}
+    - {name: AccountUpn, type: string}
+    - {name: ActionType, type: string}
+    - {name: AdditionalFields, type: object}
+    - {name: AppGuardContainerId, type: string}
+    - {name: CreatedProcessSessionId, type: integer}
+    - {name: DeviceId, type: string}
+    - {name: DeviceName, type: string}
+    - {name: FileName, type: string}
+    - {name: FileSize, type: integer}
+    - {name: FolderPath, type: string}
+    - {name: InitiatingProcessAccountDomain, type: string}
+    - {name: InitiatingProcessAccountName, type: string}
+    - {name: InitiatingProcessAccountObjectId, type: string}
+    - {name: InitiatingProcessAccountSid, type: string}
+    - {name: InitiatingProcessAccountUpn, type: string}
+    - {name: InitiatingProcessCommandLine, type: string}
+    - {name: InitiatingProcessCreationTime, type: datetime}
+    - {name: InitiatingProcessFileName, type: string}
+    - {name: InitiatingProcessFileSize, type: integer}
+    - {name: InitiatingProcessFolderPath, type: string}
+    - {name: InitiatingProcessId, type: integer}
+    - {name: InitiatingProcessIntegrityLevel, type: string}
+    - {name: InitiatingProcessLogonId, type: integer}
+    - {name: InitiatingProcessMD5, type: string}
+    - {name: InitiatingProcessParentCreationTime, type: datetime}
+    - {name: InitiatingProcessParentFileName, type: string}
+    - {name: InitiatingProcessParentId, type: integer}
+    - {name: InitiatingProcessRemoteSessionDeviceName, type: string}
+    - {name: InitiatingProcessRemoteSessionIP, type: string}
+    - {name: InitiatingProcessSHA1, type: string}
+    - {name: InitiatingProcessSHA256, type: string}
+    - {name: InitiatingProcessSessionId, type: integer}
+    - {name: InitiatingProcessSignatureStatus, type: string}
+    - {name: InitiatingProcessSignerType, type: string}
+    - {name: InitiatingProcessTokenElevation, type: string}
+    - {name: InitiatingProcessUniqueId, type: string}
+    - {name: InitiatingProcessVersionInfoCompanyName, type: string}
+    - {name: InitiatingProcessVersionInfoFileDescription, type: string}
+    - {name: InitiatingProcessVersionInfoInternalFileName, type: string}
+    - {name: InitiatingProcessVersionInfoOriginalFileName, type: string}
+    - {name: InitiatingProcessVersionInfoProductName, type: string}
+    - {name: InitiatingProcessVersionInfoProductVersion, type: string}
+    - {name: IsInitiatingProcessRemoteSession, type: boolean}
+    - {name: IsProcessRemoteSession, type: boolean}
+    - {name: LogonId, type: integer}
+    - {name: MD5, type: string}
+    - {name: MachineGroup, type: string}
+    - {name: ProcessCommandLine, type: string}
+    - {name: ProcessCreationTime, type: datetime}
+    - {name: ProcessId, type: integer}
+    - {name: ProcessIntegrityLevel, type: string}
+    - {name: ProcessRemoteSessionDeviceName, type: string}
+    - {name: ProcessRemoteSessionIP, type: string}
+    - {name: ProcessTokenElevation, type: string}
+    - {name: ProcessUniqueId, type: string}
+    - {name: ProcessVersionInfoCompanyName, type: string}
+    - {name: ProcessVersionInfoFileDescription, type: string}
+    - {name: ProcessVersionInfoInternalFileName, type: string}
+    - {name: ProcessVersionInfoOriginalFileName, type: string}
+    - {name: ProcessVersionInfoProductName, type: string}
+    - {name: ProcessVersionInfoProductVersion, type: string}
+    - {name: ReportId, type: integer}
+    - {name: SHA1, type: string}
+    - {name: SHA256, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Timestamp, type: datetime}
+    - {name: Type, type: string}
+device_registry_events:
+  table: DeviceRegistryEvents
+  description: |
+    DeviceRegistryEvents — auto-generated from captured tenant schema (48 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: ActionType, type: string}
+    - {name: AppGuardContainerId, type: string}
+    - {name: DeviceId, type: string}
+    - {name: DeviceName, type: string}
+    - {name: InitiatingProcessAccountDomain, type: string}
+    - {name: InitiatingProcessAccountName, type: string}
+    - {name: InitiatingProcessAccountObjectId, type: string}
+    - {name: InitiatingProcessAccountSid, type: string}
+    - {name: InitiatingProcessAccountUpn, type: string}
+    - {name: InitiatingProcessCommandLine, type: string}
+    - {name: InitiatingProcessCreationTime, type: datetime}
+    - {name: InitiatingProcessFileName, type: string}
+    - {name: InitiatingProcessFileSize, type: integer}
+    - {name: InitiatingProcessFolderPath, type: string}
+    - {name: InitiatingProcessId, type: integer}
+    - {name: InitiatingProcessIntegrityLevel, type: string}
+    - {name: InitiatingProcessMD5, type: string}
+    - {name: InitiatingProcessParentCreationTime, type: datetime}
+    - {name: InitiatingProcessParentFileName, type: string}
+    - {name: InitiatingProcessParentId, type: integer}
+    - {name: InitiatingProcessRemoteSessionDeviceName, type: string}
+    - {name: InitiatingProcessRemoteSessionIP, type: string}
+    - {name: InitiatingProcessSHA1, type: string}
+    - {name: InitiatingProcessSHA256, type: string}
+    - {name: InitiatingProcessSessionId, type: integer}
+    - {name: InitiatingProcessTokenElevation, type: string}
+    - {name: InitiatingProcessUniqueId, type: string}
+    - {name: InitiatingProcessVersionInfoCompanyName, type: string}
+    - {name: InitiatingProcessVersionInfoFileDescription, type: string}
+    - {name: InitiatingProcessVersionInfoInternalFileName, type: string}
+    - {name: InitiatingProcessVersionInfoOriginalFileName, type: string}
+    - {name: InitiatingProcessVersionInfoProductName, type: string}
+    - {name: InitiatingProcessVersionInfoProductVersion, type: string}
+    - {name: IsInitiatingProcessRemoteSession, type: boolean}
+    - {name: MachineGroup, type: string}
+    - {name: PreviousRegistryKey, type: string}
+    - {name: PreviousRegistryValueData, type: string}
+    - {name: PreviousRegistryValueName, type: string}
+    - {name: RegistryKey, type: string}
+    - {name: RegistryValueData, type: string}
+    - {name: RegistryValueName, type: string}
+    - {name: RegistryValueType, type: string}
+    - {name: ReportId, type: integer}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Timestamp, type: datetime}
+    - {name: Type, type: string}
+device_file_events:
+  table: DeviceFileEvents
+  description: |
+    DeviceFileEvents — auto-generated from captured tenant schema (63 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: ActionType, type: string}
+    - {name: AdditionalFields, type: object}
+    - {name: AppGuardContainerId, type: string}
+    - {name: DeviceId, type: string}
+    - {name: DeviceName, type: string}
+    - {name: FileName, type: string}
+    - {name: FileOriginIP, type: string}
+    - {name: FileOriginReferrerUrl, type: string}
+    - {name: FileOriginUrl, type: string}
+    - {name: FileSize, type: integer}
+    - {name: FolderPath, type: string}
+    - {name: InitiatingProcessAccountDomain, type: string}
+    - {name: InitiatingProcessAccountName, type: string}
+    - {name: InitiatingProcessAccountObjectId, type: string}
+    - {name: InitiatingProcessAccountSid, type: string}
+    - {name: InitiatingProcessAccountUpn, type: string}
+    - {name: InitiatingProcessCommandLine, type: string}
+    - {name: InitiatingProcessCreationTime, type: datetime}
+    - {name: InitiatingProcessFileName, type: string}
+    - {name: InitiatingProcessFileSize, type: integer}
+    - {name: InitiatingProcessFolderPath, type: string}
+    - {name: InitiatingProcessId, type: integer}
+    - {name: InitiatingProcessIntegrityLevel, type: string}
+    - {name: InitiatingProcessMD5, type: string}
+    - {name: InitiatingProcessParentCreationTime, type: datetime}
+    - {name: InitiatingProcessParentFileName, type: string}
+    - {name: InitiatingProcessParentId, type: integer}
+    - {name: InitiatingProcessRemoteSessionDeviceName, type: string}
+    - {name: InitiatingProcessRemoteSessionIP, type: string}
+    - {name: InitiatingProcessSHA1, type: string}
+    - {name: InitiatingProcessSHA256, type: string}
+    - {name: InitiatingProcessSessionId, type: integer}
+    - {name: InitiatingProcessTokenElevation, type: string}
+    - {name: InitiatingProcessUniqueId, type: string}
+    - {name: InitiatingProcessVersionInfoCompanyName, type: string}
+    - {name: InitiatingProcessVersionInfoFileDescription, type: string}
+    - {name: InitiatingProcessVersionInfoInternalFileName, type: string}
+    - {name: InitiatingProcessVersionInfoOriginalFileName, type: string}
+    - {name: InitiatingProcessVersionInfoProductName, type: string}
+    - {name: InitiatingProcessVersionInfoProductVersion, type: string}
+    - {name: IsAzureInfoProtectionApplied, type: boolean}
+    - {name: IsInitiatingProcessRemoteSession, type: boolean}
+    - {name: MD5, type: string}
+    - {name: MachineGroup, type: string}
+    - {name: PreviousFileName, type: string}
+    - {name: PreviousFolderPath, type: string}
+    - {name: ReportId, type: integer}
+    - {name: RequestAccountDomain, type: string}
+    - {name: RequestAccountName, type: string}
+    - {name: RequestAccountSid, type: string}
+    - {name: RequestProtocol, type: string}
+    - {name: RequestSourceIP, type: string}
+    - {name: RequestSourcePort, type: int}
+    - {name: SHA1, type: string}
+    - {name: SHA256, type: string}
+    - {name: SensitivityLabel, type: string}
+    - {name: SensitivitySubLabel, type: string}
+    - {name: ShareName, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Timestamp, type: datetime}
+    - {name: Type, type: string}
+device_network_events:
+  table: DeviceNetworkEvents
+  description: |
+    DeviceNetworkEvents — auto-generated from captured tenant schema (50 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: ActionType, type: string}
+    - {name: AdditionalFields, type: object}
+    - {name: AppGuardContainerId, type: string}
+    - {name: DeviceId, type: string}
+    - {name: DeviceName, type: string}
+    - {name: InitiatingProcessAccountDomain, type: string}
+    - {name: InitiatingProcessAccountName, type: string}
+    - {name: InitiatingProcessAccountObjectId, type: string}
+    - {name: InitiatingProcessAccountSid, type: string}
+    - {name: InitiatingProcessAccountUpn, type: string}
+    - {name: InitiatingProcessCommandLine, type: string}
+    - {name: InitiatingProcessCreationTime, type: datetime}
+    - {name: InitiatingProcessFileName, type: string}
+    - {name: InitiatingProcessFileSize, type: integer}
+    - {name: InitiatingProcessFolderPath, type: string}
+    - {name: InitiatingProcessId, type: integer}
+    - {name: InitiatingProcessIntegrityLevel, type: string}
+    - {name: InitiatingProcessMD5, type: string}
+    - {name: InitiatingProcessParentCreationTime, type: datetime}
+    - {name: InitiatingProcessParentFileName, type: string}
+    - {name: InitiatingProcessParentId, type: integer}
+    - {name: InitiatingProcessRemoteSessionDeviceName, type: string}
+    - {name: InitiatingProcessRemoteSessionIP, type: string}
+    - {name: InitiatingProcessSHA1, type: string}
+    - {name: InitiatingProcessSHA256, type: string}
+    - {name: InitiatingProcessSessionId, type: integer}
+    - {name: InitiatingProcessTokenElevation, type: string}
+    - {name: InitiatingProcessUniqueId, type: string}
+    - {name: InitiatingProcessVersionInfoCompanyName, type: string}
+    - {name: InitiatingProcessVersionInfoFileDescription, type: string}
+    - {name: InitiatingProcessVersionInfoInternalFileName, type: string}
+    - {name: InitiatingProcessVersionInfoOriginalFileName, type: string}
+    - {name: InitiatingProcessVersionInfoProductName, type: string}
+    - {name: InitiatingProcessVersionInfoProductVersion, type: string}
+    - {name: IsInitiatingProcessRemoteSession, type: boolean}
+    - {name: LocalIP, type: string}
+    - {name: LocalIPType, type: string}
+    - {name: LocalPort, type: int}
+    - {name: MachineGroup, type: string}
+    - {name: Protocol, type: string}
+    - {name: RemoteIP, type: string}
+    - {name: RemoteIPType, type: string}
+    - {name: RemotePort, type: int}
+    - {name: RemoteUrl, type: string}
+    - {name: ReportId, type: integer}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Timestamp, type: datetime}
+    - {name: Type, type: string}
+device_image_load_events:
+  table: DeviceImageLoadEvents
+  description: |
+    DeviceImageLoadEvents — auto-generated from captured tenant schema (47 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: ActionType, type: string}
+    - {name: AppGuardContainerId, type: string}
+    - {name: DeviceId, type: string}
+    - {name: DeviceName, type: string}
+    - {name: FileName, type: string}
+    - {name: FileSize, type: integer}
+    - {name: FolderPath, type: string}
+    - {name: InitiatingProcessAccountDomain, type: string}
+    - {name: InitiatingProcessAccountName, type: string}
+    - {name: InitiatingProcessAccountObjectId, type: string}
+    - {name: InitiatingProcessAccountSid, type: string}
+    - {name: InitiatingProcessAccountUpn, type: string}
+    - {name: InitiatingProcessCommandLine, type: string}
+    - {name: InitiatingProcessCreationTime, type: datetime}
+    - {name: InitiatingProcessFileName, type: string}
+    - {name: InitiatingProcessFileSize, type: integer}
+    - {name: InitiatingProcessFolderPath, type: string}
+    - {name: InitiatingProcessId, type: integer}
+    - {name: InitiatingProcessIntegrityLevel, type: string}
+    - {name: InitiatingProcessMD5, type: string}
+    - {name: InitiatingProcessParentCreationTime, type: datetime}
+    - {name: InitiatingProcessParentFileName, type: string}
+    - {name: InitiatingProcessParentId, type: integer}
+    - {name: InitiatingProcessRemoteSessionDeviceName, type: string}
+    - {name: InitiatingProcessRemoteSessionIP, type: string}
+    - {name: InitiatingProcessSHA1, type: string}
+    - {name: InitiatingProcessSHA256, type: string}
+    - {name: InitiatingProcessSessionId, type: integer}
+    - {name: InitiatingProcessTokenElevation, type: string}
+    - {name: InitiatingProcessUniqueId, type: string}
+    - {name: InitiatingProcessVersionInfoCompanyName, type: string}
+    - {name: InitiatingProcessVersionInfoFileDescription, type: string}
+    - {name: InitiatingProcessVersionInfoInternalFileName, type: string}
+    - {name: InitiatingProcessVersionInfoOriginalFileName, type: string}
+    - {name: InitiatingProcessVersionInfoProductName, type: string}
+    - {name: InitiatingProcessVersionInfoProductVersion, type: string}
+    - {name: IsInitiatingProcessRemoteSession, type: boolean}
+    - {name: MD5, type: string}
+    - {name: MachineGroup, type: string}
+    - {name: ReportId, type: integer}
+    - {name: SHA1, type: string}
+    - {name: SHA256, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Timestamp, type: datetime}
+    - {name: Type, type: string}
+adfs_audit_log:
+  description: |
+    AD Federation Services audit events covering authentication,
+    token issuance, federation metadata access, and DKM key operations.
+    Critical for detecting Golden SAML attack chains (T1606.002).
+
+  example: |
+    {
+      "Timestamp": "2024-06-27T14:32:06.000Z",
+      "EventID": 501,
+      "Level": "Information",
+      "Source": "AD FS Auditing",
+      "Activity": "Token issuance success",
+      "Message": "A token was successfully issued for relying party https://graph.microsoft.com",
+      "UserPrincipalName": "taylor.ramsey@contoso.com",
+      "ClientIP": "10.0.0.50",
+      "RelyingParty": "https://graph.microsoft.com",
+      "TokenType": "SAML2.0",
+      "ClaimTypes": ["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn"],
+      "AuthenticationMethod": "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+      "CorrelationId": "00000000-0000-0000-bee2-6747bdfce306"
+    }
+
+  fields:
+    - name: Timestamp
+      type: datetime
+      description: "UTC timestamp of the ADFS event"
+
+    - name: EventID
+      type: integer
+      description: "Windows Event ID"
+      values:
+        299: "Federation metadata request"
+        403: "Token validation failure"
+        411: "Security token validation failure"
+        501: "Token issuance success"
+        510: "Token issuance failure"
+        1007: "Certificate validation error"
+        4662: "LDAP read on DKM container (Directory Service Access)"
+
+    - name: Level
+      type: string
+      values: ["Information", "Warning", "Error"]
+
+    - name: Source
+      type: string
+      description: "Event source"
+      values: ["AD FS Auditing", "AD FS", "Directory Service"]
+
+    - name: Activity
+      type: string
+      description: "Human-readable activity description"
+
+    - name: Message
+      type: string
+      description: "Full event message"
+
+    - name: UserPrincipalName
+      type: string
+      description: "UPN of the user involved"
+
+    - name: ClientIP
+      type: string
+      description: "Client IP address"
+
+    - name: RelyingParty
+      type: string
+      description: "Target relying party trust URI"
+
+    - name: TokenType
+      type: string
+      values: ["SAML1.1", "SAML2.0", "JWT"]
+
+    - name: AuthenticationMethod
+      type: string
+      description: "SAML authentication context class"
+
+    - name: CorrelationId
+      type: guid
+      description: "Correlation GUID for multi-event flows"
+
+  detection_patterns:
+    - name: "DKM Key Access"
+      description: "ADFS Distributed Key Management container read — potential Golden SAML preparation"
+      indicators:
+        - "EventID == 4662"
+        - "Message contains 'CryptoPolicy' or 'DKM'"
+
+    - name: "Token Forging Anomaly"
+      description: "Token issued outside normal ADFS flow"
+      indicators:
+        - "EventID == 501"
+        - "ClientIP is external or unexpected"
+        - "AuthenticationMethod mismatch with policy"
+
+    - name: "Federation Metadata Reconnaissance"
+      description: "Unusual federation metadata access"
+      indicators:
+        - "EventID == 299"
+        - "ClientIP is not a known federation partner"
+
+# ============================================
+# ALERT EVIDENCE (AlertEvidence)
+# Source: Microsoft 365 Defender / MCAS / MTP
+# Table: AlertEvidence
+# ============================================
+alert_evidence:
+  table: AlertEvidence
+  description: |
+    AlertEvidence — auto-generated from captured tenant schema (43 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AccountDomain, type: string}
+    - {name: AccountName, type: string}
+    - {name: AccountObjectId, type: string}
+    - {name: AccountSid, type: string}
+    - {name: AccountUpn, type: string}
+    - {name: AdditionalFields, type: object}
+    - {name: AlertId, type: string}
+    - {name: Application, type: string}
+    - {name: ApplicationId, type: int}
+    - {name: AttackTechniques, type: string}
+    - {name: Categories, type: string}
+    - {name: CloudPlatform, type: string}
+    - {name: CloudResource, type: string}
+    - {name: DetectionSource, type: string}
+    - {name: DeviceId, type: string}
+    - {name: DeviceName, type: string}
+    - {name: EmailSubject, type: string}
+    - {name: EntityType, type: string}
+    - {name: EvidenceDirection, type: string}
+    - {name: EvidenceRole, type: string}
+    - {name: FileName, type: string}
+    - {name: FileSize, type: integer}
+    - {name: FolderPath, type: string}
+    - {name: LocalIP, type: string}
+    - {name: NetworkMessageId, type: string}
+    - {name: OAuthApplicationId, type: string}
+    - {name: ProcessCommandLine, type: string}
+    - {name: RegistryKey, type: string}
+    - {name: RegistryValueData, type: string}
+    - {name: RegistryValueName, type: string}
+    - {name: RemoteIP, type: string}
+    - {name: RemoteUrl, type: string}
+    - {name: SHA1, type: string}
+    - {name: SHA256, type: string}
+    - {name: ServiceSource, type: string}
+    - {name: Severity, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: ThreatFamily, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Timestamp, type: datetime}
+    - {name: Title, type: string}
+    - {name: Type, type: string}
+lateral_movement_events:
+  description: |
+    Custom log schema for lateral movement events generated by the
+    lateral-movement-coordinator mock service. Captures PsExec, WMI,
+    SMB, RDP, and Impacket movement across hosts.
+
+  example: |
+    {
+      "Timestamp": "2024-06-27T14:35:00.000Z",
+      "MovementType": "psexec",
+      "SourceHost": "vnevado-win10v",
+      "TargetHost": "vnevado-win10b",
+      "SourceUser": "kyleg",
+      "Command": "cmd.exe /c whoami",
+      "SourceEvents": 2,
+      "TargetEvents": 2,
+      "TargetPid": 9012,
+      "Status": "success"
+    }
+
+  fields:
+    - name: Timestamp
+      type: datetime
+      description: "UTC timestamp of the lateral movement event"
+
+    - name: MovementType
+      type: string
+      description: "Type of lateral movement technique used"
+      values: ["psexec", "wmi", "smb_copy", "rdp", "impacket"]
+
+    - name: SourceHost
+      type: string
+      description: "Hostname of the source machine"
+
+    - name: TargetHost
+      type: string
+      description: "Hostname of the target machine"
+
+    - name: SourceUser
+      type: string
+      description: "User account performing the lateral movement"
+
+    - name: Command
+      type: string
+      description: "Command executed on the target (for psexec/wmi)"
+
+    - name: Status
+      type: string
+      values: ["success", "failed", "partial"]
+
+  detection_patterns:
+    - name: "Cross-Host Lateral Movement"
+      description: "Movement between two different hosts"
+      indicators:
+        - "SourceHost != TargetHost"
+        - "MovementType in ('psexec', 'wmi', 'impacket')"
+
+# ============================================
+# ALERT INFO (AlertInfo)
+# Source: Microsoft Defender for Endpoint / MDATP Alert Engine
+# Table: AlertInfo
+# ============================================
+alert_info:
+  table: AlertInfo
+  description: |
+    AlertInfo — auto-generated from captured tenant schema (12 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AlertId, type: string}
+    - {name: AttackTechniques, type: string}
+    - {name: Category, type: string}
+    - {name: DetectionSource, type: string}
+    - {name: ServiceSource, type: string}
+    - {name: Severity, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Timestamp, type: datetime}
+    - {name: Title, type: string}
+    - {name: Type, type: string}
+threat_intel_indicators:
+  description: |
+    Threat intelligence indicators (IOCs) from Microsoft Defender Threat
+    Intelligence and connected TI feeds. Each row is a STIX indicator with
+    an observable (IP, domain, URL, file hash) plus confidence, validity
+    window, and MITRE-tagged metadata. Used by detection/threat-intel agents
+    to correlate environment telemetry against known-bad indicators.
+
+  example: |
+    {
+      "Id": "TWljcm9zb2Z0IERlZmVuZGVyIFRocmVhdCBJbnRlbGxpZ2VuY2U=---indicator--00000000-0000-0000-6d40-0f39fab5a4d0",
+      "ObservableKey": "network-traffic:src_ref.value",
+      "ObservableValue": "198.51.100.247",
+      "Pattern": "[network-traffic:src_ref.value = '198.51.100.247']",
+      "Type": "ThreatIntelIndicators",
+      "Confidence": 100,
+      "IsActive": true,
+      "IsDeleted": false,
+      "Revoked": false,
+      "ValidFrom": "2026-06-18T18:54:44.8308243Z",
+      "ValidUntil": "2026-06-18T23:53:13.8428619Z",
+      "Created": "2026-05-28T16:55:22.5639243Z",
+      "Modified": "2026-06-18T18:54:44.8308243Z",
+      "Tags": "honeypot,p:default,ic:100,vic:100",
+      "AdditionalFields": "{\"TLPLevel\":\"Green\"}",
+      "Data": "{\"pattern\":\"[network-traffic:src_ref.value = '198.51.100.247']\",\"indicator_types\":[\"Botnet\"],\"confidence\":100,\"type\":\"indicator\"}",
+      "SourceSystem": "Microsoft Defender Threat Intelligence",
+      "LastUpdateMethod": "BasicMDTIConnector",
+      "TenantId": "87654321-4321-4321-4321-cba987654321",
+      "AzureTenantId": "87654321-4321-4321-4321-cba987654321",
+      "WorkspaceId": "87654321-4321-4321-4321-cba987654321",
+      "TimeGenerated": "2026-06-18T19:15:09.1780000Z"
+    }
+
+  fields:
+    - name: Id
+      type: string
+      description: "Unique indicator identifier (connector-prefixed STIX id)"
+    - name: ObservableKey
+      type: string
+      description: "STIX observable path"
+      values:
+        - "network-traffic:src_ref.value"
+        - "domain-name:value"
+        - "url:value"
+        - "file:hashes.MD5"
+        - "file:hashes.'SHA-256'"
+        - "file:hashes.'SHA-1'"
+        - "email-addr:value"
+    - name: ObservableValue
+      type: string
+      description: "The IOC value (IP, domain, URL, hash, email)"
+    - name: Pattern
+      type: string
+      description: "STIX pattern expression"
+    - name: Type
+      type: string
+      description: "Always 'ThreatIntelIndicators'"
+    - name: Confidence
+      type: integer
+      description: "Confidence score 0-100"
+    - name: IsActive
+      type: boolean
+    - name: IsDeleted
+      type: boolean
+    - name: Revoked
+      type: boolean
+    - name: ValidFrom
+      type: datetime
+    - name: ValidUntil
+      type: datetime
+    - name: Created
+      type: datetime
+    - name: Modified
+      type: datetime
+    - name: Tags
+      type: string
+      description: "Comma-separated tags including MITRE technique attack-patterns"
+    - name: AdditionalFields
+      type: object
+      description: "JSON string with TLPLevel etc."
+    - name: Data
+      type: object
+      description: "Full STIX indicator JSON"
+    - name: SourceSystem
+      type: string
+    - name: LastUpdateMethod
+      type: string
+    - name: TenantId
+      type: string
+    - name: AzureTenantId
+      type: string
+    - name: WorkspaceId
+      type: string
+    - name: TimeGenerated
+      type: datetime
+
+# ============================================
+# EXPOSURE GRAPH NODES (ExposureGraphNodes)
+# Source: Microsoft Security Exposure Management (enterprise exposure graph)
+# Table: ExposureGraphNodes  (snapshot — no TimeGenerated column)
+# Schema mirrors live tenant getschema export (9 columns).
+# ============================================
+exposure_graph_nodes:
+  description: |
+    Nodes of the Microsoft Security Exposure Management graph — assets and
+    identities (users, groups, devices, VMs, storage, container images, CVEs,
+    role assignments, security recommendations). Used by posture/exposure
+    agents to reason about attack surface. Snapshot table (no TimeGenerated).
+
+  example: |
+    {
+      "NodeId": "14b3bca440d9427a89dd6a4ec8ca7d18",
+      "NodeLabel": "user",
+      "NodeName": "user-attacker-s1ss01",
+      "Categories": ["environmentAzure", "environmentCloud", "identities", "identity", "user_account"],
+      "EntityIds": ["{\"type\":\"AadObjectId\",\"id\":\"tenantid=87654321-4321-4321-4321-cba987654321;objectid=00000000-0000-0000-6484-d0bb2771dc06\"}"],
+      "NodeProperties": {"rawData": {"accountUpn": "quinn.barrett@contoso.com", "accountObjectId": "00000000-0000-0000-6484-d0bb2771dc06", "identityType": "User", "primaryProvider": "AzureActiveDirectory"}},
+      "SourceSystem": "",
+      "TenantId": "87654321-4321-4321-4321-cba987654321",
+      "Type": "ExposureGraphNodes"
+    }
+
+  fields:
+    - name: NodeId
+      type: string
+      description: "Stable node identifier (hex)"
+    - name: NodeLabel
+      type: string
+      description: "Node kind"
+      values:
+        - "user"
+        - "group"
+        - "device"
+        - "Cve"
+        - "container-image"
+        - "microsoft.authorization/roleassignments"
+        - "mdcSecurityRecommendation"
+    - name: NodeName
+      type: string
+      description: "Display name of the asset/identity"
+    - name: Categories
+      type: array
+      description: "Classification tags (environment, identity, etc.)"
+    - name: EntityIds
+      type: array
+      description: "Typed entity identifiers (AadObjectId, SecurityIdentifier, etc.)"
+    - name: NodeProperties
+      type: object
+      description: "Provider-specific properties under rawData"
+    - name: SourceSystem
+      type: string
+    - name: TenantId
+      type: string
+    - name: Type
+      type: string
+      description: "Always 'ExposureGraphNodes'"
+
+# ============================================
+# EXPOSURE GRAPH EDGES (ExposureGraphEdges)
+# Source: Microsoft Security Exposure Management (enterprise exposure graph)
+# Table: ExposureGraphEdges  (snapshot — no TimeGenerated column)
+# Schema mirrors live tenant getschema export (14 columns).
+# ============================================
+exposure_graph_edges:
+  description: |
+    Edges of the Microsoft Security Exposure Management graph — relationships
+    between nodes (e.g. user "member of" group, CVE "affecting" container-image,
+    identity "has role"/"can authenticate as"). Used by posture/exposure agents
+    to trace attack paths. Snapshot table (no TimeGenerated).
+
+  example: |
+    {
+      "EdgeId": "87654321-4321-4321-4321-cba987654321_EBF033C252503265836E11319C196896",
+      "EdgeLabel": "member of",
+      "SourceNodeId": "14b3bca440d9427a89dd6a4ec8ca7d18",
+      "SourceNodeName": "user-attacker-s1ss01",
+      "SourceNodeLabel": "user",
+      "SourceNodeCategories": ["identities", "identity", "user_account"],
+      "TargetNodeId": "4635ceec335d4fb9a0059097f3c8980c",
+      "TargetNodeName": "group-tenant-admins-s1ss01",
+      "TargetNodeLabel": "group",
+      "TargetNodeCategories": ["identities", "identity", "user_group"],
+      "EdgeProperties": {"rawData": {}},
+      "SourceSystem": "",
+      "TenantId": "87654321-4321-4321-4321-cba987654321",
+      "Type": "ExposureGraphEdges"
+    }
+
+  fields:
+    - name: EdgeId
+      type: string
+      description: "Stable edge identifier (tenantId_hash)"
+    - name: EdgeLabel
+      type: string
+      description: "Relationship type"
+      values:
+        - "member of"
+        - "affecting"
+        - "contains"
+        - "has role"
+        - "can authenticate as"
+        - "owns"
+        - "has permissions to"
+    - name: SourceNodeId
+      type: string
+    - name: SourceNodeName
+      type: string
+    - name: SourceNodeLabel
+      type: string
+    - name: SourceNodeCategories
+      type: array
+    - name: TargetNodeId
+      type: string
+    - name: TargetNodeName
+      type: string
+    - name: TargetNodeLabel
+      type: string
+    - name: TargetNodeCategories
+      type: array
+    - name: EdgeProperties
+      type: object
+    - name: SourceSystem
+      type: string
+    - name: TenantId
+      type: string
+    - name: Type
+      type: string
+      description: "Always 'ExposureGraphEdges'"
+
+# ============================================
+# IDENTITY INFO (IdentityInfo)
+# Source: Microsoft Defender XDR / Microsoft Sentinel UEBA identity inventory
+# Table: IdentityInfo  (snapshot — latest record per identity)
+# Schema mirrors live tenant getschema export (subset of 51 columns).
+# ============================================
+identity_info:
+  description: |
+    Per-identity inventory enrichment from Microsoft Sentinel UEBA / Defender XDR.
+    One row per account with criticality, assigned roles, PIM roles, group
+    membership, risk, and directory attributes. Used by posture/recon/detection
+    agents to enrich identities discovered in the attack chain.
+
+  example: |
+    {
+      "AccountUpn": "user-attacker@contoso.com",
+      "TimeGenerated": "2026-06-04T19:23:03.9372852Z",
+      "AccountObjectId": "00000000-0000-0000-6a85-85b6cab308d9",
+      "AccountDisplayName": "user-attacker",
+      "AccountName": "user-attacker",
+      "AccountDomain": "contoso.com",
+      "CriticalityLevel": 4,
+      "Type": "User",
+      "CloudSid": "S-1-12-1-3143412435-1210893047-1516006784-3011391012",
+      "IsAccountEnabled": 1,
+      "CreatedDateTime": "2026-05-29T21:31:42Z",
+      "SourceProvider": "AzureActiveDirectory",
+      "IdentityEnvironment": "Cloud",
+      "PrivilegedEntraPimRoles": null,
+      "AssignedRoles": null,
+      "GroupMembership": null,
+      "RiskLevel": "",
+      "BlastRadius": "",
+      "TenantId": ""
+    }
+
+  fields:
+    - name: AccountUpn
+      type: string
+    - name: TimeGenerated
+      type: datetime
+    - name: AccountObjectId
+      type: string
+    - name: AccountDisplayName
+      type: string
+    - name: AccountName
+      type: string
+    - name: AccountDomain
+      type: string
+    - name: CriticalityLevel
+      type: integer
+      description: "Asset criticality (lower = more critical; 0-4 typical)"
+    - name: Type
+      type: string
+      values: ["User", "ServicePrincipal", "Device"]
+    - name: CloudSid
+      type: string
+    - name: IsAccountEnabled
+      type: integer
+    - name: CreatedDateTime
+      type: datetime
+    - name: SourceProvider
+      type: string
+    - name: IdentityEnvironment
+      type: string
+      values: ["Cloud", "Hybrid", "OnPrem"]
+    - name: PrivilegedEntraPimRoles
+      type: array
+    - name: AssignedRoles
+      type: array
+    - name: GroupMembership
+      type: array
+    - name: RiskLevel
+      type: string
+    - name: BlastRadius
+      type: string
+    - name: TenantId
+      type: string
+
+# ============================================
+# BEHAVIOR ANALYTICS (BehaviorAnalytics)
+# Source: Microsoft Sentinel UEBA (Entity Behavior Analytics)
+# Table: BehaviorAnalytics  (derived anomaly/behavior event stream)
+# Schema mirrors live tenant getschema export (30 columns).
+# ============================================
+behavior_analytics:
+  description: |
+    Entity Behavior Analytics records from Microsoft Sentinel UEBA. Each row is
+    a user/device activity enriched with anomaly insights and an investigation
+    priority. Used by detection/posture agents to spot anomalous behavior tied to
+    the attack chain (unusual sign-in IPs, first-time resource access, etc.).
+
+  example: |
+    {
+      "TenantId": "00000000-0000-0000-0000-000000000000",
+      "SourceRecordId": "00000000-0000-0000-04e9-e5ce3200c237",
+      "TimeGenerated": "2026-06-18T21:02:15.8837655Z",
+      "TimeProcessed": "2026-06-18T21:03:29.9147259Z",
+      "ActivityType": "LogOn",
+      "ActionType": "ResourceAccess",
+      "UserName": "user-attacker",
+      "UserPrincipalName": "user-attacker@contoso.com",
+      "EventSource": "SecurityEvent",
+      "SourceIPAddress": "192.0.2.153",
+      "SourceIPLocation": "",
+      "SourceDevice": "",
+      "DestinationDevice": "",
+      "ActorName": "",
+      "ActorPrincipalName": "",
+      "TargetName": "",
+      "TargetPrincipalName": "",
+      "Device": "",
+      "UsersInsights": "{\"BlastRadius\":\"High\"}",
+      "DevicesInsights": "{}",
+      "ActivityInsights": "{\"FirstTimeUserLoggedOnToDevice\":\"True\"}",
+      "InvestigationPriority": 8,
+      "Type": "BehaviorAnalytics"
+    }
+
+  fields:
+    - name: TenantId
+      type: string
+    - name: SourceRecordId
+      type: string
+    - name: TimeGenerated
+      type: datetime
+    - name: TimeProcessed
+      type: datetime
+    - name: ActivityType
+      type: string
+      values: ["LogOn", "ResourceAccess", "FailedLogOn", "AccountUpdated"]
+    - name: ActionType
+      type: string
+    - name: UserName
+      type: string
+    - name: UserPrincipalName
+      type: string
+    - name: EventSource
+      type: string
+      values: ["SecurityEvent", "SigninLogs", "AuditLogs", "AzureActivity"]
+    - name: SourceIPAddress
+      type: string
+    - name: SourceIPLocation
+      type: string
+    - name: SourceDevice
+      type: string
+    - name: DestinationIPAddress
+      type: string
+    - name: DestinationDevice
+      type: string
+    - name: ActorPrincipalName
+      type: string
+    - name: TargetPrincipalName
+      type: string
+    - name: Device
+      type: string
+    - name: UsersInsights
+      type: object
+    - name: DevicesInsights
+      type: object
+    - name: ActivityInsights
+      type: object
+    - name: InvestigationPriority
+      type: integer
+      description: "0-10; higher = more anomalous"
+    - name: Type
+      type: string
+      description: "Always 'BehaviorAnalytics'"
+
+# ============================================
+# USER PEER ANALYTICS (UserPeerAnalytics)
+# Source: Microsoft Sentinel UEBA — per-user peer groups
+# Table: UserPeerAnalytics  (snapshot — ranked peers per user)
+# Schema mirrors live tenant getschema export (13 columns).
+# ============================================
+user_peer_analytics:
+  description: |
+    Ranked peer relationships per user from Microsoft Sentinel UEBA. Each row
+    links a user to a peer (PeerUser*) with a Rank. Used by posture/detection
+    agents to assess whether a user's behavior deviates from their peer group.
+
+  example: |
+    {
+      "TenantId": "00000000-0000-0000-0000-000000000000",
+      "TimeGenerated": "2026-06-19T19:00:00.1164058Z",
+      "AADTenantId": "00000000-0000-0000-0000-000000000000",
+      "UserId": "00000000-0000-0000-4f30-9bb92cfd611f",
+      "UserName": "user-attacker",
+      "UserPrincipalName": "user-attacker@contoso.com",
+      "PeerUserId": "00000000-0000-0000-8576-7f40155a87b1",
+      "PeerUserName": "user-peer-1",
+      "PeerUserPrincipalName": "user-peer-1@contoso.com",
+      "Rank": 1,
+      "SourceSystem": "Azure",
+      "Type": "UserPeerAnalytics"
+    }
+
+  fields:
+    - name: TenantId
+      type: string
+    - name: TimeGenerated
+      type: datetime
+    - name: AADTenantId
+      type: string
+    - name: UserId
+      type: string
+    - name: UserName
+      type: string
+    - name: UserPrincipalName
+      type: string
+    - name: PeerUserId
+      type: string
+    - name: PeerUserName
+      type: string
+    - name: PeerUserPrincipalName
+      type: string
+    - name: Rank
+      type: integer
+      description: "Peer rank (1 = closest peer)"
+    - name: SourceSystem
+      type: string
+    - name: Type
+      type: string
+      description: "Always 'UserPeerAnalytics'"
+
+# ============================================
+# EMAIL EVENTS (EmailEvents)
+# Source: Microsoft Defender for Office 365 (MDO)
+# Table: EmailEvents  (email delivery event stream)
+# Schema mirrors live tenant getschema export (subset of 53 columns).
+# ============================================
+email_events:
+  description: |
+    Email delivery events from Microsoft Defender for Office 365. One row per
+    message with sender/recipient, delivery action/location, threat classification
+    and URL/attachment counts. Used by detection/threat-intel agents to spot
+    phishing, BEC, and malicious-URL delivery in the attack chain.
+
+  example: |
+    {
+      "TimeGenerated": "2026-06-09T22:30:00.0000000Z",
+      "NetworkMessageId": "00000000-0000-0000-1a1e-e1b0f8261064",
+      "InternetMessageId": "<abc@contoso.com>",
+      "SenderFromAddress": "mssecurity-noreply@microsoft.com",
+      "SenderFromDomain": "microsoft.com",
+      "SenderDisplayName": "Microsoft Security",
+      "SenderIPv4": "192.0.2.153",
+      "RecipientEmailAddress": "user-attacker@contoso.com",
+      "RecipientDomain": "contoso.com",
+      "Subject": "PIM: role activation",
+      "EmailDirection": "Inbound",
+      "DeliveryAction": "Delivered",
+      "DeliveryLocation": "Inbox",
+      "ThreatTypes": "",
+      "ThreatNames": "",
+      "DetectionMethods": "",
+      "UrlCount": 4,
+      "AttachmentCount": 0,
+      "EmailSize": 24576,
+      "IsFirstContact": false,
+      "Type": "EmailEvents"
+    }
+
+  fields:
+    - name: TimeGenerated
+      type: datetime
+    - name: NetworkMessageId
+      type: string
+    - name: InternetMessageId
+      type: string
+    - name: SenderFromAddress
+      type: string
+    - name: SenderFromDomain
+      type: string
+    - name: SenderDisplayName
+      type: string
+    - name: SenderIPv4
+      type: string
+    - name: RecipientEmailAddress
+      type: string
+    - name: RecipientDomain
+      type: string
+    - name: Subject
+      type: string
+    - name: EmailDirection
+      type: string
+      values: ["Inbound", "Outbound", "Intra-org"]
+    - name: DeliveryAction
+      type: string
+      values: ["Delivered", "Blocked", "Junked", "Replaced"]
+    - name: DeliveryLocation
+      type: string
+      values: ["Inbox", "Junk", "Quarantine", "Deleted Items"]
+    - name: ThreatTypes
+      type: string
+    - name: ThreatNames
+      type: string
+    - name: DetectionMethods
+      type: string
+    - name: UrlCount
+      type: integer
+    - name: AttachmentCount
+      type: integer
+    - name: EmailSize
+      type: integer
+    - name: IsFirstContact
+      type: boolean
+    - name: Type
+      type: string
+      description: "Always 'EmailEvents'"
+
+# ============================================
+# EMAIL URL INFO (EmailUrlInfo)
+# Source: Microsoft Defender for Office 365 (MDO)
+# Table: EmailUrlInfo  (URLs extracted from emails; joins EmailEvents on NetworkMessageId)
+# Schema mirrors live tenant getschema export (12 columns).
+# ============================================
+email_url_info:
+  description: |
+    URLs extracted from emails by Microsoft Defender for Office 365. Joins
+    EmailEvents on NetworkMessageId. Used by detection/threat-intel agents to
+    correlate malicious URLs delivered via email with the attack chain.
+
+  example: |
+    {
+      "TimeGenerated": "2026-06-09T22:30:00.0000000Z",
+      "NetworkMessageId": "00000000-0000-0000-1a1e-e1b0f8261064",
+      "Url": "https://login.microsoftonline.com.attacker.example/verify",
+      "UrlDomain": "login.microsoftonline.com.attacker.example",
+      "UrlLocation": "Body",
+      "UrlChainId": "0",
+      "UrlChainPosition": 0,
+      "Type": "EmailUrlInfo"
+    }
+
+  fields:
+    - name: TimeGenerated
+      type: datetime
+    - name: NetworkMessageId
+      type: string
+    - name: Url
+      type: string
+    - name: UrlDomain
+      type: string
+    - name: UrlLocation
+      type: string
+      values: ["Body", "Header", "Attachment", "QRCode"]
+    - name: UrlChainId
+      type: string
+    - name: UrlChainPosition
+      type: integer
+    - name: Type
+      type: string
+      description: "Always 'EmailUrlInfo'"
+
+# ============================================
+# OFFICE ACTIVITY (OfficeActivity)
+# Source: Microsoft 365 / Office 365 unified audit log
+# Table: OfficeActivity  (admin/user activity across M365 workloads)
+# Schema mirrors live tenant getschema export (subset of 152 columns).
+# ============================================
+office_activity:
+  description: |
+    Microsoft 365 unified audit-log activity (Exchange, SharePoint, AzureAD,
+    admin operations). Subset of the 152-column table covering the
+    most query-relevant fields. Used by detection/posture agents to trace
+    admin actions (role assignments, mailbox rules, domain changes) in the chain.
+
+  example: |
+    {
+      "TimeGenerated": "2026-06-09T22:50:00.0000000Z",
+      "OfficeWorkload": "AzureActiveDirectory",
+      "Operation": "Add member to role.",
+      "RecordType": "AzureActiveDirectory",
+      "UserId": "user-attacker@contoso.com",
+      "UserType": "Regular",
+      "ClientIP": "192.0.2.153",
+      "ResultStatus": "Success",
+      "OrganizationId": "00000000-0000-0000-0000-000000000000",
+      "Type": "OfficeActivity"
+    }
+
+  fields:
+    - name: TimeGenerated
+      type: datetime
+    - name: OfficeWorkload
+      type: string
+      values: ["AzureActiveDirectory", "Exchange", "SharePoint", "OneDrive", "MicrosoftTeams"]
+    - name: Operation
+      type: string
+    - name: RecordType
+      type: string
+    - name: UserId
+      type: string
+    - name: UserType
+      type: string
+      values: ["Regular", "Admin", "System", "Application"]
+    - name: ClientIP
+      type: string
+    - name: ResultStatus
+      type: string
+      values: ["Success", "Failed"]
+    - name: OrganizationId
+      type: string
+    - name: Type
+      type: string
+      description: "Always 'OfficeActivity'"
+
+# ============================================
+# CLOUD APP EVENTS (CloudAppEvents)
+# Source: Microsoft Defender for Cloud Apps (MCAS / MDA)
+# Table: CloudAppEvents  (cloud-app activity stream)
+# Schema mirrors live tenant getschema export (subset of 40 columns).
+# ============================================
+cloud_app_events:
+  description: |
+    Cloud-app activity from Microsoft Defender for Cloud Apps. One row per cloud
+    action with actor, application, IP, and admin/impersonation flags. Used by
+    detection/posture agents to spot risky cloud-app operations in the chain.
+
+  example: |
+    {
+      "TimeGenerated": "2026-06-09T22:40:00.0000000Z",
+      "ActionType": "Update application – Certificates and secrets management",
+      "Application": "Microsoft Azure",
+      "ApplicationId": 11161,
+      "AccountDisplayName": "user-attacker",
+      "AccountObjectId": "00000000-0000-0000-6a85-85b6cab308d9",
+      "AccountType": "Regular",
+      "IPAddress": "192.0.2.153",
+      "CountryCode": "US",
+      "IsAdminOperation": true,
+      "IsImpersonated": false,
+      "IsExternalUser": false,
+      "ObjectName": "domain-attacker.com",
+      "ObjectType": "Domain",
+      "UserAgent": "python-requests/2.31",
+      "Type": "CloudAppEvents"
+    }
+
+  fields:
+    - name: TimeGenerated
+      type: datetime
+    - name: ActionType
+      type: string
+    - name: Application
+      type: string
+    - name: ApplicationId
+      type: integer
+    - name: AccountDisplayName
+      type: string
+    - name: AccountObjectId
+      type: string
+    - name: AccountType
+      type: string
+    - name: IPAddress
+      type: string
+    - name: CountryCode
+      type: string
+    - name: IsAdminOperation
+      type: boolean
+    - name: IsImpersonated
+      type: boolean
+    - name: IsExternalUser
+      type: boolean
+    - name: ObjectName
+      type: string
+    - name: ObjectType
+      type: string
+    - name: UserAgent
+      type: string
+    - name: Type
+      type: string
+      description: "Always 'CloudAppEvents'"
+
+device_logon_events:
+  table: DeviceLogonEvents
+  description: |
+    DeviceLogonEvents — auto-generated from captured tenant schema (54 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AccountDomain, type: string}
+    - {name: AccountName, type: string}
+    - {name: AccountSid, type: string}
+    - {name: ActionType, type: string}
+    - {name: AdditionalFields, type: object}
+    - {name: AppGuardContainerId, type: string}
+    - {name: DeviceId, type: string}
+    - {name: DeviceName, type: string}
+    - {name: FailureReason, type: string}
+    - {name: InitiatingProcessAccountDomain, type: string}
+    - {name: InitiatingProcessAccountName, type: string}
+    - {name: InitiatingProcessAccountObjectId, type: string}
+    - {name: InitiatingProcessAccountSid, type: string}
+    - {name: InitiatingProcessAccountUpn, type: string}
+    - {name: InitiatingProcessCommandLine, type: string}
+    - {name: InitiatingProcessCreationTime, type: datetime}
+    - {name: InitiatingProcessFileName, type: string}
+    - {name: InitiatingProcessFileSize, type: integer}
+    - {name: InitiatingProcessFolderPath, type: string}
+    - {name: InitiatingProcessId, type: integer}
+    - {name: InitiatingProcessIntegrityLevel, type: string}
+    - {name: InitiatingProcessMD5, type: string}
+    - {name: InitiatingProcessParentCreationTime, type: datetime}
+    - {name: InitiatingProcessParentFileName, type: string}
+    - {name: InitiatingProcessParentId, type: integer}
+    - {name: InitiatingProcessRemoteSessionDeviceName, type: string}
+    - {name: InitiatingProcessRemoteSessionIP, type: string}
+    - {name: InitiatingProcessSHA1, type: string}
+    - {name: InitiatingProcessSHA256, type: string}
+    - {name: InitiatingProcessSessionId, type: integer}
+    - {name: InitiatingProcessTokenElevation, type: string}
+    - {name: InitiatingProcessUniqueId, type: string}
+    - {name: InitiatingProcessVersionInfoCompanyName, type: string}
+    - {name: InitiatingProcessVersionInfoFileDescription, type: string}
+    - {name: InitiatingProcessVersionInfoInternalFileName, type: string}
+    - {name: InitiatingProcessVersionInfoOriginalFileName, type: string}
+    - {name: InitiatingProcessVersionInfoProductName, type: string}
+    - {name: InitiatingProcessVersionInfoProductVersion, type: string}
+    - {name: IsInitiatingProcessRemoteSession, type: boolean}
+    - {name: IsLocalAdmin, type: boolean}
+    - {name: LogonId, type: integer}
+    - {name: LogonType, type: string}
+    - {name: MachineGroup, type: string}
+    - {name: Protocol, type: string}
+    - {name: RemoteDeviceName, type: string}
+    - {name: RemoteIP, type: string}
+    - {name: RemoteIPType, type: string}
+    - {name: RemotePort, type: int}
+    - {name: ReportId, type: integer}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Timestamp, type: datetime}
+    - {name: Type, type: string}
+
+device_events:
+  table: DeviceEvents
+  description: |
+    DeviceEvents — auto-generated from captured tenant schema (70 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AccountDomain, type: string}
+    - {name: AccountName, type: string}
+    - {name: AccountSid, type: string}
+    - {name: ActionType, type: string}
+    - {name: AdditionalFields, type: object}
+    - {name: AppGuardContainerId, type: string}
+    - {name: CreatedProcessSessionId, type: integer}
+    - {name: DeviceId, type: string}
+    - {name: DeviceName, type: string}
+    - {name: FileName, type: string}
+    - {name: FileOriginIP, type: string}
+    - {name: FileOriginUrl, type: string}
+    - {name: FileSize, type: integer}
+    - {name: FolderPath, type: string}
+    - {name: InitiatingProcessAccountDomain, type: string}
+    - {name: InitiatingProcessAccountName, type: string}
+    - {name: InitiatingProcessAccountObjectId, type: string}
+    - {name: InitiatingProcessAccountSid, type: string}
+    - {name: InitiatingProcessAccountUpn, type: string}
+    - {name: InitiatingProcessCommandLine, type: string}
+    - {name: InitiatingProcessCreationTime, type: datetime}
+    - {name: InitiatingProcessFileName, type: string}
+    - {name: InitiatingProcessFileSize, type: integer}
+    - {name: InitiatingProcessFolderPath, type: string}
+    - {name: InitiatingProcessId, type: integer}
+    - {name: InitiatingProcessLogonId, type: integer}
+    - {name: InitiatingProcessMD5, type: string}
+    - {name: InitiatingProcessParentCreationTime, type: datetime}
+    - {name: InitiatingProcessParentFileName, type: string}
+    - {name: InitiatingProcessParentId, type: integer}
+    - {name: InitiatingProcessRemoteSessionDeviceName, type: string}
+    - {name: InitiatingProcessRemoteSessionIP, type: string}
+    - {name: InitiatingProcessSHA1, type: string}
+    - {name: InitiatingProcessSHA256, type: string}
+    - {name: InitiatingProcessSessionId, type: integer}
+    - {name: InitiatingProcessUniqueId, type: string}
+    - {name: InitiatingProcessVersionInfoCompanyName, type: string}
+    - {name: InitiatingProcessVersionInfoFileDescription, type: string}
+    - {name: InitiatingProcessVersionInfoInternalFileName, type: string}
+    - {name: InitiatingProcessVersionInfoOriginalFileName, type: string}
+    - {name: InitiatingProcessVersionInfoProductName, type: string}
+    - {name: InitiatingProcessVersionInfoProductVersion, type: string}
+    - {name: IsInitiatingProcessRemoteSession, type: boolean}
+    - {name: IsProcessRemoteSession, type: boolean}
+    - {name: LocalIP, type: string}
+    - {name: LocalPort, type: int}
+    - {name: LogonId, type: integer}
+    - {name: MD5, type: string}
+    - {name: MachineGroup, type: string}
+    - {name: ProcessCommandLine, type: string}
+    - {name: ProcessCreationTime, type: datetime}
+    - {name: ProcessId, type: integer}
+    - {name: ProcessRemoteSessionDeviceName, type: string}
+    - {name: ProcessRemoteSessionIP, type: string}
+    - {name: ProcessTokenElevation, type: string}
+    - {name: RegistryKey, type: string}
+    - {name: RegistryValueData, type: string}
+    - {name: RegistryValueName, type: string}
+    - {name: RemoteDeviceName, type: string}
+    - {name: RemoteIP, type: string}
+    - {name: RemotePort, type: int}
+    - {name: RemoteUrl, type: string}
+    - {name: ReportId, type: integer}
+    - {name: SHA1, type: string}
+    - {name: SHA256, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Timestamp, type: datetime}
+    - {name: Type, type: string}
+
+device_network_info:
+  table: DeviceNetworkInfo
+  description: |
+    DeviceNetworkInfo — auto-generated from captured tenant schema (21 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: ConnectedNetworks, type: object}
+    - {name: DefaultGateways, type: object}
+    - {name: DeviceId, type: string}
+    - {name: DeviceName, type: string}
+    - {name: DnsAddresses, type: object}
+    - {name: IPAddresses, type: object}
+    - {name: IPv4Dhcp, type: string}
+    - {name: IPv6Dhcp, type: string}
+    - {name: MacAddress, type: string}
+    - {name: MachineGroup, type: string}
+    - {name: NetworkAdapterName, type: string}
+    - {name: NetworkAdapterStatus, type: string}
+    - {name: NetworkAdapterType, type: string}
+    - {name: NetworkAdapterVendor, type: string}
+    - {name: ReportId, type: integer}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Timestamp, type: datetime}
+    - {name: TunnelType, type: string}
+    - {name: Type, type: string}
+
+device_file_certificate_info:
+  table: DeviceFileCertificateInfo
+  description: |
+    DeviceFileCertificateInfo — auto-generated from captured tenant schema (23 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: CertificateCountersignatureTime, type: datetime}
+    - {name: CertificateCreationTime, type: datetime}
+    - {name: CertificateExpirationTime, type: datetime}
+    - {name: CertificateSerialNumber, type: string}
+    - {name: CrlDistributionPointUrls, type: string}
+    - {name: DeviceId, type: string}
+    - {name: DeviceName, type: string}
+    - {name: IsRootSignerMicrosoft, type: boolean}
+    - {name: IsSigned, type: boolean}
+    - {name: IsTrusted, type: boolean}
+    - {name: Issuer, type: string}
+    - {name: IssuerHash, type: string}
+    - {name: MachineGroup, type: string}
+    - {name: ReportId, type: integer}
+    - {name: SHA1, type: string}
+    - {name: SignatureType, type: string}
+    - {name: Signer, type: string}
+    - {name: SignerHash, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Timestamp, type: datetime}
+    - {name: Type, type: string}
+
+signin_logs:
+  table: SigninLogs
+  description: |
+    SigninLogs — auto-generated from captured tenant schema (94 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AADTenantId, type: string}
+    - {name: Agent, type: object}
+    - {name: AlternateSignInName, type: string}
+    - {name: AppDisplayName, type: string}
+    - {name: AppId, type: string}
+    - {name: AppOwnerTenantId, type: string}
+    - {name: AppliedConditionalAccessPolicies, type: string}
+    - {name: AppliedEventListeners, type: object}
+    - {name: AuthenticationAppDeviceDetails, type: string}
+    - {name: AuthenticationAppPolicyEvaluationDetails, type: string}
+    - {name: AuthenticationContextClassReferences, type: string}
+    - {name: AuthenticationDetails, type: string}
+    - {name: AuthenticationMethodsUsed, type: string}
+    - {name: AuthenticationProcessingDetails, type: string}
+    - {name: AuthenticationProtocol, type: string}
+    - {name: AuthenticationRequirement, type: string}
+    - {name: AuthenticationRequirementPolicies, type: string}
+    - {name: AuthenticatorAppLocation, type: string}
+    - {name: AutonomousSystemNumber, type: string}
+    - {name: Category, type: string}
+    - {name: ClientAppUsed, type: string}
+    - {name: ClientCredentialType, type: string}
+    - {name: ConditionalAccessAudiences, type: string}
+    - {name: ConditionalAccessPolicies, type: object}
+    - {name: ConditionalAccessStatus, type: string}
+    - {name: CorrelationId, type: string}
+    - {name: CreatedDateTime, type: datetime}
+    - {name: CrossTenantAccessType, type: string}
+    - {name: DeviceDetail, type: object}
+    - {name: DurationMs, type: integer}
+    - {name: FederatedCredentialId, type: string}
+    - {name: FlaggedForReview, type: boolean}
+    - {name: GlobalSecureAccessIpAddress, type: string}
+    - {name: HomeTenantId, type: string}
+    - {name: HomeTenantName, type: string}
+    - {name: IPAddress, type: string}
+    - {name: IPAddressFromResourceProvider, type: string}
+    - {name: Id, type: string}
+    - {name: Identity, type: string}
+    - {name: IncomingTokenType, type: string}
+    - {name: IsInteractive, type: boolean}
+    - {name: IsRisky, type: boolean}
+    - {name: IsTenantRestricted, type: boolean}
+    - {name: IsThroughGlobalSecureAccess, type: boolean}
+    - {name: Level, type: string}
+    - {name: Location, type: string}
+    - {name: LocationDetails, type: object}
+    - {name: MfaDetail, type: object}
+    - {name: NetworkLocationDetails, type: string}
+    - {name: OperationName, type: string}
+    - {name: OperationVersion, type: string}
+    - {name: OriginalRequestId, type: string}
+    - {name: OriginalTransferMethod, type: string}
+    - {name: ProcessingTimeInMilliseconds, type: string}
+    - {name: Resource, type: string}
+    - {name: ResourceDisplayName, type: string}
+    - {name: ResourceGroup, type: string}
+    - {name: ResourceId, type: string}
+    - {name: ResourceIdentity, type: string}
+    - {name: ResourceOwnerTenantId, type: string}
+    - {name: ResourceProvider, type: string}
+    - {name: ResourceServicePrincipalId, type: string}
+    - {name: ResourceTenantId, type: string}
+    - {name: ResultDescription, type: string}
+    - {name: ResultSignature, type: string}
+    - {name: ResultType, type: string}
+    - {name: RiskDetail, type: string}
+    - {name: RiskEventTypes, type: string}
+    - {name: RiskEventTypes_V2, type: string}
+    - {name: RiskLevel, type: string}
+    - {name: RiskLevelAggregated, type: string}
+    - {name: RiskLevelDuringSignIn, type: string}
+    - {name: RiskState, type: string}
+    - {name: ServicePrincipalId, type: string}
+    - {name: ServicePrincipalName, type: string}
+    - {name: SessionId, type: string}
+    - {name: SessionLifetimePolicies, type: string}
+    - {name: SignInIdentifier, type: string}
+    - {name: SignInIdentifierType, type: string}
+    - {name: SourceAppClientId, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: Status, type: object}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: TokenIssuerName, type: string}
+    - {name: TokenIssuerType, type: string}
+    - {name: TokenProtectionStatusDetails, type: object}
+    - {name: Type, type: string}
+    - {name: UniqueTokenIdentifier, type: string}
+    - {name: UserAgent, type: string}
+    - {name: UserDisplayName, type: string}
+    - {name: UserId, type: string}
+    - {name: UserPrincipalName, type: string}
+    - {name: UserType, type: string}
+
+aad_non_interactive_user_sign_in_logs:
+  table: AADNonInteractiveUserSignInLogs
+  description: |
+    AADNonInteractiveUserSignInLogs — auto-generated from captured tenant schema (85 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AADTenantId, type: string}
+    - {name: Agent, type: string}
+    - {name: AlternateSignInName, type: string}
+    - {name: AppDisplayName, type: string}
+    - {name: AppId, type: string}
+    - {name: AppOwnerTenantId, type: string}
+    - {name: AppliedEventListeners, type: object}
+    - {name: AuthenticationContextClassReferences, type: string}
+    - {name: AuthenticationDetails, type: string}
+    - {name: AuthenticationMethodsUsed, type: string}
+    - {name: AuthenticationProcessingDetails, type: string}
+    - {name: AuthenticationProtocol, type: string}
+    - {name: AuthenticationRequirement, type: string}
+    - {name: AuthenticationRequirementPolicies, type: string}
+    - {name: AuthenticatorAppLocation, type: string}
+    - {name: AutonomousSystemNumber, type: string}
+    - {name: Category, type: string}
+    - {name: ClientAppUsed, type: string}
+    - {name: ClientCredentialType, type: string}
+    - {name: ClientSessionId, type: string}
+    - {name: ConditionalAccessAudiences, type: string}
+    - {name: ConditionalAccessPolicies, type: string}
+    - {name: ConditionalAccessPoliciesV2, type: object}
+    - {name: ConditionalAccessStatus, type: string}
+    - {name: CorrelationId, type: string}
+    - {name: CreatedDateTime, type: datetime}
+    - {name: CrossTenantAccessType, type: string}
+    - {name: DeviceDetail, type: string}
+    - {name: DurationMs, type: integer}
+    - {name: FederatedCredentialId, type: string}
+    - {name: GlobalSecureAccessIpAddress, type: string}
+    - {name: HomeTenantId, type: string}
+    - {name: HomeTenantName, type: string}
+    - {name: IPAddress, type: string}
+    - {name: Id, type: string}
+    - {name: Identity, type: string}
+    - {name: IncomingTokenType, type: string}
+    - {name: IsInteractive, type: boolean}
+    - {name: IsRisky, type: boolean}
+    - {name: IsTenantRestricted, type: boolean}
+    - {name: IsThroughGlobalSecureAccess, type: boolean}
+    - {name: Level, type: string}
+    - {name: Location, type: string}
+    - {name: LocationDetails, type: string}
+    - {name: MfaDetail, type: string}
+    - {name: NetworkLocationDetails, type: string}
+    - {name: OperationName, type: string}
+    - {name: OperationVersion, type: string}
+    - {name: OriginalRequestId, type: string}
+    - {name: OriginalTransferMethod, type: string}
+    - {name: ProcessingTimeInMs, type: string}
+    - {name: ResourceDisplayName, type: string}
+    - {name: ResourceGroup, type: string}
+    - {name: ResourceIdentity, type: string}
+    - {name: ResourceOwnerTenantId, type: string}
+    - {name: ResourceServicePrincipalId, type: string}
+    - {name: ResourceTenantId, type: string}
+    - {name: ResultDescription, type: string}
+    - {name: ResultSignature, type: string}
+    - {name: ResultType, type: string}
+    - {name: RiskDetail, type: string}
+    - {name: RiskEventTypes, type: string}
+    - {name: RiskEventTypes_V2, type: string}
+    - {name: RiskLevelAggregated, type: string}
+    - {name: RiskLevelDuringSignIn, type: string}
+    - {name: RiskState, type: string}
+    - {name: ServicePrincipalId, type: string}
+    - {name: SessionId, type: string}
+    - {name: SessionLifetimePolicies, type: string}
+    - {name: SignInEventTypes, type: string}
+    - {name: SignInIdentifierType, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: Status, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: TokenIssuerName, type: string}
+    - {name: TokenIssuerType, type: string}
+    - {name: TokenProtectionStatusDetails, type: string}
+    - {name: Type, type: string}
+    - {name: UniqueTokenIdentifier, type: string}
+    - {name: UserAgent, type: string}
+    - {name: UserDisplayName, type: string}
+    - {name: UserId, type: string}
+    - {name: UserPrincipalName, type: string}
+    - {name: UserType, type: string}
+
+aad_managed_identity_sign_in_logs:
+  table: AADManagedIdentitySignInLogs
+  description: |
+    AADManagedIdentitySignInLogs — auto-generated from captured tenant schema (46 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AADTenantId, type: string}
+    - {name: Agent, type: string}
+    - {name: AppId, type: string}
+    - {name: AppOwnerTenantId, type: string}
+    - {name: AuthenticationContextClassReferences, type: string}
+    - {name: AuthenticationProcessingDetails, type: string}
+    - {name: Category, type: string}
+    - {name: ClientCredentialType, type: string}
+    - {name: ConditionalAccessAudiences, type: string}
+    - {name: ConditionalAccessPolicies, type: string}
+    - {name: ConditionalAccessPoliciesV2, type: object}
+    - {name: ConditionalAccessStatus, type: string}
+    - {name: CorrelationId, type: string}
+    - {name: CreatedDateTime, type: datetime}
+    - {name: DurationMs, type: integer}
+    - {name: FederatedCredentialId, type: string}
+    - {name: IPAddress, type: string}
+    - {name: Id, type: string}
+    - {name: Identity, type: string}
+    - {name: Level, type: string}
+    - {name: Location, type: string}
+    - {name: LocationDetails, type: string}
+    - {name: ManagedServiceIdentity, type: string}
+    - {name: NetworkLocationDetails, type: string}
+    - {name: OperationName, type: string}
+    - {name: OperationVersion, type: string}
+    - {name: ResourceDisplayName, type: string}
+    - {name: ResourceGroup, type: string}
+    - {name: ResourceIdentity, type: string}
+    - {name: ResourceOwnerTenantId, type: string}
+    - {name: ResourceServicePrincipalId, type: string}
+    - {name: ResultDescription, type: string}
+    - {name: ResultSignature, type: string}
+    - {name: ResultType, type: string}
+    - {name: ServicePrincipalCredentialKeyId, type: string}
+    - {name: ServicePrincipalCredentialThumbprint, type: string}
+    - {name: ServicePrincipalId, type: string}
+    - {name: ServicePrincipalName, type: string}
+    - {name: SessionId, type: string}
+    - {name: SourceAppClientId, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Type, type: string}
+    - {name: UniqueTokenIdentifier, type: string}
+    - {name: UserAgent, type: string}
+
+aad_service_principal_sign_in_logs:
+  table: AADServicePrincipalSignInLogs
+  description: |
+    AADServicePrincipalSignInLogs — auto-generated from captured tenant schema (45 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AADTenantId, type: string}
+    - {name: Agent, type: string}
+    - {name: AppId, type: string}
+    - {name: AppOwnerTenantId, type: string}
+    - {name: AuthenticationContextClassReferences, type: string}
+    - {name: AuthenticationProcessingDetails, type: string}
+    - {name: AutonomousSystemNumber, type: string}
+    - {name: Category, type: string}
+    - {name: ClientCredentialType, type: string}
+    - {name: ConditionalAccessAudiences, type: string}
+    - {name: ConditionalAccessPolicies, type: string}
+    - {name: ConditionalAccessPoliciesV2, type: object}
+    - {name: ConditionalAccessStatus, type: string}
+    - {name: CorrelationId, type: string}
+    - {name: CreatedDateTime, type: datetime}
+    - {name: DurationMs, type: integer}
+    - {name: FederatedCredentialId, type: string}
+    - {name: IPAddress, type: string}
+    - {name: Id, type: string}
+    - {name: Identity, type: string}
+    - {name: Level, type: string}
+    - {name: Location, type: string}
+    - {name: LocationDetails, type: string}
+    - {name: NetworkLocationDetails, type: string}
+    - {name: OperationName, type: string}
+    - {name: OperationVersion, type: string}
+    - {name: ResourceDisplayName, type: string}
+    - {name: ResourceGroup, type: string}
+    - {name: ResourceIdentity, type: string}
+    - {name: ResourceOwnerTenantId, type: string}
+    - {name: ResourceServicePrincipalId, type: string}
+    - {name: ResultDescription, type: string}
+    - {name: ResultSignature, type: string}
+    - {name: ResultType, type: string}
+    - {name: ServicePrincipalCredentialKeyId, type: string}
+    - {name: ServicePrincipalCredentialThumbprint, type: string}
+    - {name: ServicePrincipalId, type: string}
+    - {name: ServicePrincipalName, type: string}
+    - {name: SessionId, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Type, type: string}
+    - {name: UniqueTokenIdentifier, type: string}
+    - {name: UserAgent, type: string}
+
+microsoft_service_principal_sign_in_logs:
+  table: MicrosoftServicePrincipalSignInLogs
+  description: |
+    MicrosoftServicePrincipalSignInLogs — auto-generated from captured tenant schema (23 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AppId, type: string}
+    - {name: AppOwnerTenantId, type: string}
+    - {name: Category, type: string}
+    - {name: CorrelationId, type: string}
+    - {name: CreatedDateTime, type: datetime}
+    - {name: DurationMs, type: integer}
+    - {name: OperationName, type: string}
+    - {name: OperationVersion, type: string}
+    - {name: ResourceDisplayName, type: string}
+    - {name: ResourceGroup, type: string}
+    - {name: ResourceIdentity, type: string}
+    - {name: ResourceOwnerTenantId, type: string}
+    - {name: ResourceServicePrincipalId, type: string}
+    - {name: ResultSignature, type: string}
+    - {name: ServicePrincipalCredentialKeyId, type: string}
+    - {name: ServicePrincipalCredentialThumbprint, type: string}
+    - {name: ServicePrincipalId, type: string}
+    - {name: ServicePrincipalName, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Type, type: string}
+    - {name: UniqueTokenIdentifier, type: string}
+
+aad_graph_activity_logs:
+  table: AADGraphActivityLogs
+  description: |
+    AADGraphActivityLogs — auto-generated from captured tenant schema (34 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AADTenantId, type: string}
+    - {name: ActorType, type: string}
+    - {name: ApiVersion, type: string}
+    - {name: AppId, type: string}
+    - {name: CallerIpAddress, type: string}
+    - {name: Category, type: string}
+    - {name: ClientAuthMethod, type: string}
+    - {name: DeviceId, type: string}
+    - {name: DurationMs, type: int}
+    - {name: IdentityProvider, type: string}
+    - {name: Level, type: string}
+    - {name: Location, type: string}
+    - {name: OperationName, type: string}
+    - {name: RequestId, type: string}
+    - {name: RequestMethod, type: string}
+    - {name: RequestUri, type: string}
+    - {name: ResponseSizeBytes, type: int}
+    - {name: ResponseStatusCode, type: int}
+    - {name: ResultSignature, type: string}
+    - {name: Roles, type: string}
+    - {name: Scopes, type: string}
+    - {name: ServicePrincipalId, type: string}
+    - {name: SessionId, type: string}
+    - {name: SignInActivityId, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: TimeRequested, type: datetime}
+    - {name: TokenIssuedAt, type: datetime}
+    - {name: Type, type: string}
+    - {name: UserAgent, type: string}
+    - {name: UserId, type: string}
+    - {name: Wids, type: string}
+    - {name: _ResourceId, type: string}
+
+microsoft_graph_activity_logs:
+  table: MicrosoftGraphActivityLogs
+  description: |
+    MicrosoftGraphActivityLogs — auto-generated from captured tenant schema (33 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: ATContent, type: string}
+    - {name: ATContentH, type: string}
+    - {name: ATContentP, type: string}
+    - {name: AadTenantId, type: string}
+    - {name: ApiVersion, type: string}
+    - {name: AppId, type: string}
+    - {name: ClientAuthMethod, type: int}
+    - {name: ClientRequestId, type: string}
+    - {name: DeviceId, type: string}
+    - {name: DurationMs, type: int}
+    - {name: IPAddress, type: string}
+    - {name: IdentityProvider, type: string}
+    - {name: Location, type: string}
+    - {name: OperationId, type: string}
+    - {name: RequestId, type: string}
+    - {name: RequestMethod, type: string}
+    - {name: RequestUri, type: string}
+    - {name: ResponseSizeBytes, type: int}
+    - {name: ResponseStatusCode, type: int}
+    - {name: Roles, type: string}
+    - {name: Scopes, type: string}
+    - {name: ServicePrincipalId, type: string}
+    - {name: SessionId, type: string}
+    - {name: SignInActivityId, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: TokenIssuedAt, type: datetime}
+    - {name: Type, type: string}
+    - {name: UniqueTokenId, type: string}
+    - {name: UserAgent, type: string}
+    - {name: UserId, type: string}
+    - {name: Wids, type: string}
+
+aad_provisioning_logs:
+  table: AADProvisioningLogs
+  description: |
+    AADProvisioningLogs — auto-generated from captured tenant schema (28 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AADTenantId, type: string}
+    - {name: Action, type: string}
+    - {name: Category, type: string}
+    - {name: ChangeId, type: string}
+    - {name: CorrelationId, type: string}
+    - {name: CycleId, type: string}
+    - {name: DurationMs, type: integer}
+    - {name: Id, type: string}
+    - {name: InitiatedBy, type: string}
+    - {name: JobId, type: string}
+    - {name: ModifiedProperties, type: string}
+    - {name: OperationName, type: string}
+    - {name: OperationVersion, type: string}
+    - {name: ProvisioningAction, type: string}
+    - {name: ProvisioningStatusInfo, type: string}
+    - {name: ProvisioningSteps, type: string}
+    - {name: ResultDescription, type: string}
+    - {name: ResultSignature, type: string}
+    - {name: ResultType, type: string}
+    - {name: ServicePrincipal, type: string}
+    - {name: SourceIdentity, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: StatusInfo, type: string}
+    - {name: TargetIdentity, type: string}
+    - {name: TargetSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Type, type: string}
+
+identity_logon_events:
+  table: IdentityLogonEvents
+  description: |
+    IdentityLogonEvents — auto-generated from captured tenant schema (32 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AccountDisplayName, type: string}
+    - {name: AccountDomain, type: string}
+    - {name: AccountName, type: string}
+    - {name: AccountObjectId, type: string}
+    - {name: AccountSid, type: string}
+    - {name: AccountUpn, type: string}
+    - {name: ActionType, type: string}
+    - {name: AdditionalFields, type: object}
+    - {name: Application, type: string}
+    - {name: DestinationDeviceName, type: string}
+    - {name: DestinationIPAddress, type: string}
+    - {name: DestinationPort, type: string}
+    - {name: DeviceName, type: string}
+    - {name: DeviceType, type: string}
+    - {name: FailureReason, type: string}
+    - {name: IPAddress, type: string}
+    - {name: ISP, type: string}
+    - {name: LastSeenForUser, type: object}
+    - {name: Location, type: string}
+    - {name: LogonType, type: string}
+    - {name: OSPlatform, type: string}
+    - {name: Port, type: string}
+    - {name: Protocol, type: string}
+    - {name: ReportId, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TargetAccountDisplayName, type: string}
+    - {name: TargetDeviceName, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Timestamp, type: datetime}
+    - {name: Type, type: string}
+    - {name: UncommonForUser, type: object}
+
+identity_query_events:
+  table: IdentityQueryEvents
+  description: |
+    IdentityQueryEvents — auto-generated from captured tenant schema (29 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AccountDisplayName, type: string}
+    - {name: AccountDomain, type: string}
+    - {name: AccountName, type: string}
+    - {name: AccountObjectId, type: string}
+    - {name: AccountSid, type: string}
+    - {name: AccountUpn, type: string}
+    - {name: ActionType, type: string}
+    - {name: AdditionalFields, type: object}
+    - {name: Application, type: string}
+    - {name: DestinationDeviceName, type: string}
+    - {name: DestinationIPAddress, type: string}
+    - {name: DestinationPort, type: string}
+    - {name: DeviceName, type: string}
+    - {name: IPAddress, type: string}
+    - {name: Location, type: string}
+    - {name: Port, type: string}
+    - {name: Protocol, type: string}
+    - {name: Query, type: string}
+    - {name: QueryTarget, type: string}
+    - {name: QueryType, type: string}
+    - {name: ReportId, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TargetAccountDisplayName, type: string}
+    - {name: TargetAccountUpn, type: string}
+    - {name: TargetDeviceName, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Timestamp, type: datetime}
+    - {name: Type, type: string}
+
+identity_directory_events:
+  table: IdentityDirectoryEvents
+  description: |
+    IdentityDirectoryEvents — auto-generated from captured tenant schema (27 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AccountDisplayName, type: string}
+    - {name: AccountDomain, type: string}
+    - {name: AccountName, type: string}
+    - {name: AccountObjectId, type: string}
+    - {name: AccountSid, type: string}
+    - {name: AccountUpn, type: string}
+    - {name: ActionType, type: string}
+    - {name: AdditionalFields, type: object}
+    - {name: Application, type: string}
+    - {name: DestinationDeviceName, type: string}
+    - {name: DestinationIPAddress, type: string}
+    - {name: DestinationPort, type: string}
+    - {name: DeviceName, type: string}
+    - {name: IPAddress, type: string}
+    - {name: ISP, type: string}
+    - {name: Location, type: string}
+    - {name: Port, type: string}
+    - {name: Protocol, type: string}
+    - {name: ReportId, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TargetAccountDisplayName, type: string}
+    - {name: TargetAccountUpn, type: string}
+    - {name: TargetDeviceName, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Timestamp, type: datetime}
+    - {name: Type, type: string}
+
+security_alert:
+  table: SecurityAlert
+  description: |
+    SecurityAlert — auto-generated from captured tenant schema (35 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AlertLink, type: string}
+    - {name: AlertName, type: string}
+    - {name: AlertSeverity, type: string}
+    - {name: AlertType, type: string}
+    - {name: CompromisedEntity, type: string}
+    - {name: ConfidenceLevel, type: string}
+    - {name: ConfidenceScore, type: float}
+    - {name: Description, type: string}
+    - {name: DisplayName, type: string}
+    - {name: EndTime, type: datetime}
+    - {name: Entities, type: string}
+    - {name: ExtendedLinks, type: string}
+    - {name: ExtendedProperties, type: string}
+    - {name: IsIncident, type: boolean}
+    - {name: ProcessingEndTime, type: datetime}
+    - {name: ProductComponentName, type: string}
+    - {name: ProductName, type: string}
+    - {name: ProviderName, type: string}
+    - {name: RemediationSteps, type: string}
+    - {name: ResourceId, type: string}
+    - {name: SourceComputerId, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: StartTime, type: datetime}
+    - {name: Status, type: string}
+    - {name: SubTechniques, type: string}
+    - {name: SystemAlertId, type: string}
+    - {name: Tactics, type: string}
+    - {name: Techniques, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Type, type: string}
+    - {name: VendorName, type: string}
+    - {name: VendorOriginalId, type: string}
+    - {name: WorkspaceResourceGroup, type: string}
+    - {name: WorkspaceSubscriptionId, type: string}
+
+security_incident:
+  table: SecurityIncident
+  description: |
+    SecurityIncident — auto-generated from captured tenant schema (31 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AdditionalData, type: object}
+    - {name: AlertIds, type: object}
+    - {name: BookmarkIds, type: object}
+    - {name: Classification, type: string}
+    - {name: ClassificationComment, type: string}
+    - {name: ClassificationReason, type: string}
+    - {name: ClosedTime, type: datetime}
+    - {name: Comments, type: object}
+    - {name: CreatedTime, type: datetime}
+    - {name: Description, type: string}
+    - {name: FirstActivityTime, type: datetime}
+    - {name: FirstModifiedTime, type: datetime}
+    - {name: IncidentName, type: string}
+    - {name: IncidentNumber, type: int}
+    - {name: IncidentUrl, type: string}
+    - {name: Labels, type: object}
+    - {name: LastActivityTime, type: datetime}
+    - {name: LastModifiedTime, type: datetime}
+    - {name: ModifiedBy, type: string}
+    - {name: Owner, type: object}
+    - {name: ProviderIncidentId, type: string}
+    - {name: ProviderName, type: string}
+    - {name: RelatedAnalyticRuleIds, type: object}
+    - {name: Severity, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: Status, type: string}
+    - {name: Tasks, type: object}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Title, type: string}
+    - {name: Type, type: string}
+
+url_click_events:
+  table: UrlClickEvents
+  description: |
+    UrlClickEvents — auto-generated from captured tenant schema (19 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AccountUpn, type: string}
+    - {name: ActionType, type: string}
+    - {name: AppName, type: string}
+    - {name: AppVersion, type: string}
+    - {name: DetectionMethods, type: string}
+    - {name: IPAddress, type: string}
+    - {name: IsClickedThrough, type: boolean}
+    - {name: NetworkMessageId, type: string}
+    - {name: ReportId, type: string}
+    - {name: SourceId, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: ThreatTypes, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Timestamp, type: datetime}
+    - {name: Type, type: string}
+    - {name: Url, type: string}
+    - {name: UrlChain, type: string}
+    - {name: Workload, type: string}
+
+email_attachment_info:
+  table: EmailAttachmentInfo
+  description: |
+    EmailAttachmentInfo — auto-generated from captured tenant schema (20 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: DetectionMethods, type: string}
+    - {name: FileExtension, type: string}
+    - {name: FileName, type: string}
+    - {name: FileSize, type: integer}
+    - {name: FileType, type: string}
+    - {name: NetworkMessageId, type: string}
+    - {name: RecipientEmailAddress, type: string}
+    - {name: RecipientObjectId, type: string}
+    - {name: ReportId, type: string}
+    - {name: SHA256, type: string}
+    - {name: SenderDisplayName, type: string}
+    - {name: SenderFromAddress, type: string}
+    - {name: SenderObjectId, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: ThreatNames, type: string}
+    - {name: ThreatTypes, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Timestamp, type: datetime}
+    - {name: Type, type: string}
+
+email_post_delivery_events:
+  table: EmailPostDeliveryEvents
+  description: |
+    EmailPostDeliveryEvents — auto-generated from captured tenant schema (19 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: Action, type: string}
+    - {name: ActionResult, type: string}
+    - {name: ActionTrigger, type: string}
+    - {name: ActionType, type: string}
+    - {name: DeliveryLocation, type: string}
+    - {name: DetectionMethods, type: string}
+    - {name: EmailDirection, type: string}
+    - {name: InternetMessageId, type: string}
+    - {name: NetworkMessageId, type: string}
+    - {name: RecipientEmailAddress, type: string}
+    - {name: ReportId, type: string}
+    - {name: SenderFromAddress, type: string}
+    - {name: SourceLocation, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: ThreatTypes, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Timestamp, type: datetime}
+    - {name: Type, type: string}
+
+device_tvm_software_inventory:
+  table: DeviceTvmSoftwareInventory
+  description: |
+    DeviceTvmSoftwareInventory — auto-generated from captured tenant schema (15 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: DeviceId, type: string}
+    - {name: DeviceName, type: string}
+    - {name: EndOfSupportDate, type: datetime}
+    - {name: EndOfSupportStatus, type: string}
+    - {name: MachineGroup, type: string}
+    - {name: OSArchitecture, type: string}
+    - {name: OSPlatform, type: string}
+    - {name: OSVersion, type: string}
+    - {name: ProductCodeCpe, type: string}
+    - {name: SoftwareName, type: string}
+    - {name: SoftwareVendor, type: string}
+    - {name: SoftwareVersion, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: Type, type: string}
+
+device_tvm_software_vulnerabilities:
+  table: DeviceTvmSoftwareVulnerabilities
+  description: |
+    DeviceTvmSoftwareVulnerabilities — auto-generated from captured tenant schema (19 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AadDeviceId, type: string}
+    - {name: CveId, type: string}
+    - {name: CveMitigationStatus, type: string}
+    - {name: CveTags, type: object}
+    - {name: DeviceId, type: string}
+    - {name: DeviceName, type: string}
+    - {name: MachineGroup, type: string}
+    - {name: OSArchitecture, type: string}
+    - {name: OSPlatform, type: string}
+    - {name: OSVersion, type: string}
+    - {name: RecommendedSecurityUpdate, type: string}
+    - {name: RecommendedSecurityUpdateId, type: string}
+    - {name: SoftwareName, type: string}
+    - {name: SoftwareVendor, type: string}
+    - {name: SoftwareVersion, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: Type, type: string}
+    - {name: VulnerabilitySeverityLevel, type: string}
+
+device_tvm_secure_configuration_assessment:
+  table: DeviceTvmSecureConfigurationAssessment
+  description: |
+    DeviceTvmSecureConfigurationAssessment — auto-generated from captured tenant schema (17 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: ConfigurationCategory, type: string}
+    - {name: ConfigurationId, type: string}
+    - {name: ConfigurationImpact, type: float}
+    - {name: ConfigurationSubcategory, type: string}
+    - {name: Context, type: object}
+    - {name: DeviceId, type: string}
+    - {name: DeviceName, type: string}
+    - {name: IsApplicable, type: boolean}
+    - {name: IsCompliant, type: boolean}
+    - {name: IsExpectedUserImpact, type: boolean}
+    - {name: MachineGroup, type: string}
+    - {name: OSPlatform, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Timestamp, type: datetime}
+    - {name: Type, type: string}
+
+device_tvm_info_gathering:
+  table: DeviceTvmInfoGathering
+  description: |
+    DeviceTvmInfoGathering — auto-generated from captured tenant schema (10 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AdditionalFields, type: object}
+    - {name: DeviceId, type: string}
+    - {name: DeviceName, type: string}
+    - {name: LastSeenTime, type: datetime}
+    - {name: MachineGroup, type: string}
+    - {name: OSPlatform, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: Timestamp, type: datetime}
+    - {name: Type, type: string}
+
+audit_logs:
+  table: AuditLogs
+  description: |
+    AuditLogs — auto-generated from captured tenant schema (30 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AADOperationType, type: string}
+    - {name: AADTenantId, type: string}
+    - {name: ActivityDateTime, type: datetime}
+    - {name: ActivityDisplayName, type: string}
+    - {name: AdditionalDetails, type: object}
+    - {name: Category, type: string}
+    - {name: CorrelationId, type: string}
+    - {name: DurationMs, type: integer}
+    - {name: Id, type: string}
+    - {name: Identity, type: string}
+    - {name: InitiatedBy, type: object}
+    - {name: Level, type: string}
+    - {name: Location, type: string}
+    - {name: LoggedByService, type: string}
+    - {name: OperationName, type: string}
+    - {name: OperationVersion, type: string}
+    - {name: Resource, type: string}
+    - {name: ResourceGroup, type: string}
+    - {name: ResourceId, type: string}
+    - {name: ResourceProvider, type: string}
+    - {name: Result, type: string}
+    - {name: ResultDescription, type: string}
+    - {name: ResultReason, type: string}
+    - {name: ResultSignature, type: string}
+    - {name: ResultType, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TargetResources, type: object}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Type, type: string}
+
+syslog:
+  table: Syslog
+  description: |
+    Syslog — auto-generated from captured tenant schema (16 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: CollectorHostName, type: string}
+    - {name: Computer, type: string}
+    - {name: EventTime, type: datetime}
+    - {name: Facility, type: string}
+    - {name: HostIP, type: string}
+    - {name: HostName, type: string}
+    - {name: MG, type: string}
+    - {name: ProcessID, type: int}
+    - {name: ProcessName, type: string}
+    - {name: SeverityLevel, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: SyslogMessage, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Type, type: string}
+    - {name: _ResourceId, type: string}
+
+windows_event:
+  table: WindowsEvent
+  description: |
+    WindowsEvent — auto-generated from captured tenant schema (26 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: Channel, type: string}
+    - {name: Computer, type: string}
+    - {name: Correlation, type: string}
+    - {name: Data, type: object}
+    - {name: EventData, type: object}
+    - {name: EventID, type: int}
+    - {name: EventLevel, type: int}
+    - {name: EventLevelName, type: string}
+    - {name: EventOriginId, type: string}
+    - {name: EventRecordId, type: string}
+    - {name: Keywords, type: string}
+    - {name: ManagementGroupName, type: string}
+    - {name: Opcode, type: string}
+    - {name: Provider, type: string}
+    - {name: RawEventData, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: SystemProcessId, type: int}
+    - {name: SystemThreadId, type: int}
+    - {name: SystemUserId, type: string}
+    - {name: Task, type: int}
+    - {name: TenantId, type: string}
+    - {name: TimeCreated, type: datetime}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Type, type: string}
+    - {name: Version, type: int}
+    - {name: _ResourceId, type: string}
+
+azfw_network_rule:
+  table: AZFWNetworkRule
+  description: |
+    AZFWNetworkRule — auto-generated from captured tenant schema (16 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: Action, type: string}
+    - {name: ActionReason, type: string}
+    - {name: DestinationIp, type: string}
+    - {name: DestinationPort, type: int}
+    - {name: Policy, type: string}
+    - {name: Protocol, type: string}
+    - {name: Rule, type: string}
+    - {name: RuleCollection, type: string}
+    - {name: RuleCollectionGroup, type: string}
+    - {name: SourceIp, type: string}
+    - {name: SourcePort, type: int}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Type, type: string}
+    - {name: _ResourceId, type: string}
+
+storage_file_logs:
+  table: StorageFileLogs
+  description: |
+    StorageFileLogs — auto-generated from captured tenant schema (60 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AccountName, type: string}
+    - {name: AuthenticationHash, type: string}
+    - {name: AuthenticationType, type: string}
+    - {name: AuthorizationDetails, type: object}
+    - {name: CallerIpAddress, type: string}
+    - {name: Category, type: string}
+    - {name: ClientRequestId, type: string}
+    - {name: ConditionsUsed, type: string}
+    - {name: ContentLengthHeader, type: integer}
+    - {name: CorrelationId, type: string}
+    - {name: DurationMs, type: float}
+    - {name: Etag, type: string}
+    - {name: LastModifiedTime, type: datetime}
+    - {name: Location, type: string}
+    - {name: MetricResponseType, type: string}
+    - {name: ObjectKey, type: string}
+    - {name: OperationCount, type: int}
+    - {name: OperationName, type: string}
+    - {name: OperationVersion, type: string}
+    - {name: Protocol, type: string}
+    - {name: ReferrerHeader, type: string}
+    - {name: RequestBodySize, type: integer}
+    - {name: RequestHeaderSize, type: integer}
+    - {name: RequestMd5, type: string}
+    - {name: RequesterAppId, type: string}
+    - {name: RequesterAudience, type: string}
+    - {name: RequesterObjectId, type: string}
+    - {name: RequesterTenantId, type: string}
+    - {name: RequesterTokenIssuer, type: string}
+    - {name: RequesterUpn, type: string}
+    - {name: RequesterUserName, type: string}
+    - {name: ResponseBodySize, type: integer}
+    - {name: ResponseHeaderSize, type: integer}
+    - {name: ResponseMd5, type: string}
+    - {name: SasExpiryStatus, type: string}
+    - {name: SchemaVersion, type: string}
+    - {name: ServerLatencyMs, type: float}
+    - {name: ServiceType, type: string}
+    - {name: SmbCommandDetail, type: string}
+    - {name: SmbCommandMajor, type: int}
+    - {name: SmbCommandMinor, type: string}
+    - {name: SmbCreditsConsumed, type: int}
+    - {name: SmbFileId, type: string}
+    - {name: SmbMessageID, type: string}
+    - {name: SmbPersistentHandleID, type: string}
+    - {name: SmbPrimarySID, type: string}
+    - {name: SmbSessionID, type: string}
+    - {name: SmbStatusCode, type: string}
+    - {name: SmbTreeConnectID, type: string}
+    - {name: SmbVolatileHandleID, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: StatusCode, type: string}
+    - {name: StatusText, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: TlsVersion, type: string}
+    - {name: Type, type: string}
+    - {name: Uri, type: string}
+    - {name: UserAgentHeader, type: string}
+    - {name: _ResourceId, type: string}
+
+azure_dev_ops_auditing:
+  table: AzureDevOpsAuditing
+  description: |
+    AzureDevOpsAuditing — auto-generated from captured tenant schema (26 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: ActivityId, type: string}
+    - {name: ActorCUID, type: string}
+    - {name: ActorClientId, type: string}
+    - {name: ActorDisplayName, type: string}
+    - {name: ActorUPN, type: string}
+    - {name: ActorUserId, type: string}
+    - {name: Area, type: string}
+    - {name: AuthenticationMechanism, type: string}
+    - {name: Category, type: string}
+    - {name: CategoryDisplayName, type: string}
+    - {name: CorrelationId, type: string}
+    - {name: Data, type: object}
+    - {name: Details, type: string}
+    - {name: Id, type: string}
+    - {name: IpAddress, type: string}
+    - {name: OperationName, type: string}
+    - {name: ProjectId, type: string}
+    - {name: ProjectName, type: string}
+    - {name: ScopeDisplayName, type: string}
+    - {name: ScopeId, type: string}
+    - {name: ScopeType, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Type, type: string}
+    - {name: UserAgent, type: string}
+
+microsoft_azure_bastion_audit_logs:
+  table: MicrosoftAzureBastionAuditLogs
+  description: |
+    MicrosoftAzureBastionAuditLogs — auto-generated from captured tenant schema (22 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: ClientIpAddress, type: string}
+    - {name: ClientPort, type: int}
+    - {name: Duration, type: int}
+    - {name: Location, type: string}
+    - {name: Message, type: string}
+    - {name: OperationName, type: string}
+    - {name: Protocol, type: string}
+    - {name: ResourceType, type: string}
+    - {name: SessionEndTime, type: string}
+    - {name: SessionStartTime, type: datetime}
+    - {name: SourceSystem, type: string}
+    - {name: TargetResourceId, type: string}
+    - {name: TargetVMIPAddress, type: string}
+    - {name: TenantId, type: string}
+    - {name: Time, type: datetime}
+    - {name: TimeGenerated, type: datetime}
+    - {name: TunnelId, type: string}
+    - {name: Type, type: string}
+    - {name: UserAgent, type: string}
+    - {name: UserEmail, type: string}
+    - {name: UserName, type: string}
+    - {name: _ResourceId, type: string}
+
+graph_notifications_activity_logs:
+  table: GraphNotificationsActivityLogs
+  description: |
+    GraphNotificationsActivityLogs — auto-generated from captured tenant schema (20 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AccountType, type: string}
+    - {name: ApplicationId, type: string}
+    - {name: ContextId, type: string}
+    - {name: CorrelationId, type: string}
+    - {name: DurationMs, type: int}
+    - {name: Location, type: string}
+    - {name: LoggingLevel, type: string}
+    - {name: Message, type: string}
+    - {name: PublicationIds, type: string}
+    - {name: ResourceIdentity, type: string}
+    - {name: ResultDescription, type: string}
+    - {name: ResultStatusCode, type: int}
+    - {name: SourceSystem, type: string}
+    - {name: SubscriptionIdentity, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Type, type: string}
+    - {name: WebHeaders, type: string}
+    - {name: WorkloadNamespace, type: string}
+    - {name: WorkloadResource, type: string}
+
+container_app_http_logs:
+  table: ContainerAppHTTPLogs
+  description: |
+    ContainerAppHTTPLogs — auto-generated from captured tenant schema (30 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: Authority, type: string}
+    - {name: BytesReceived, type: integer}
+    - {name: BytesSent, type: integer}
+    - {name: ConnectionId, type: string}
+    - {name: ContainerAppName, type: string}
+    - {name: EnvironmentName, type: string}
+    - {name: EnvoyContainerId, type: string}
+    - {name: EnvoyPodName, type: string}
+    - {name: Location, type: string}
+    - {name: Method, type: string}
+    - {name: OperationName, type: string}
+    - {name: Path, type: string}
+    - {name: Protocol, type: string}
+    - {name: ReplicaName, type: string}
+    - {name: RequestDuration, type: integer}
+    - {name: RequestId, type: string}
+    - {name: ResponseCodeDetails, type: string}
+    - {name: ResponseFlags, type: string}
+    - {name: RevisionName, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: StartTime, type: datetime}
+    - {name: StatusCode, type: int}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Type, type: string}
+    - {name: UpstreamHost, type: string}
+    - {name: UpstreamRequestAttemptCount, type: int}
+    - {name: UserAgent, type: string}
+    - {name: XForwardedFor, type: string}
+    - {name: _ResourceId, type: string}
+
+container_registry_login_events:
+  table: ContainerRegistryLoginEvents
+  description: |
+    ContainerRegistryLoginEvents — auto-generated from captured tenant schema (17 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: CallerIpAddress, type: string}
+    - {name: Category, type: string}
+    - {name: CorrelationId, type: string}
+    - {name: DurationMs, type: string}
+    - {name: Identity, type: string}
+    - {name: JwtId, type: string}
+    - {name: LoginServer, type: string}
+    - {name: OperationName, type: string}
+    - {name: Region, type: string}
+    - {name: ResultDescription, type: string}
+    - {name: ResultType, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Type, type: string}
+    - {name: UserAgent, type: string}
+    - {name: _ResourceId, type: string}
+
+container_registry_repository_events:
+  table: ContainerRegistryRepositoryEvents
+  description: |
+    ContainerRegistryRepositoryEvents — auto-generated from captured tenant schema (23 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: ArtifactType, type: string}
+    - {name: CallerIpAddress, type: string}
+    - {name: Category, type: string}
+    - {name: CorrelationId, type: string}
+    - {name: Digest, type: string}
+    - {name: DurationMs, type: string}
+    - {name: Identity, type: string}
+    - {name: LoginServer, type: string}
+    - {name: MediaType, type: string}
+    - {name: OperationName, type: string}
+    - {name: Region, type: string}
+    - {name: Repository, type: string}
+    - {name: ResultDescription, type: string}
+    - {name: ResultType, type: string}
+    - {name: Size, type: int}
+    - {name: SourceSystem, type: string}
+    - {name: Tag, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Type, type: string}
+    - {name: UserAgent, type: string}
+    - {name: UserTenantId, type: string}
+    - {name: _ResourceId, type: string}
+
+intune_audit_logs:
+  table: IntuneAuditLogs
+  description: |
+    IntuneAuditLogs — auto-generated from captured tenant schema (11 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: Category, type: string}
+    - {name: CorrelationId, type: string}
+    - {name: Identity, type: string}
+    - {name: OperationName, type: string}
+    - {name: Properties, type: string}
+    - {name: ResultDescription, type: string}
+    - {name: ResultType, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Type, type: string}
+
+intune_devices:
+  table: IntuneDevices
+  description: |
+    IntuneDevices — auto-generated from captured tenant schema (47 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AADTenantId, type: string}
+    - {name: AndroidPatchLevel, type: string}
+    - {name: BatchId, type: string}
+    - {name: CategoryName, type: string}
+    - {name: CompliantState, type: string}
+    - {name: CreatedDate, type: string}
+    - {name: DeviceId, type: string}
+    - {name: DeviceName, type: string}
+    - {name: DeviceRegistrationState, type: string}
+    - {name: DeviceState, type: string}
+    - {name: EasID, type: string}
+    - {name: EncryptionStatusString, type: string}
+    - {name: GraphDeviceIsManaged, type: boolean}
+    - {name: IMEI, type: string}
+    - {name: InGracePeriodUntil, type: string}
+    - {name: IntuneAccountId, type: string}
+    - {name: JailBroken, type: string}
+    - {name: JoinType, type: string}
+    - {name: LastContact, type: string}
+    - {name: MEID, type: string}
+    - {name: ManagedBy, type: string}
+    - {name: ManagedDeviceName, type: string}
+    - {name: Manufacturer, type: string}
+    - {name: Model, type: string}
+    - {name: OS, type: string}
+    - {name: OSVersion, type: string}
+    - {name: OperationName, type: string}
+    - {name: Ownership, type: string}
+    - {name: PhoneNumber, type: string}
+    - {name: PrimaryUser, type: string}
+    - {name: ReferenceId, type: string}
+    - {name: Result, type: string}
+    - {name: SerialNumber, type: string}
+    - {name: SkuFamily, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: Stats, type: object}
+    - {name: StorageFree, type: integer}
+    - {name: StorageTotal, type: integer}
+    - {name: SubscriberCarrierNetwork, type: string}
+    - {name: SupervisedStatusString, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Type, type: string}
+    - {name: UPN, type: string}
+    - {name: UserEmail, type: string}
+    - {name: UserName, type: string}
+    - {name: WifiMacAddress, type: string}
+
+intune_device_compliance_org:
+  table: IntuneDeviceComplianceOrg
+  description: |
+    IntuneDeviceComplianceOrg — auto-generated from captured tenant schema (30 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AADTenantId, type: string}
+    - {name: BatchId, type: string}
+    - {name: ComplianceState, type: string}
+    - {name: DeviceHealthThreatLevel, type: string}
+    - {name: DeviceId, type: string}
+    - {name: DeviceName, type: string}
+    - {name: DeviceType, type: string}
+    - {name: IMEI, type: string}
+    - {name: InGracePeriodUntil, type: string}
+    - {name: IntuneAccountId, type: string}
+    - {name: LastContact, type: string}
+    - {name: ManagementAgents, type: string}
+    - {name: OS, type: string}
+    - {name: OSDescription, type: string}
+    - {name: OSVersion, type: string}
+    - {name: OperationName, type: string}
+    - {name: OwnerType, type: string}
+    - {name: Result, type: string}
+    - {name: RetireAfterDatetime, type: string}
+    - {name: SerialNumber, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: Stats, type: object}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Type, type: string}
+    - {name: UPN, type: string}
+    - {name: UserEmail, type: string}
+    - {name: UserId, type: string}
+    - {name: UserName, type: string}
+    - {name: _ResourceId, type: string}
+
+intune_operational_logs:
+  table: IntuneOperationalLogs
+  description: |
+    IntuneOperationalLogs — auto-generated from captured tenant schema (8 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: Category, type: string}
+    - {name: OperationName, type: string}
+    - {name: Properties, type: string}
+    - {name: Result, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: Type, type: string}
+
+storage_blob_logs:
+  table: StorageBlobLogs
+  description: |
+    StorageBlobLogs — auto-generated from captured tenant schema (52 columns). Phase 10 §9.0 full-universe coverage.
+  fields:
+    - {name: AccessTier, type: string}
+    - {name: AccountName, type: string}
+    - {name: AuthenticationHash, type: string}
+    - {name: AuthenticationType, type: string}
+    - {name: AuthorizationDetails, type: object}
+    - {name: CallerIpAddress, type: string}
+    - {name: Category, type: string}
+    - {name: ClientRequestId, type: string}
+    - {name: ConditionsUsed, type: string}
+    - {name: ContentLengthHeader, type: integer}
+    - {name: CorrelationId, type: string}
+    - {name: DestinationUri, type: string}
+    - {name: DurationMs, type: float}
+    - {name: Etag, type: string}
+    - {name: LastModifiedTime, type: datetime}
+    - {name: Location, type: string}
+    - {name: MetricResponseType, type: string}
+    - {name: ObjectKey, type: string}
+    - {name: OperationCount, type: int}
+    - {name: OperationName, type: string}
+    - {name: OperationVersion, type: string}
+    - {name: Protocol, type: string}
+    - {name: ReferrerHeader, type: string}
+    - {name: RehydratePriority, type: string}
+    - {name: RequestBodySize, type: integer}
+    - {name: RequestHeaderSize, type: integer}
+    - {name: RequestMd5, type: string}
+    - {name: RequesterAppId, type: string}
+    - {name: RequesterAudience, type: string}
+    - {name: RequesterObjectId, type: string}
+    - {name: RequesterTenantId, type: string}
+    - {name: RequesterTokenIssuer, type: string}
+    - {name: RequesterUpn, type: string}
+    - {name: ResponseBodySize, type: integer}
+    - {name: ResponseHeaderSize, type: integer}
+    - {name: ResponseMd5, type: string}
+    - {name: SasExpiryStatus, type: string}
+    - {name: SchemaVersion, type: string}
+    - {name: ServerLatencyMs, type: float}
+    - {name: ServiceType, type: string}
+    - {name: SourceAccessTier, type: string}
+    - {name: SourceSystem, type: string}
+    - {name: SourceUri, type: string}
+    - {name: StatusCode, type: string}
+    - {name: StatusText, type: string}
+    - {name: TenantId, type: string}
+    - {name: TimeGenerated, type: datetime}
+    - {name: TlsVersion, type: string}
+    - {name: Type, type: string}
+    - {name: Uri, type: string}
+    - {name: UserAgentHeader, type: string}
+    - {name: _ResourceId, type: string}
+
+security_event:
+  table: SecurityEvent
+  description: |
+    Windows Security audit events (logons, Kerberos, account/group changes). The
+    real Sentinel SecurityEvent table is FLAT (EventID/Computer/LogonType are
+    top-level columns); the benign diagnostic-envelope rows are flattened at
+    ingest (properties + EventData lifted to the top level) so both benign and
+    attack rows expose the real flat columns. (Phase 10 §9.4 / §10 live capture)
+  fields:
+    - {name: time, type: datetime}
+    - {name: TimeGenerated, type: datetime}
+    - {name: category, type: string}
+    - {name: operationName, type: string}
+    - {name: resultType, type: string}
+    - {name: properties, type: object}
+    - {name: _source, type: string}
+    # Flat SecurityEvent columns (real Sentinel schema) — populated by the
+    # flatten pass on benign rows and emitted directly by attack rows.
+    - {name: EventID, type: int}
+    - {name: Activity, type: string}
+    - {name: Channel, type: string}
+    - {name: Computer, type: string}
+    - {name: LogonType, type: int}
+    - {name: TargetUserName, type: string}
+    - {name: TargetDomainName, type: string}
+    - {name: SubjectUserName, type: string}
+    - {name: IpAddress, type: string}
+    - {name: WorkstationName, type: string}
+
+sysmon_event:
+  table: SysmonEvent
+  description: |
+    Sysmon endpoint telemetry (process create, network connection, file/registry). Diagnostic-envelope; EventID + EventData in properties. (Phase 10 §9.4)
+  fields:
+    - {name: time, type: datetime}
+    - {name: category, type: string}
+    - {name: operationName, type: string}
+    - {name: resultType, type: string}
+    - {name: properties, type: object}
+    - {name: _source, type: string}
+
+sql_security_audit_events:
+  table: SQLSecurityAuditEvents
+  description: |
+    Azure SQL database security audit events. Azure diagnostic-settings schema. (Phase 10 §9.4)
+  fields:
+    - {name: time, type: datetime}
+    - {name: resourceId, type: string}
+    - {name: operationName, type: string}
+    - {name: category, type: string}
+    - {name: resultType, type: string}
+    - {name: properties, type: object}
+    - {name: _source, type: string}
+
+event_grid_publish_logs:
+  table: EventGridPublishLogs
+  description: |
+    Azure Event Grid publish operations. Azure diagnostic-settings schema. (Phase 10 §9.4)
+  fields:
+    - {name: time, type: datetime}
+    - {name: resourceId, type: string}
+    - {name: operationName, type: string}
+    - {name: category, type: string}
+    - {name: resultType, type: string}
+    - {name: durationMs, type: integer}
+    - {name: callerIpAddress, type: string}
+    - {name: properties, type: object}
+    - {name: _source, type: string}

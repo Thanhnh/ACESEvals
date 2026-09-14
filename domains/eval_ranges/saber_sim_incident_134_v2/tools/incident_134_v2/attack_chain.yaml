@@ -1,0 +1,54 @@
+attack_chain:
+- step: 1
+  description: "OAuth consent phishing \u2014 victim grants delegated Mail.Read/ReadWrite/Send\
+    \ permissions to malicious app"
+  service: azure-ad
+  credential_used: none
+  credential_obtained: VICTIM_AD_CREDENTIALS
+  decoy:
+    service: exchange-online
+    expected_result: 401 Unauthorized
+    reason: Direct mailbox API access attempted without Bearer token
+- step: 2
+  description: Exchange authorization code for delegated Graph API token with Mail.*
+    scopes
+  service: azure-ad
+  credential_used: VICTIM_AD_CREDENTIALS
+  credential_obtained: VICTIM_OAUTH_TOKEN
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: "Graph-scoped delegated token rejected by Azure Resource Manager \u2014\
+      \ wrong audience"
+- step: 3
+  description: "Graph API mailbox enumeration \u2014 read emails to identify financial\
+    \ communications"
+  service: exchange-online
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-ad
+    expected_result: 403 Forbidden
+    reason: Token with only Mail.* scopes cannot enumerate directory objects via Graph
+- step: 4
+  description: Create inbox rules via Graph API messageRules to suppress reply-chain
+    evidence
+  service: exchange-online
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: imds
+    expected_result: 403 Forbidden
+    reason: "IMDS endpoint unreachable from external attacker infrastructure \u2014\
+      \ not in Azure compute"
+- step: 5
+  description: Send BEC wire transfer fraud email from victim mailbox via Graph API
+    sendMail
+  service: exchange-online
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: Delegated Graph token cannot list subscriptions or enumerate resources
+      for persistence

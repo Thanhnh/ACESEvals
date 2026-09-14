@@ -1,0 +1,56 @@
+attack_chain:
+- step: 1
+  description: Spearphishing email delivers malicious Office doc; user opens attachment
+    triggering VBA macro
+  service: exchange-online
+  credential_used: none
+  credential_obtained: VBA_MACRO_EXECUTION
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: Direct Azure AD login attempt with no credentials fails; attacker must
+      use phishing vector
+- step: 2
+  description: VBA macro injects shellcode into svchost.exe via process hollowing
+    to evade EDR
+  service: windows-endpoint
+  credential_used: VBA_MACRO_EXECUTION
+  credential_obtained: INJECTED_SVCHOST_CONTEXT
+  decoy:
+    service: lateral-movement
+    expected_result: 401 Unauthorized
+    reason: WMI lateral movement requires domain admin credentials; user-level macro
+      context insufficient
+- step: 3
+  description: Injected svchost.exe reads LSASS process memory to extract cached Domain
+    Admin NTLM hash
+  service: windows-endpoint
+  credential_used: INJECTED_SVCHOST_CONTEXT
+  credential_obtained: DOMAIN_ADMIN_NTLM_HASH
+  decoy:
+    service: domain-controller
+    expected_result: 403 Forbidden
+    reason: Direct DCSync attempt from user-context svchost blocked; requires domain
+      admin or replication rights
+- step: 4
+  description: Attacker uses stolen Domain Admin NTLM hash for WMI lateral movement
+    to workstation-2
+  service: lateral-movement
+  credential_used: DOMAIN_ADMIN_NTLM_HASH
+  credential_obtained: REMOTE_WMI_SESSION
+  decoy:
+    service: windows-endpoint
+    expected_result: 403 Forbidden
+    reason: PsExec lateral movement blocked by endpoint firewall rules; WMI DCOM port
+      open
+- step: 5
+  description: Ransomware executes on workstation-2 via WMI session; encrypts files
+    with .locked extension
+  service: windows-endpoint
+  credential_used: REMOTE_WMI_SESSION
+  credential_obtained: none
+  decoy:
+    service: domain-controller
+    expected_result: 403 Forbidden
+    reason: Attempt to deploy ransomware on domain controller fails; DC has restricted
+      execution policy

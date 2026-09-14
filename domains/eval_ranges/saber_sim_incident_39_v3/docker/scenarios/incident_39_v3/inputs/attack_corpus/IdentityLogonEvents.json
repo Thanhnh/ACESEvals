@@ -1,0 +1,41 @@
+[
+  {
+    "AccountDisplayName": "Document Viewer Pro",
+    "AccountDomain": "",
+    "AccountName": "",
+    "AccountObjectId": "",
+    "AccountSid": "",
+    "AccountUpn": "Document Viewer Pro",
+    "ActionType": "LogonSuccess",
+    "AdditionalFields": {
+      "source": "azure_ad"
+    },
+    "Application": "Azure AD",
+    "DestinationDeviceName": "",
+    "DestinationIPAddress": "",
+    "DestinationPort": "",
+    "DeviceName": "",
+    "DeviceType": "",
+    "FailureReason": "",
+    "IPAddress": "172.30.30.1",
+    "ISP": "",
+    "LastSeenForUser": null,
+    "Location": "",
+    "LogonType": "Interactive",
+    "OSPlatform": "",
+    "Port": "",
+    "Protocol": "OAuth",
+    "ReportId": "",
+    "SourceSystem": "",
+    "TargetAccountDisplayName": "",
+    "TargetDeviceName": "",
+    "TenantId": "",
+    "TimeGenerated": "",
+    "Timestamp": "2026-07-01T08:58:29.0544144Z",
+    "Type": "IdentityLogonEvents",
+    "UncommonForUser": null,
+    "source": "",
+    "collectedAt": "2026-07-01T08:58:30.388854Z",
+    "AttackTechnique": "T1528"
+  }
+]

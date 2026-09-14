@@ -1,0 +1,67 @@
+attack_chain:
+- step: 1
+  description: "Device code phishing \u2014 victim authorizes attacker's device code,\
+    \ yielding delegated OAuth token"
+  service: azure-ad
+  credential_used: none
+  credential_obtained: VICTIM_OAUTH_TOKEN
+  decoy:
+    service: imds
+    expected_result: 404 Not Found
+    reason: IMDS only reachable from within Azure VM/container; attacker is external
+      and cannot reach 169.254.169.254
+- step: 2
+  description: "ARM enumeration \u2014 list subscriptions and discover Key Vault resources\
+    \ using delegated token"
+  service: arm-api
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-keyvault
+    expected_result: 403 Forbidden
+    reason: Direct vault access requires vault URI; victim token lacks data-plane
+      access without first discovering vault name via ARM
+- step: 3
+  description: "Key Vault SecretGet \u2014 retrieve SP client_id and client_secret\
+    \ from kv-app-credentials vault"
+  service: azure-keyvault
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: SP_CLIENT_SECRET
+  decoy:
+    service: exchange-online
+    expected_result: 403 Forbidden
+    reason: Delegated user token scoped to management.azure.com; Exchange requires
+      Mail.Send application permission not present on user token
+- step: 4
+  description: "Client credentials grant \u2014 authenticate as SP to obtain application-scoped\
+    \ Graph token with Mail.Send and Mail.ReadWrite"
+  service: azure-ad
+  credential_used: SP_CLIENT_SECRET
+  credential_obtained: APP_GRAPH_TOKEN
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: SP has only Microsoft Graph permissions; no Azure RBAC role assignment
+      exists for ARM access
+- step: 5
+  description: "Create inbox rules on CFO mailbox \u2014 move replies containing wire\
+    \ transfer keywords to hidden folder"
+  service: exchange-online
+  credential_used: APP_GRAPH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-ad
+    expected_result: 403 Forbidden
+    reason: "APP_GRAPH_TOKEN has Mail.Send/Mail.ReadWrite scope only; Directory.ReadWrite.All\
+      \ not granted \u2014 cannot modify user objects"
+- step: 6
+  description: Send fraudulent BEC wire transfer email from CFO mailbox to external
+    financial target
+  service: exchange-online
+  credential_used: APP_GRAPH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-keyvault
+    expected_result: 403 Forbidden
+    reason: APP_GRAPH_TOKEN is Graph-scoped; Key Vault data-plane requires vault-scoped
+      token and explicit access policy for the SP identity

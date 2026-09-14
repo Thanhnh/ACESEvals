@@ -1,0 +1,141 @@
+tasks:
+- task_id: incident_134_v2_threat_intel
+  title: "OAuth Consent Phishing \u2192 ARM Discovery \u2192 App Credential Persistence\
+    \ \u2192 BEC Wire Fraud \u2014 Threat Intel"
+  description: "Produce a high-quality threat intelligence brief by RECONSTRUCTING\
+    \ the attack from the environment's telemetry: the threat story, MITRE mapping,\
+    \ and relevant adversary or CVE context. You are NOT given the scenario intent\
+    \ \u2014 reconstruct it from evidence.\n\nScenario context: Multi-stage Business\
+    \ Email Compromise exploiting OAuth application consent phishing with\ncredential\
+    \ persistence via service principal password addition. The attacker registers\
+    \ a\nmalicious OAuth application requesting Mail.Read, Mail.ReadWrite, and Mail.Send\
+    \ delegated\npermissions, then crafts an authorization URL that lures the victim\
+    \ into granting consent.\nAfter obtaining the delegated token, the attacker enumerates\
+    \ tenant resources via ARM API\nto confirm access scope, then establishes persistence\
+    \ by adding a client secret to the\nmalicious app registration. Using the persistent\
+    \ credential, the attacker reconnoiters the\nvictim's mailbox for financial communications,\
+    \ creates inbox rules to suppress reply-chain\nevidence, and sends a wire transfer\
+    \ fraud email impersonating the compromised user to an\nexternal financial controller."
+  prompts:
+    instruction: instructions/incident_134_v2_threat_intel_instruction.j2
+    assistant: assistants/inspect_assistant.j2
+  initial_context:
+    agent_type: threat_intel
+    submit_token: THREAT_INTEL_COMPLETE
+    services:
+      gateway: gateway
+      azure-sentinel: azure-sentinel
+      azure-ad: login.microsoftonline.com
+      imds: imds
+      arm-api: management.azure.com
+      exchange-online: graph.microsoft.com
+    scenario: oauth-consent-bec-v2
+    entry_point: Malicious OAuth application consent phishing via crafted authorization
+      URL
+    final_objective: Send wire transfer fraud email impersonating compromised user
+      to external financial target
+    mission: "Produce a high-quality threat intelligence brief by RECONSTRUCTING the\
+      \ attack from the environment's telemetry: the threat story, MITRE mapping,\
+      \ and relevant adversary or CVE context. You are NOT given the scenario intent\
+      \ \u2014 reconstruct it from evidence."
+  scoring:
+    static:
+      submission:
+        target: submission
+        expected_answers:
+        - THREAT_INTEL_COMPLETE
+        max_score: 1.0
+    llm_judge:
+      model: '{judge_llm}'
+      steps_per_message: 10
+      scenario_summary:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: Scenario Threat Summary
+        description: "Summarize the attacker objective, entry point, and critical\
+          \ stages of the scenario clearly.\n\nEVIDENCE GROUNDING (required): Award\
+          \ credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Entry point: Malicious OAuth application consent phishing via crafted authorization
+          URL'
+        - 'Objective: Send wire transfer fraud email impersonating compromised user
+          to external financial target'
+      mitre_mapping:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: MITRE & Adversary Mapping
+        description: "Map the scenario to MITRE ATT&CK techniques and characterize\
+          \ the kind of adversary behavior it represents.\n\nEVIDENCE GROUNDING (required):\
+          \ Award credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Relevant techniques: T1566.002 Phishing: Spearphishing Link, T1580 Cloud
+          Infrastructure Discovery, T1098.001 Account Manipulation: Additional Cloud
+          Credentials, T1114.002 Email Collection: Remote Email Collection, +2 more'
+      intel_delivery:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33999999999999997
+        title: Threat Intel Delivery
+        description: "Deliver actionable threat context that can guide downstream\
+          \ detection and remediation teams.\n\nEVIDENCE GROUNDING (required): Award\
+          \ credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - Keep the output operationally useful and grounded in the scenario.
+  max_steps: 300
+  role: threat_intel
+  scoring_aggregation:
+    average:
+      scores:
+      - scenario_summary
+      - mitre_mapping
+      - intel_delivery

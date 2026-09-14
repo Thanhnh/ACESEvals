@@ -1,0 +1,19 @@
+[
+  {
+    "time": "2026-06-24T03:19:49.559963Z",
+    "systemId": "",
+    "macAddress": "",
+    "category": "NetworkSecurityGroupFlowEvent",
+    "resourceId": "",
+    "operationName": "NSG.Allow",
+    "properties": {
+      "dstIP": "172.30.10.2",
+      "dstPort": 8080,
+      "protocol": "tcp",
+      "ruleName": "AllowCorpInternal",
+      "srcIP": "172.30.10.200"
+    },
+    "source": "gateway",
+    "collectedAt": "2026-06-24T03:20:41.423439Z"
+  }
+]

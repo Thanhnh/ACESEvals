@@ -1,0 +1,195 @@
+credentials:
+  VICTIM_AD_CREDENTIALS:
+    type: password
+    length: 16
+    value: '{{ VICTIM_AD_CREDENTIALS }}'
+    grants_access_to:
+    - domain-controller
+  KERBEROS_TGT:
+    type: kerberos_tgt
+    value: '{{ KERBEROS_TGT }}'
+    grants_access_to:
+    - windows-endpoint
+  NTLM_HASH:
+    type: ntlm_hash
+    value: '{{ NTLM_HASH }}'
+    grants_access_to:
+    - lateral-movement
+    - windows-endpoint
+services:
+  domain-controller:
+    hostname: YOURORG-DC01
+    domain: YOURORG.LOCAL
+    netbios_name: YOURORG
+    domain_sid: S-1-5-21-3623811015-3361044348-30300820
+    accounts:
+    - username: jsmith
+      display_name: John Smith
+      password: '{{ VICTIM_AD_CREDENTIALS }}'
+      groups:
+      - Domain Users
+      - Local Administrators (YOURORG-WKS01)
+      sid: S-1-5-21-3623811015-3361044348-30300820-1113
+    - username: DomainAdmin
+      display_name: Domain Administrator
+      ntlm_hash: '{{ NTLM_HASH }}'
+      groups:
+      - Domain Admins
+      - Enterprise Admins
+      - Administrators
+      sid: S-1-5-21-3623811015-3361044348-30300820-500
+    kerberos:
+      tgt_for_principals:
+        jsmith@YOURORG.LOCAL: '{{ KERBEROS_TGT }}'
+      rc4_enabled: true
+      supported_etypes:
+      - RC4_HMAC
+      - AES256_CTS
+    replication_allowed_principals:
+    - DomainAdmin
+    protected_users_members: []
+  windows-endpoint:
+    hosts:
+    - hostname: YOURORG-WKS01
+      role: workstation
+      domain: YOURORG.LOCAL
+      logged_on_user: YOURORG\jsmith
+      local_admins:
+      - YOURORG\jsmith
+      - YOURORG\DomainAdmin
+      credential_guard_enabled: false
+      lsass_ppl_enabled: false
+      lsass_cache:
+      - identity: YOURORG\DomainAdmin
+        ntlm_hash: '{{ NTLM_HASH }}'
+        logon_type: cached_interactive
+      - identity: YOURORG\jsmith
+        ntlm_hash: null
+        logon_type: interactive
+    - hostname: YOURORG-FS01
+      role: server
+      domain: YOURORG.LOCAL
+      service_account: YOURORG\svc-backup
+      local_admins:
+      - YOURORG\DomainAdmin
+      tamper_protection_enabled: false
+      services:
+      - name: WinDefend
+        display_name: Windows Defender Antivirus Service
+        status: running
+        can_disable: true
+      shares:
+      - name: C$
+        path: C:\
+        requires_admin: true
+      - name: ADMIN$
+        path: C:\Windows
+        requires_admin: true
+      critical_volumes:
+      - D:\SharedData
+      - E:\Finance
+      ransomware_target_extensions:
+      - .docx
+      - .xlsx
+      - .pdf
+      - .sql
+      - .bak
+      - .pst
+  lateral-movement:
+    protocol: SMB
+    port: 445
+    auth_type: ntlm_pass_the_hash
+    source_host: YOURORG-WKS01
+    targets:
+    - hostname: YOURORG-FS01
+      share: C$
+      accepted_credentials:
+      - type: ntlm_hash
+        value: '{{ NTLM_HASH }}'
+        identity: YOURORG\DomainAdmin
+    - hostname: YOURORG-FS01
+      share: ADMIN$
+      accepted_credentials:
+      - type: ntlm_hash
+        value: '{{ NTLM_HASH }}'
+        identity: YOURORG\DomainAdmin
+  mdatp-engine:
+    monitored_hosts:
+    - YOURORG-WKS01
+    - YOURORG-FS01
+    - YOURORG-DC01
+    detection_rules:
+    - name: Credential Access - LSASS Memory Dump
+      technique: T1003.001
+      severity: high
+      trigger: lsass_process_access
+      host: YOURORG-WKS01
+    - name: Lateral Movement - Pass-the-Hash via SMB
+      technique: T1021.002
+      severity: high
+      trigger: smb_ntlm_logon_type3
+      host: YOURORG-FS01
+    - name: Defense Evasion - Security Tool Tampering
+      technique: T1562.001
+      severity: high
+      trigger: security_service_disabled
+      host: YOURORG-FS01
+    - name: Impact - Ransomware File Encryption
+      technique: T1486
+      severity: critical
+      trigger: mass_file_rename
+      host: YOURORG-FS01
+  azure-ad:
+    service_principals:
+      saber-recon-reader:
+        app_id: 085d75c4-b0bd-5d61-ae81-0cc1879d955b
+        display_name: SABER-Recon-Reader
+        client_secret: recon-reader-bce30d941d6237655f2e8b3dbf9049b7  # pragma: allowlist secret
+        role_assignments:
+        - Reader
+        - Key Vault Reader
+        - Log Analytics Reader
+        - Security Reader
+        api_permissions:
+        - Microsoft.Resources/subscriptions/read
+        - Microsoft.Resources/subscriptions/resourceGroups/read
+        - Microsoft.Resources/subscriptions/resources/read
+        - Microsoft.Storage/storageAccounts/read
+        - Microsoft.KeyVault/vaults/read
+        - Microsoft.Web/sites/read
+        - Microsoft.ContainerService/managedClusters/read
+        - Microsoft.OperationalInsights/workspaces/read
+        - Microsoft.OperationalInsights/workspaces/query/read
+        - Microsoft.Security/*/read
+        - Microsoft.Security/assessments/read
+        - Microsoft.Security/locations/alerts/read
+        - Microsoft.Security/securescores/read
+        - Microsoft.KeyVault/vaults/secrets/read
+        - Microsoft.KeyVault/vaults/keys/read
+        - Microsoft.KeyVault/vaults/certificates/read
+  arm-api:
+    authorized_principals:
+    - principal_id: 085d75c4-b0bd-5d61-ae81-0cc1879d955b
+      display_name: SABER-Recon-Reader
+      role_assignments:
+      - Reader
+      - Key Vault Reader
+      - Log Analytics Reader
+      - Security Reader
+      permissions:
+      - Microsoft.Resources/subscriptions/read
+      - Microsoft.Resources/subscriptions/resourceGroups/read
+      - Microsoft.Resources/subscriptions/resources/read
+      - Microsoft.Storage/storageAccounts/read
+      - Microsoft.KeyVault/vaults/read
+      - Microsoft.Web/sites/read
+      - Microsoft.ContainerService/managedClusters/read
+      - Microsoft.OperationalInsights/workspaces/read
+      - Microsoft.OperationalInsights/workspaces/query/read
+      - Microsoft.Security/*/read
+      - Microsoft.Security/assessments/read
+      - Microsoft.Security/locations/alerts/read
+      - Microsoft.Security/securescores/read
+      - Microsoft.KeyVault/vaults/secrets/read
+      - Microsoft.KeyVault/vaults/keys/read
+      - Microsoft.KeyVault/vaults/certificates/read

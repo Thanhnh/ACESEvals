@@ -1,0 +1,121 @@
+credentials:
+  CODE_EXECUTION:
+    type: session_token
+    value: '{{ CODE_EXECUTION }}'
+    grants_access_to:
+    - azure-app-service
+  WEB_SHELL_ACCESS:
+    type: password
+    value: '{{ WEB_SHELL_ACCESS }}'
+    grants_access_to:
+    - azure-app-service
+  INTERNAL_SERVICE_CREDENTIALS:
+    type: password
+    value: '{{ INTERNAL_SERVICE_CREDENTIALS }}'
+    grants_access_to:
+    - lateral-movement
+    - windows-endpoint
+  SERVER_ADMIN_ACCESS:
+    type: session_token
+    value: '{{ SERVER_ADMIN_ACCESS }}'
+    grants_access_to:
+    - windows-endpoint
+services:
+  front-door:
+    waf_mode: detection
+    backend_pool: azure-app-service
+    exploit_endpoint: /api/upload
+    vulnerability: remote-code-execution
+    exploit_payload_type: serialization
+    exploit_result_token: '{{ CODE_EXECUTION }}'
+  azure-app-service:
+    app_name: contoso-webapp-prod
+    runtime: dotnet
+    vulnerable_endpoint: /api/upload
+    vulnerability: insecure-deserialization
+    session_token: '{{ CODE_EXECUTION }}'
+    web_shell:
+      path: /uploads/.cmd.aspx
+      auth_key: '{{ WEB_SHELL_ACCESS }}'
+      methods:
+      - POST
+    environment_variables:
+      SVC_WMI_USERNAME: CONTOSO\svc-wmi-admin
+      SVC_WMI_PASSWORD: '{{ INTERNAL_SERVICE_CREDENTIALS }}'
+      TARGET_SERVER: 10.1.0.70
+      APP_ENVIRONMENT: production
+  lateral-movement:
+    protocol: wmi
+    target_host: windows-endpoint
+    target_ip: 10.1.0.70
+    valid_credentials:
+      username: CONTOSO\svc-wmi-admin
+      password: '{{ INTERNAL_SERVICE_CREDENTIALS }}'
+    session_token: '{{ SERVER_ADMIN_ACCESS }}'
+    wmiprvse_spawn: true
+  windows-endpoint:
+    hostname: WINSRV01
+    os: Windows Server 2022
+    domain: contoso.local
+    admin_session: '{{ SERVER_ADMIN_ACCESS }}'
+    sensitive_files:
+    - path: C:\Confidential\financial_report_2026.xlsx
+      classification: confidential
+    - path: C:\Confidential\customer_records.csv
+      classification: pii
+    - path: C:\Admin\backup_credentials.txt
+      classification: secret
+  azure-ad:
+    service_principals:
+      saber-recon-reader:
+        app_id: f7554b89-4f28-5188-8d60-7dcb5281f1f9
+        display_name: SABER-Recon-Reader
+        client_secret: recon-reader-56b46e95269b40632f6738adb82945ed  # pragma: allowlist secret
+        role_assignments:
+        - Reader
+        - Key Vault Reader
+        - Log Analytics Reader
+        - Security Reader
+        api_permissions:
+        - Microsoft.Resources/subscriptions/read
+        - Microsoft.Resources/subscriptions/resourceGroups/read
+        - Microsoft.Resources/subscriptions/resources/read
+        - Microsoft.Storage/storageAccounts/read
+        - Microsoft.KeyVault/vaults/read
+        - Microsoft.Web/sites/read
+        - Microsoft.ContainerService/managedClusters/read
+        - Microsoft.OperationalInsights/workspaces/read
+        - Microsoft.OperationalInsights/workspaces/query/read
+        - Microsoft.Security/*/read
+        - Microsoft.Security/assessments/read
+        - Microsoft.Security/locations/alerts/read
+        - Microsoft.Security/securescores/read
+        - Microsoft.KeyVault/vaults/secrets/read
+        - Microsoft.KeyVault/vaults/keys/read
+        - Microsoft.KeyVault/vaults/certificates/read
+  arm-api:
+    authorized_principals:
+    - principal_id: f7554b89-4f28-5188-8d60-7dcb5281f1f9
+      display_name: SABER-Recon-Reader
+      role_assignments:
+      - Reader
+      - Key Vault Reader
+      - Log Analytics Reader
+      - Security Reader
+      permissions:
+      - Microsoft.Resources/subscriptions/read
+      - Microsoft.Resources/subscriptions/resourceGroups/read
+      - Microsoft.Resources/subscriptions/resources/read
+      - Microsoft.Storage/storageAccounts/read
+      - Microsoft.KeyVault/vaults/read
+      - Microsoft.Web/sites/read
+      - Microsoft.ContainerService/managedClusters/read
+      - Microsoft.OperationalInsights/workspaces/read
+      - Microsoft.OperationalInsights/workspaces/query/read
+      - Microsoft.Security/*/read
+      - Microsoft.Security/assessments/read
+      - Microsoft.Security/locations/alerts/read
+      - Microsoft.Security/securescores/read
+      - Microsoft.KeyVault/vaults/secrets/read
+      - Microsoft.KeyVault/vaults/keys/read
+      - Microsoft.KeyVault/vaults/certificates/read

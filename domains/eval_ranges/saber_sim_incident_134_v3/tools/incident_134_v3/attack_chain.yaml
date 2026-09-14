@@ -1,0 +1,57 @@
+attack_chain:
+- step: 1
+  description: "OAuth consent phishing \u2014 victim grants delegated Mail.ReadWrite\
+    \ and Mail.Send permissions to malicious app; attacker obtains delegated access\
+    \ token"
+  service: azure-ad
+  credential_used: none
+  credential_obtained: VICTIM_OAUTH_TOKEN
+  decoy:
+    service: exchange-online
+    expected_result: 401 Unauthorized
+    reason: Exchange requires valid OAuth bearer token; attacker has no token before
+      consent is granted
+- step: 2
+  description: "Attacker authenticates to Graph API from adversary infrastructure\
+    \ using delegated token \u2014 non-interactive sign-in from foreign IP"
+  service: azure-ad
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: ARM rejects delegated Graph token; audience mismatch (token issued for
+      graph.microsoft.com, not management.azure.com)
+- step: 3
+  description: "Mailbox reconnaissance \u2014 enumerate CFO mailbox via Graph API\
+    \ to identify wire transfer threads and financial contacts"
+  service: exchange-online
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: imds
+    expected_result: 403 Forbidden
+    reason: IMDS only accessible from Azure VM wire server; external attacker IP cannot
+      reach 169.254.169.254
+- step: 4
+  description: "Create inbox rule to move replies from finance contacts to RSS Subscriptions\
+    \ folder and mark as read \u2014 suppresses detection of fraud"
+  service: exchange-online
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: Attacker attempts to create Exchange transport rule via ARM API; Graph-scoped
+      token rejected by ARM audience validation
+- step: 5
+  description: "Send fraudulent wire transfer request from CFO mailbox to accounts\
+    \ payable \u2014 BEC wire fraud impersonating compromised executive"
+  service: exchange-online
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-ad
+    expected_result: 403 Forbidden
+    reason: Attacker attempts to add client credentials to app registration for persistence;
+      delegated Mail scopes insufficient for Application.ReadWrite.All

@@ -1,0 +1,41 @@
+[
+  {
+    "AccountDisplayName": "s.chen",
+    "AccountDomain": "",
+    "AccountName": "",
+    "AccountObjectId": "",
+    "AccountSid": "",
+    "AccountUpn": "s.chen@contoso.com",
+    "ActionType": "LogonSuccess",
+    "AdditionalFields": {
+      "source": "azure_ad"
+    },
+    "Application": "Azure AD",
+    "DestinationDeviceName": "",
+    "DestinationIPAddress": "",
+    "DestinationPort": "",
+    "DeviceName": "",
+    "DeviceType": "",
+    "FailureReason": "",
+    "IPAddress": "172.30.30.1",
+    "ISP": "",
+    "LastSeenForUser": null,
+    "Location": "",
+    "LogonType": "Interactive",
+    "OSPlatform": "",
+    "Port": "",
+    "Protocol": "OAuth",
+    "ReportId": "",
+    "SourceSystem": "",
+    "TargetAccountDisplayName": "",
+    "TargetDeviceName": "",
+    "TenantId": "",
+    "TimeGenerated": "",
+    "Timestamp": "2026-06-30T09:25:47.3333751Z",
+    "Type": "IdentityLogonEvents",
+    "UncommonForUser": null,
+    "source": "",
+    "collectedAt": "2026-06-30T09:25:48.039688Z",
+    "AttackTechnique": "T1078.004"
+  }
+]

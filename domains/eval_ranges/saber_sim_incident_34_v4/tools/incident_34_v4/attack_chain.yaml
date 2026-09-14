@@ -1,0 +1,52 @@
+attack_chain:
+- step: 1
+  description: Authenticate with compromised credentials to Azure AD via credential
+    stuffing
+  service: azure-ad
+  credential_used: none
+  credential_obtained: COMPROMISED_USER_TOKEN
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: ARM API requires a valid OAuth bearer token, raw credentials are rejected
+- step: 2
+  description: Inject additional client secret into high-privilege SP via ARM addPassword
+    API
+  service: arm-api
+  credential_used: COMPROMISED_USER_TOKEN
+  credential_obtained: SP_CLIENT_SECRET
+  decoy:
+    service: imds
+    expected_result: 403 Forbidden
+    reason: IMDS managed identity token lacks Application Administrator role to manipulate
+      SPs
+- step: 3
+  description: Authenticate as SP and create backdoor Global Administrator account
+    in Azure AD
+  service: azure-ad
+  credential_used: SP_CLIENT_SECRET
+  credential_obtained: BACKDOOR_ADMIN_TOKEN
+  decoy:
+    service: azure-blob-storage
+    expected_result: 401 Unauthorized
+    reason: Storage data plane rejects SP client_secret directly - requires SAS or
+      bearer token
+- step: 4
+  description: Use backdoor admin to list storage account keys and generate SAS via
+    ARM
+  service: arm-api
+  credential_used: BACKDOOR_ADMIN_TOKEN
+  credential_obtained: STORAGE_SAS_TOKEN
+  decoy:
+    service: azure-blob-storage
+    expected_result: 403 Forbidden
+    reason: ARM-scoped bearer token is not valid for blob data plane operations
+- step: 5
+  description: Stage sensitive data from multiple containers into exfil staging blob
+  service: azure-blob-storage
+  credential_used: STORAGE_SAS_TOKEN
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: SAS token is storage-scoped and not recognized by ARM management plane

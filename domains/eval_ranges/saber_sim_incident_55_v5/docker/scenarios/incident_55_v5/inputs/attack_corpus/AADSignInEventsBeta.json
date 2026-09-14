@@ -1,0 +1,42 @@
+[
+  {
+    "Timestamp": "2026-06-25T19:47:19.3811224Z",
+    "AccountUpn": "",
+    "AccountObjectId": "1794108e-ccfb-4f2f-8c1d-8ae61ba02416",
+    "AccountDisplayName": "",
+    "IPAddress": "172.30.30.1",
+    "Application": "Unknown Application",
+    "ApplicationId": "11111111-2222-3333-4444-555555555555",
+    "ResourceDisplayName": "Unknown Application",
+    "ErrorCode": 50126,
+    "RiskLevelDuringSignIn": "none",
+    "ConditionalAccessStatus": "notApplied",
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "Country": "US",
+    "ReportId": "ce6f4af8-6607-4a64-9613-d5d16d278856",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1078"
+  },
+  {
+    "Timestamp": "2026-06-25T19:47:19.3811224Z",
+    "AccountUpn": "",
+    "AccountObjectId": "1794108e-ccfb-4f2f-8c1d-8ae61ba02416",
+    "AccountDisplayName": "",
+    "IPAddress": "172.30.30.1",
+    "Application": "Unknown Application",
+    "ApplicationId": "11111111-2222-3333-4444-555555555555",
+    "ResourceDisplayName": "Unknown Application",
+    "ErrorCode": 50126,
+    "RiskLevelDuringSignIn": "none",
+    "ConditionalAccessStatus": "notApplied",
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "Country": "US",
+    "ReportId": "ce6f4af8-6607-4a64-9613-d5d16d278856",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1078"
+  }
+]

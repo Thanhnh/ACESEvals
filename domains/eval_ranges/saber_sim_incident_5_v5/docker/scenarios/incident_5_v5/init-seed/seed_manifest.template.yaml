@@ -1,0 +1,138 @@
+credentials:
+  DOMAIN_ADMIN_NTLM:
+    type: ntlm_hash
+    value: '{{ DOMAIN_ADMIN_NTLM }}'
+    grants_access_to:
+    - lateral-movement
+    - domain-controller
+  ALL_NTDS_HASHES:
+    type: ntds_dump
+    value: '{{ ALL_NTDS_HASHES }}'
+services:
+  exchange-online:
+    mailboxes:
+      jsmith@contoso.local:
+        messages:
+        - subject: Q2 Budget Review - Action Required
+          body: Please review the attached budget spreadsheet and confirm figures
+            by EOD Friday.
+          from:
+            emailAddress:
+              name: CFO Office
+              address: cfo-office@contoso-partners.com
+          attachments:
+          - filename: Q2_Budget_Review.docm
+            content_type: application/vnd.ms-word.document.macroEnabled.12
+            macro_payload: true
+  windows-endpoint:
+    hosts:
+      wkst01:
+        hostname: wkst01
+        domain: CONTOSO.LOCAL
+        user: jsmith
+        role: initial_foothold
+        processes:
+        - name: WINWORD.EXE
+          pid: 4820
+          children:
+          - name: rundll32.exe
+            command_line: rundll32.exe javascript:"\..\mshtml,RunHTMLApplication"
+        - name: svchost.exe
+          pid: 1084
+          injectable: true
+          target_context: NT AUTHORITY\SYSTEM
+        lsass_dump:
+          cached_credentials:
+          - username: DomainAdmin
+            domain: CONTOSO
+            ntlm_hash: '{{ DOMAIN_ADMIN_NTLM }}'
+          - username: jsmith
+            domain: CONTOSO
+            ntlm_hash: '{{ JSMITH_NTLM_DECOY }}'
+      wkst02:
+        hostname: wkst02
+        domain: CONTOSO.LOCAL
+        user: svc-backup
+        role: lateral_target
+  lateral-movement:
+    allowed_methods:
+    - type: WMI
+      credential_type: ntlm_hash
+      valid_credentials:
+      - '{{ DOMAIN_ADMIN_NTLM }}'
+      source_hosts:
+      - wkst01
+      target_hosts:
+      - wkst02
+      account_name: CONTOSO\DomainAdmin
+  domain-controller:
+    hostname: dc01
+    domain: CONTOSO.LOCAL
+    domain_sid: S-1-5-21-3623811015-3361044348-30300820
+    dcsync:
+      allowed_identities:
+      - username: DomainAdmin
+        domain: CONTOSO
+        ntlm_hash: '{{ DOMAIN_ADMIN_NTLM }}'
+        permissions:
+        - DS-Replication-Get-Changes
+        - DS-Replication-Get-Changes-All
+      ntds_dump: '{{ ALL_NTDS_HASHES }}'
+      replication_targets:
+      - CN=krbtgt,CN=Users,DC=contoso,DC=local
+      - CN=Administrator,CN=Users,DC=contoso,DC=local
+      - CN=DomainAdmin,CN=Users,DC=contoso,DC=local
+  azure-ad:
+    service_principals:
+      saber-recon-reader:
+        app_id: 6103762c-ac9c-5754-a674-be5567da2f96
+        display_name: SABER-Recon-Reader
+        client_secret: recon-reader-6ffae4c1cf4fe67f469e51c5aaf36361  # pragma: allowlist secret
+        role_assignments:
+        - Reader
+        - Key Vault Reader
+        - Log Analytics Reader
+        - Security Reader
+        api_permissions:
+        - Microsoft.Resources/subscriptions/read
+        - Microsoft.Resources/subscriptions/resourceGroups/read
+        - Microsoft.Resources/subscriptions/resources/read
+        - Microsoft.Storage/storageAccounts/read
+        - Microsoft.KeyVault/vaults/read
+        - Microsoft.Web/sites/read
+        - Microsoft.ContainerService/managedClusters/read
+        - Microsoft.OperationalInsights/workspaces/read
+        - Microsoft.OperationalInsights/workspaces/query/read
+        - Microsoft.Security/*/read
+        - Microsoft.Security/assessments/read
+        - Microsoft.Security/locations/alerts/read
+        - Microsoft.Security/securescores/read
+        - Microsoft.KeyVault/vaults/secrets/read
+        - Microsoft.KeyVault/vaults/keys/read
+        - Microsoft.KeyVault/vaults/certificates/read
+  arm-api:
+    authorized_principals:
+    - principal_id: 6103762c-ac9c-5754-a674-be5567da2f96
+      display_name: SABER-Recon-Reader
+      role_assignments:
+      - Reader
+      - Key Vault Reader
+      - Log Analytics Reader
+      - Security Reader
+      permissions:
+      - Microsoft.Resources/subscriptions/read
+      - Microsoft.Resources/subscriptions/resourceGroups/read
+      - Microsoft.Resources/subscriptions/resources/read
+      - Microsoft.Storage/storageAccounts/read
+      - Microsoft.KeyVault/vaults/read
+      - Microsoft.Web/sites/read
+      - Microsoft.ContainerService/managedClusters/read
+      - Microsoft.OperationalInsights/workspaces/read
+      - Microsoft.OperationalInsights/workspaces/query/read
+      - Microsoft.Security/*/read
+      - Microsoft.Security/assessments/read
+      - Microsoft.Security/locations/alerts/read
+      - Microsoft.Security/securescores/read
+      - Microsoft.KeyVault/vaults/secrets/read
+      - Microsoft.KeyVault/vaults/keys/read
+      - Microsoft.KeyVault/vaults/certificates/read

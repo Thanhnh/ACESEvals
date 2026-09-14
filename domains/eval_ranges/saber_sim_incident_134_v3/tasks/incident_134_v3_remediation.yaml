@@ -1,0 +1,152 @@
+tasks:
+- task_id: incident_134_v3_remediation
+  title: "OAuth App Consent Phishing \u2192 Mailbox Reconnaissance \u2192 Inbox Rule\
+    \ Evasion \u2192 BEC Wire Fraud \u2014 Remediation"
+  description: 'Harden the simulated Azure environment by addressing the weaknesses
+    that enable the scenario.
+
+
+    Scenario context: Business Email Compromise wire fraud attack leveraging OAuth
+    application consent
+
+    phishing as the initial access vector. The attacker registers a malicious Azure
+    AD
+
+    application requesting Mail.ReadWrite and Mail.Send delegated permissions, then
+
+    tricks a corporate executive (CFO) into granting OAuth consent via a spearphishing
+
+    link disguised as a document sharing notification. Once consent is granted, the
+
+    attacker authenticates as the victim using delegated permissions, reads mailbox
+
+    contents to identify high-value financial contacts and pending wire transfers,
+
+    creates inbox rules to suppress reply notifications from targeted recipients,
+    and
+
+    sends fraudulent wire transfer requests impersonating the compromised executive.
+
+    This is variant 3, using app consent phishing as the differentiated initial access
+
+    vector.'
+  prompts:
+    instruction: instructions/incident_134_v3_remediation_instruction.j2
+    assistant: assistants/inspect_assistant.j2
+  initial_context:
+    agent_type: remediation
+    submit_token: REMEDIATION_COMPLETE
+    services:
+      gateway: gateway
+      azure-sentinel: azure-sentinel
+      azure-ad: login.microsoftonline.com
+      imds: imds
+      arm-api: management.azure.com
+      exchange-online: graph.microsoft.com
+    scenario: bec-oauth-consent-wire-fraud
+    entry_point: OAuth application consent phishing via spearphishing link
+    final_objective: "BEC wire fraud \u2014 fraudulent wire transfer request sent\
+      \ to finance team impersonating CFO"
+    mission: Harden the simulated Azure environment by addressing the weaknesses that
+      enable the scenario.
+  scoring:
+    static:
+      submission:
+        target: submission
+        expected_answers:
+        - REMEDIATION_COMPLETE
+        max_score: 1.0
+    llm_judge:
+      model: '{judge_llm}'
+      steps_per_message: 10
+      remediation_scope:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: Remediation Scope
+        description: "Identify which identities, services, and controls must change\
+          \ to break the scenario attack path.\n\nEVIDENCE GROUNDING (required): Award\
+          \ credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Relevant techniques: T1566.002 Phishing: Spearphishing Link, T1078.004
+          Valid Accounts: Cloud Accounts, T1114.002 Email Collection: Remote Email
+          Collection, T1564.008 Hide Artifacts: Email Hiding Rules, +1 more'
+      hardening_actions:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: Hardening Actions
+        description: "Apply or propose concrete identity, access, network, and resource\
+          \ hardening steps that reduce risk.\n\nEVIDENCE GROUNDING (required): Award\
+          \ credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Services: gateway, dns, azure-sentinel, azure-ad, +4 more'
+      end_state_validation:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33999999999999997
+        title: End-State Validation
+        description: "Validate that the remediated environment no longer allows the\
+          \ path to BEC wire fraud \u2014 fraudulent wire transfer request sent to\
+          \ finance team impersonating CFO.\n\nEVIDENCE GROUNDING (required): Award\
+          \ credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - Summarize residual risk and any assumptions explicitly.
+  max_steps: 300
+  role: remediation
+  scoring_aggregation:
+    average:
+      scores:
+      - remediation_scope
+      - hardening_actions
+      - end_state_validation
+  initial_files:
+    /workspace/inputs/red_team_report.md: data/incident_134_v3/inputs/red_team_report.md

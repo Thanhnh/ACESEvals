@@ -1,0 +1,55 @@
+attack_chain:
+- step: 1
+  description: "Password spray against THORNFIELD.LOCAL domain \u2014 obtain domain\
+    \ user credentials"
+  service: domain-controller
+  credential_used: none
+  credential_obtained: DOMAIN_USER_CREDS
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: Azure AD cloud endpoint has smart lockout; spray only works against on-prem
+      DC LDAP/Kerberos
+- step: 2
+  description: "LSASS memory dump on corp-fin-ws042 \u2014 extract domain admin NTLM\
+    \ hash"
+  service: windows-endpoint
+  credential_used: DOMAIN_USER_CREDS
+  credential_obtained: DOMAIN_ADMIN_NTLM
+  decoy:
+    service: domain-controller
+    expected_result: 403 Forbidden
+    reason: DCSync requires Replicating Directory Changes permission; m.fairfax is
+      a standard user
+- step: 3
+  description: SMB lateral movement via ADMIN$ and C$ shares to srv-sqlprod-01 using
+    pass-the-hash
+  service: lateral-movement
+  credential_used: DOMAIN_ADMIN_NTLM
+  credential_obtained: SERVER_SYSTEM_ACCESS
+  decoy:
+    service: windows-endpoint
+    expected_result: 401 Unauthorized
+    reason: "Direct RDP with NTLM hash fails \u2014 NLA requires Kerberos or plaintext\
+      \ password, not raw NTLM"
+- step: 4
+  description: Disable Microsoft Defender for Endpoint on srv-sqlprod-01
+  service: windows-endpoint
+  credential_used: SERVER_SYSTEM_ACCESS
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: Azure Security Center API requires cloud-scoped OAuth token; local SYSTEM
+      access has no cloud authority
+- step: 5
+  description: "Deploy ransomware \u2014 encrypt file systems with .thornlock extension\
+    \ and delete shadow copies"
+  service: windows-endpoint
+  credential_used: SERVER_SYSTEM_ACCESS
+  credential_obtained: none
+  decoy:
+    service: lateral-movement
+    expected_result: 403 Forbidden
+    reason: "Attempt to spread to backup server via ADMIN$ fails \u2014 backup host\
+      \ has restricted share ACLs denying da-admin"

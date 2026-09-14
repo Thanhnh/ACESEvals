@@ -1,0 +1,36 @@
+[
+  {
+    "AlertId": "alert-1",
+    "AttackTechniques": "T1055",
+    "Category": "DefenseEvasion",
+    "DetectionSource": "EDR",
+    "ServiceSource": "Microsoft Defender for Endpoint",
+    "Severity": "High",
+    "SourceSystem": "",
+    "TenantId": "",
+    "TimeGenerated": "2026-07-17T19:13:22.082Z",
+    "Timestamp": "2026-07-17T19:13:22.082Z",
+    "Title": "Process injection detected",
+    "Type": "AlertInfo",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1055"
+  },
+  {
+    "AlertId": "alert-2",
+    "AttackTechniques": "T1003.001",
+    "Category": "CredentialAccess",
+    "DetectionSource": "EDR",
+    "ServiceSource": "Microsoft Defender for Endpoint",
+    "Severity": "High",
+    "SourceSystem": "",
+    "TenantId": "",
+    "TimeGenerated": "2026-07-17T19:13:22.152Z",
+    "Timestamp": "2026-07-17T19:13:22.152Z",
+    "Title": "Suspicious LSASS memory access",
+    "Type": "AlertInfo",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1003.001"
+  }
+]

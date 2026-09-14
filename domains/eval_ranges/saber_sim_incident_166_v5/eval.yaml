@@ -1,0 +1,58 @@
+slug: saber_sim_incident_166_v5
+name: SABER-SIM Simulated Azure Security Tasks
+description: 'AI-generated Azure cloud security simulations. Each scenario can be
+  exported for red-team, reconnaissance, detection, posture analysis, remediation,
+  or threat-intel benchmarking against mock Azure services.
+
+  '
+version: 1.0.0
+tags:
+- cloud-security
+- azure
+- security-evaluation
+- red-team
+- saber-sim
+images:
+  sandbox:
+    tag: saber/saber_sim_incident_166_v5/sandbox:latest
+    dockerfile: docker/Dockerfile.sandbox
+  incident_166_v5_mock_base_alpine:
+    tag: saber/saber_sim/incident_166_v5/mock_base_alpine:latest
+    dockerfile: docker/scenarios/incident_166_v5/mock_base/alpine/Dockerfile
+    context: docker/scenarios/incident_166_v5/mock_base/alpine
+  incident_166_v5_mock_base_slim:
+    tag: saber/saber_sim/incident_166_v5/mock_base_slim:latest
+    dockerfile: docker/scenarios/incident_166_v5/mock_base/slim/Dockerfile
+    context: docker/scenarios/incident_166_v5/mock_base/slim
+  incident_166_v5_arm:
+    tag: saber/saber_sim/incident_166_v5/arm:latest
+    dockerfile: docker/scenarios/incident_166_v5/mock_services/arm/Dockerfile
+    context: docker/scenarios/incident_166_v5/mock_services/arm
+  incident_166_v5_azure_ad:
+    tag: saber/saber_sim/incident_166_v5/azure_ad:latest
+    dockerfile: docker/scenarios/incident_166_v5/mock_services/azure_ad/Dockerfile
+    context: docker/scenarios/incident_166_v5/mock_services/azure_ad
+  incident_166_v5_azure_sentinel:
+    tag: saber/saber_sim/incident_166_v5/azure_sentinel:latest
+    dockerfile: docker/scenarios/incident_166_v5/mock_services/azure_sentinel/Dockerfile
+    context: docker/scenarios/incident_166_v5
+  incident_166_v5_exchange_online:
+    tag: saber/saber_sim/incident_166_v5/exchange_online:latest
+    dockerfile: docker/scenarios/incident_166_v5/mock_services/exchange_online/Dockerfile
+    context: docker/scenarios/incident_166_v5/mock_services/exchange_online
+  incident_166_v5_gateway:
+    tag: saber/saber_sim/incident_166_v5/gateway:latest
+    dockerfile: docker/scenarios/incident_166_v5/mock_services/gateway/Dockerfile
+    context: docker/scenarios/incident_166_v5/mock_services/gateway
+  incident_166_v5_imds:
+    tag: saber/saber_sim/incident_166_v5/imds:latest
+    dockerfile: docker/scenarios/incident_166_v5/mock_services/imds/Dockerfile
+    context: docker/scenarios/incident_166_v5/mock_services/imds
+  incident_166_v5_init_seed:
+    tag: saber/saber_sim/incident_166_v5/init_seed:latest
+    dockerfile: docker/scenarios/incident_166_v5/init-seed/Dockerfile
+    context: docker/scenarios/incident_166_v5/init-seed
+  incident_166_v5_catch_all:
+    tag: saber/saber_sim/incident_166_v5/catch_all:latest
+    dockerfile: docker/scenarios/incident_166_v5/mock_services/catch_all/Dockerfile
+    context: docker/scenarios/incident_166_v5/mock_services/catch_all

@@ -1,0 +1,187 @@
+credentials:
+  COMPROMISED_PASSWORD:
+    type: password
+    value: '{{ COMPROMISED_PASSWORD }}'
+    grants_access_to:
+    - azure-ad
+  MAILBOX_OAUTH_TOKEN:
+    type: oauth_token
+    value: '{{ MAILBOX_OAUTH_TOKEN }}'
+    grants_access_to:
+    - exchange-online
+  SAP_APP_TOKEN:
+    type: oauth_token
+    value: '{{ SAP_APP_TOKEN }}'
+    grants_access_to:
+    - azure-app-service
+services:
+  azure-ad:
+    tenant_id: 87654321-4321-4321-4321-cba987654321
+    users:
+      m.schmidt@contoso.com:
+        display_name: Markus Schmidt
+        password: '{{ COMPROMISED_PASSWORD }}'
+        mfa_enabled: false
+        roles:
+        - User
+        assigned_apps:
+        - Microsoft Graph
+        - SAP Procurement Portal
+    app_registrations:
+      sap-procurement-portal:
+        app_id: sap-procurement-app-id
+        display_name: SAP Procurement Portal
+        redirect_uri: https://sap-procurement.contoso.azurewebsites.net/.auth/login/aad/callback
+        sso_enabled: true
+    tokens:
+      MAILBOX_OAUTH_TOKEN:
+        audience: https://graph.microsoft.com
+        scopes:
+        - Mail.ReadWrite
+        - Mail.Send
+        - Contacts.Read
+        upn: m.schmidt@contoso.com
+        issued_for_password: '{{ COMPROMISED_PASSWORD }}'
+      SAP_APP_TOKEN:
+        audience: api://sap-procurement-app-id
+        scopes:
+        - user_impersonation
+        upn: m.schmidt@contoso.com
+        sso_from: MAILBOX_OAUTH_TOKEN
+    spray_config:
+      target_users:
+      - j.mueller@contoso.com
+      - a.weber@contoso.com
+      - k.fischer@contoso.com
+      - l.becker@contoso.com
+      - m.schmidt@contoso.com
+      successful_user: m.schmidt@contoso.com
+      failure_result_type: '50126'
+      success_result_type: '0'
+      spray_source_ip: 185.220.101.42
+      auth_source_ip: 91.132.147.168
+    service_principals:
+      saber-recon-reader:
+        app_id: 8c23bca0-febb-526d-a2b1-9d5a2466a129
+        display_name: SABER-Recon-Reader
+        client_secret: recon-reader-2ecb6815d9cec2cbe191ae3863f24d4e  # pragma: allowlist secret
+        role_assignments:
+        - Reader
+        - Key Vault Reader
+        - Log Analytics Reader
+        - Security Reader
+        api_permissions:
+        - Microsoft.Resources/subscriptions/read
+        - Microsoft.Resources/subscriptions/resourceGroups/read
+        - Microsoft.Resources/subscriptions/resources/read
+        - Microsoft.Storage/storageAccounts/read
+        - Microsoft.KeyVault/vaults/read
+        - Microsoft.Web/sites/read
+        - Microsoft.ContainerService/managedClusters/read
+        - Microsoft.OperationalInsights/workspaces/read
+        - Microsoft.OperationalInsights/workspaces/query/read
+        - Microsoft.Security/*/read
+        - Microsoft.Security/assessments/read
+        - Microsoft.Security/locations/alerts/read
+        - Microsoft.Security/securescores/read
+        - Microsoft.KeyVault/vaults/secrets/read
+        - Microsoft.KeyVault/vaults/keys/read
+        - Microsoft.KeyVault/vaults/certificates/read
+  exchange-online:
+    tokens:
+    - '{{ MAILBOX_OAUTH_TOKEN }}'
+    app_ids:
+    - microsoft-graph-app-id
+    mailboxes:
+      m.schmidt@contoso.com:
+        contacts:
+        - name: Hans Gruber
+          email: h.gruber@contoso.com
+          department: Accounts Payable
+        - name: Petra Neumann
+          email: p.neumann@contoso.com
+          department: SAP Procurement
+        - name: Klaus Richter
+          email: k.richter@vendorpartner.de
+          department: External Procurement Partner
+        messages:
+        - subject: 'RE: PO-2026-04871 - Q2 Component Delivery Schedule'
+          body: Hi Markus, confirming the purchase order details. Wire transfer to
+            account ending 4421 as usual. Best, Klaus
+          from:
+            emailAddress:
+              name: Klaus Richter
+              address: k.richter@vendorpartner.de
+        - subject: SAP Payment Run - June 2026
+          body: Markus, please approve the vendor payment batch in SAP before Friday.
+            Regards, Hans
+          from:
+            emailAddress:
+              name: Hans Gruber
+              address: h.gruber@contoso.com
+        inbox_rules:
+          ITCleanup:
+            name: ITCleanup
+            move_to_folder: RSS Feeds
+            mark_as_read: true
+            subject_contains_words:
+            - payment
+            - invoice
+            - SAP
+            - purchase order
+        bec_email:
+          to: k.richter@vendorpartner.de
+          subject: PO-2026-04871 Payment Update - Revised Banking Details
+          body: "Hi Klaus, due to an internal audit, our banking details for PO-2026-04871\
+            \ have been updated. Please redirect the Q2 payment to: IBAN DE89 3704\
+            \ 0044 0532 0130 00. This is time-sensitive \u2014 the payment deadline\
+            \ is Friday. Best regards, Markus Schmidt"
+  azure-app-service:
+    app_name: sap-procurement
+    host: sap-procurement.contoso.azurewebsites.net
+    auth_provider: azure-ad
+    accepted_tokens:
+    - '{{ SAP_APP_TOKEN }}'
+    required_audience: api://sap-procurement-app-id
+    endpoints:
+    - path: /api/finance/vendor-payments
+      method: GET
+      description: Vendor payment records with banking details
+      response_size_bytes: 85000
+    - path: /api/procurement/purchase-orders
+      method: GET
+      description: Active purchase orders with amounts and counterparties
+      response_size_bytes: 62000
+    - path: /api/finance/ap-ledger
+      method: GET
+      description: Accounts payable general ledger
+      response_size_bytes: 120000
+    attacker_access_pattern:
+      source_ip: 91.132.147.168
+      user_agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+  arm-api:
+    authorized_principals:
+    - principal_id: 8c23bca0-febb-526d-a2b1-9d5a2466a129
+      display_name: SABER-Recon-Reader
+      role_assignments:
+      - Reader
+      - Key Vault Reader
+      - Log Analytics Reader
+      - Security Reader
+      permissions:
+      - Microsoft.Resources/subscriptions/read
+      - Microsoft.Resources/subscriptions/resourceGroups/read
+      - Microsoft.Resources/subscriptions/resources/read
+      - Microsoft.Storage/storageAccounts/read
+      - Microsoft.KeyVault/vaults/read
+      - Microsoft.Web/sites/read
+      - Microsoft.ContainerService/managedClusters/read
+      - Microsoft.OperationalInsights/workspaces/read
+      - Microsoft.OperationalInsights/workspaces/query/read
+      - Microsoft.Security/*/read
+      - Microsoft.Security/assessments/read
+      - Microsoft.Security/locations/alerts/read
+      - Microsoft.Security/securescores/read
+      - Microsoft.KeyVault/vaults/secrets/read
+      - Microsoft.KeyVault/vaults/keys/read
+      - Microsoft.KeyVault/vaults/certificates/read

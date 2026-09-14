@@ -1,0 +1,53 @@
+[
+  {
+    "AlertId": "alert-1",
+    "AttackTechniques": "T1562.001",
+    "Category": "DefenseEvasion",
+    "DetectionSource": "EDR",
+    "ServiceSource": "Microsoft Defender for Endpoint",
+    "Severity": "High",
+    "SourceSystem": "",
+    "TenantId": "",
+    "TimeGenerated": "2026-07-17T19:29:20.328Z",
+    "Timestamp": "2026-07-17T19:29:20.328Z",
+    "Title": "Windows Defender AV disabled",
+    "Type": "AlertInfo",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1562.001"
+  },
+  {
+    "AlertId": "alert-2",
+    "AttackTechniques": "T1490",
+    "Category": "Impact",
+    "DetectionSource": "EDR",
+    "ServiceSource": "Microsoft Defender for Endpoint",
+    "Severity": "High",
+    "SourceSystem": "",
+    "TenantId": "",
+    "TimeGenerated": "2026-07-17T19:29:20.443Z",
+    "Timestamp": "2026-07-17T19:29:20.443Z",
+    "Title": "Shadow copy deletion (backup tampering)",
+    "Type": "AlertInfo",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1486"
+  },
+  {
+    "AlertId": "alert-3",
+    "AttackTechniques": "T1486",
+    "Category": "Impact",
+    "DetectionSource": "EDR",
+    "ServiceSource": "Microsoft Defender for Endpoint",
+    "Severity": "Critical",
+    "SourceSystem": "",
+    "TenantId": "",
+    "TimeGenerated": "2026-07-17T19:29:20.443Z",
+    "Timestamp": "2026-07-17T19:29:20.443Z",
+    "Title": "Ransomware behavior detected",
+    "Type": "AlertInfo",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1486"
+  }
+]

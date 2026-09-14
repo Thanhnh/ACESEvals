@@ -1,0 +1,27 @@
+[
+  {
+    "DetectionMethods": "",
+    "FileExtension": "",
+    "FileName": "Invoice_Q1_2024.docm",
+    "FileSize": null,
+    "FileType": "docm",
+    "NetworkMessageId": "msg-b889c9139c27",
+    "RecipientEmailAddress": "jsmith@alpineskihouse.com",
+    "RecipientObjectId": "",
+    "ReportId": "",
+    "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "SenderDisplayName": "",
+    "SenderFromAddress": "billing@vendor-invoices.com",
+    "SenderObjectId": "",
+    "SourceSystem": "",
+    "TenantId": "",
+    "ThreatNames": "",
+    "ThreatTypes": "Phish",
+    "TimeGenerated": "",
+    "Timestamp": "2026-07-01T20:18:01Z",
+    "Type": "EmailAttachmentInfo",
+    "source": "exchange_online",
+    "collectedAt": "2026-07-01T20:18:22.955127Z",
+    "AttackTechnique": "T1566.001"
+  }
+]

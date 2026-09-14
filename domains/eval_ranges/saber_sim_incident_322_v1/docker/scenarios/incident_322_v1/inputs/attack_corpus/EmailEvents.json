@@ -1,0 +1,28 @@
+[
+  {
+    "TimeGenerated": "",
+    "NetworkMessageId": "msg-b889c9139c27",
+    "InternetMessageId": "",
+    "SenderFromAddress": "billing@vendor-invoices.com",
+    "SenderFromDomain": "",
+    "SenderDisplayName": "Accounts Receivable",
+    "SenderIPv4": "",
+    "RecipientEmailAddress": "jsmith@alpineskihouse.com",
+    "RecipientDomain": "",
+    "Subject": "Outstanding Invoice Q1 2024 - Action Required",
+    "EmailDirection": "Inbound",
+    "DeliveryAction": "Delivered",
+    "DeliveryLocation": "",
+    "ThreatTypes": "Phish",
+    "ThreatNames": "",
+    "DetectionMethods": "",
+    "UrlCount": null,
+    "AttachmentCount": 1,
+    "EmailSize": null,
+    "IsFirstContact": null,
+    "Type": "EmailEvents",
+    "source": "exchange_online",
+    "collectedAt": "2026-07-01T20:18:22.955101Z",
+    "AttackTechnique": "T1566.001"
+  }
+]

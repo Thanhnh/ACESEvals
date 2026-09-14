@@ -1,0 +1,19 @@
+[
+  {
+    "AlertId": "alert-1",
+    "AttackTechniques": "T1003.003",
+    "Category": "CredentialAccess",
+    "DetectionSource": "EDR",
+    "ServiceSource": "Microsoft Defender for Endpoint",
+    "Severity": "High",
+    "SourceSystem": "",
+    "TenantId": "",
+    "TimeGenerated": "2026-07-01T20:18:01.000Z",
+    "Timestamp": "2026-07-01T20:18:01.000Z",
+    "Title": "NTDS.dit access detected",
+    "Type": "AlertInfo",
+    "source": "",
+    "collectedAt": "",
+    "AttackTechnique": "T1003.003"
+  }
+]

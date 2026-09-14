@@ -1,0 +1,51 @@
+attack_chain:
+- step: 1
+  description: "Exploit public-facing IIS application for code execution (w3wp.exe\
+    \ \u2192 cmd.exe)"
+  service: windows-endpoint
+  credential_used: none
+  credential_obtained: IIS_APPPOOL_EXECUTION
+  decoy:
+    service: imds
+    expected_result: 404 Not Found
+    reason: "Attacker probes for IMDS assuming Azure VM \u2014 host is not IMDS-enabled"
+- step: 2
+  description: Deploy ASPX web shell to IIS webroot for persistent C2 access
+  service: windows-endpoint
+  credential_used: IIS_APPPOOL_EXECUTION
+  credential_obtained: WEBSHELL_ACCESS
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: "Attacker attempts Azure AD token request with IIS service account \u2014\
+      \ no client credentials configured"
+- step: 3
+  description: Enumerate domain accounts via LDAP queries to domain controller
+  service: domain-controller
+  credential_used: WEBSHELL_ACCESS
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 401 Unauthorized
+    reason: "Attacker tries ARM API subscription enumeration \u2014 no valid Bearer\
+      \ token from on-prem context"
+- step: 4
+  description: Dump LSASS process memory to extract cached Domain Admin NTLM hash
+  service: windows-endpoint
+  credential_used: WEBSHELL_ACCESS
+  credential_obtained: DOMAIN_ADMIN_NTLM_HASH
+  decoy:
+    service: domain-controller
+    expected_result: 403 Forbidden
+    reason: "Attacker attempts DCSync with IIS AppPool identity \u2014 insufficient\
+      \ replication privileges"
+- step: 5
+  description: Pass-the-hash lateral movement via SMB/PsExec to domain controller
+  service: lateral-movement
+  credential_used: DOMAIN_ADMIN_NTLM_HASH
+  credential_obtained: DC_SYSTEM_ACCESS
+  decoy:
+    service: azure-ad
+    expected_result: 401 Unauthorized
+    reason: "Attacker attempts NTLM hash against Azure AD for cloud pivot \u2014 NTLM\
+      \ not accepted for cloud auth"

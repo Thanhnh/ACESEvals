@@ -1,0 +1,89 @@
+[
+  {
+    "AADOperationType": "",
+    "AADTenantId": "",
+    "ActivityDateTime": "",
+    "ActivityDisplayName": "",
+    "AdditionalDetails": null,
+    "Category": "AuditLogs",
+    "CorrelationId": "",
+    "DurationMs": 0,
+    "Id": "",
+    "Identity": "",
+    "InitiatedBy": "j.mitchell",
+    "Level": "",
+    "Location": "",
+    "LoggedByService": "",
+    "OperationName": "Add service principal credentials",
+    "OperationVersion": "",
+    "Resource": "",
+    "ResourceGroup": "",
+    "ResourceId": "",
+    "ResourceProvider": "",
+    "Result": "",
+    "ResultDescription": "",
+    "ResultReason": "",
+    "ResultSignature": "",
+    "ResultType": "Success",
+    "SourceSystem": "",
+    "TargetResources": [
+      {
+        "DisplayName": "backdoor",
+        "Id": "22222222-3333-4444-5555-666666666666"
+      }
+    ],
+    "TenantId": "",
+    "TimeGenerated": "2026-07-01T08:37:49.9974473Z",
+    "Type": "AuditLogs",
+    "source": "",
+    "collectedAt": "2026-07-01T08:37:50.459348Z",
+    "AttackTechnique": "T1098.001"
+  },
+  {
+    "AADOperationType": "",
+    "AADTenantId": "",
+    "ActivityDateTime": "",
+    "ActivityDisplayName": "",
+    "AdditionalDetails": null,
+    "Category": "AuditLogs",
+    "CorrelationId": "",
+    "DurationMs": 0,
+    "Id": "",
+    "Identity": "",
+    "InitiatedBy": {
+      "user": {
+        "id": "385c26e3-7702-ee76-8de7-43d25702395e",
+        "ipAddress": "172.30.30.1",
+        "userPrincipalName": "j.mitchell@contoso.com"
+      }
+    },
+    "Level": "",
+    "Location": "",
+    "LoggedByService": "",
+    "OperationName": "Add user",
+    "OperationVersion": "",
+    "Resource": "",
+    "ResourceGroup": "",
+    "ResourceId": "",
+    "ResourceProvider": "",
+    "Result": "",
+    "ResultDescription": "",
+    "ResultReason": "",
+    "ResultSignature": "",
+    "ResultType": "Success",
+    "SourceSystem": "",
+    "TargetResources": [
+      {
+        "id": "46b994c4-c83e-5bd1-928b-fd9efba3100c",
+        "type": "User",
+        "userPrincipalName": "svc-backup@contoso.com"
+      }
+    ],
+    "TenantId": "",
+    "TimeGenerated": "2026-07-01T08:37:49.7426397Z",
+    "Type": "AuditLogs",
+    "source": "",
+    "collectedAt": "2026-07-01T08:37:50.459367Z",
+    "AttackTechnique": "T1136.003"
+  }
+]

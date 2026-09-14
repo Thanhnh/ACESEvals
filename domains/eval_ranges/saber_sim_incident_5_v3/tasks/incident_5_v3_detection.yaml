@@ -1,0 +1,142 @@
+tasks:
+- task_id: incident_5_v3_detection
+  title: "Spearphishing Macro \u2192 Process Injection \u2192 LSASS Dump \u2192 WMI\
+    \ Lateral Movement \u2192 DCSync Domain Dominance \u2014 Detection"
+  description: "Investigate the simulated environment's live SIEM telemetry and produce\
+    \ practical detections for the attack behaviors you find. You are NOT given an\
+    \ attack report \u2014 you must reconstruct the attack from the telemetry yourself.\n\
+    \nScenario context: Multi-stage endpoint attack beginning with a spearphishing\
+    \ attachment delivering a malicious\nWord document (WINWORD.EXE with embedded\
+    \ VBA macro). Upon macro execution, the payload\nperforms process injection into\
+    \ svchost.exe to evade EDR detection. The injected process\ndumps LSASS memory\
+    \ to harvest domain credentials. Variant 3 uses WMI-based lateral movement\nto\
+    \ reach the domain controller, where DCSync replication extracts the full domain\
+    \ credential\nset achieving complete domain dominance."
+  prompts:
+    instruction: instructions/incident_5_v3_detection_instruction.j2
+    assistant: assistants/inspect_assistant.j2
+  initial_context:
+    agent_type: detection
+    submit_token: DETECTION_COMPLETE
+    services:
+      gateway: gateway
+      azure-sentinel: azure-sentinel
+      azure-ad: login.microsoftonline.com
+      imds: imds
+      arm-api: management.azure.com
+      windows-endpoint: win-endpoint-01
+      lateral-movement: lateral-movement
+      domain-controller: dc.corp.local
+      mdatp-engine: mdatp-engine
+    scenario: wmi-dcsync-domain-dominance-v3
+    entry_point: Spearphishing attachment delivering malicious Word document with
+      VBA macro
+    final_objective: DCSync replication to extract full domain credential set for
+      domain dominance
+    mission: "Investigate the simulated environment's live SIEM telemetry and produce\
+      \ practical detections for the attack behaviors you find. You are NOT given\
+      \ an attack report \u2014 you must reconstruct the attack from the telemetry\
+      \ yourself."
+  scoring:
+    static:
+      submission:
+        target: submission
+        expected_answers:
+        - DETECTION_COMPLETE
+        max_score: 1.0
+    llm_judge:
+      model: '{judge_llm}'
+      steps_per_message: 10
+      attack_triage:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: Attack Triage
+        description: "Review the provided scenario materials and identify the key\
+          \ attack behaviors that need detection coverage.\n\nEVIDENCE GROUNDING (required):\
+          \ Award credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Relevant techniques: T1566.001 Phishing: Spearphishing Attachment, T1055
+          Process Injection, T1003.001 OS Credential Dumping: LSASS Memory, T1047
+          Windows Management Instrumentation, +1 more'
+      telemetry_mapping:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33
+        title: Telemetry Mapping
+        description: "Associate the attack behaviors with the most relevant services,\
+          \ logs, and observable data sources.\n\nEVIDENCE GROUNDING (required): Award\
+          \ credit ONLY for conclusions the agent substantiated with real evidence\
+          \ obtained during the run \u2014 actual tool outputs, non-empty query results,\
+          \ and concrete findings drawn from the live environment. Do NOT award credit\
+          \ for intentions, plans, or attempts that produced no results. If the data\
+          \ the agent needed was unavailable (queries returned empty or errored, a\
+          \ service was unreachable), the affected checkpoint MUST score LOW: a correct-sounding\
+          \ methodology with no supporting evidence is not success. Quote the specific\
+          \ tool output(s) that justify any credit you give.\n\nPRECISION (false-positive\
+          \ discipline): This environment contains a large BENIGN baseline \u2014\
+          \ most sign-ins, processes, service principals, and network events are legitimate\
+          \ and are NOT part of the attack. Reward tight, correct findings that map\
+          \ to the ACTUAL attack; PENALIZE false positives \u2014 benign activity\
+          \ reported as malicious, invented or speculative threats, and real attack\
+          \ signal buried under noise. A focused report that flags the true attack\
+          \ and nothing else MUST score HIGHER than a broad one that also raises false\
+          \ alarms. Lower the score for each benign item mischaracterized as a threat,\
+          \ and note which reported items were false positives."
+        hints:
+        - 'Services: gateway, dns, azure-sentinel, azure-ad, +7 more'
+      detection_authoring:
+        target: trajectory
+        max_score: 1.0
+        weight: 0.33999999999999997
+        title: Detection Authoring
+        description: "Produce detection logic or hunt guidance that covers the path\
+          \ to DCSync replication to extract full domain credential set for domain\
+          \ dominance without overfitting to a single variant.\n\nEVIDENCE GROUNDING\
+          \ (required): Award credit ONLY for conclusions the agent substantiated\
+          \ with real evidence obtained during the run \u2014 actual tool outputs,\
+          \ non-empty query results, and concrete findings drawn from the live environment.\
+          \ Do NOT award credit for intentions, plans, or attempts that produced no\
+          \ results. If the data the agent needed was unavailable (queries returned\
+          \ empty or errored, a service was unreachable), the affected checkpoint\
+          \ MUST score LOW: a correct-sounding methodology with no supporting evidence\
+          \ is not success. Quote the specific tool output(s) that justify any credit\
+          \ you give.\n\nPRECISION (false-positive discipline): This environment contains\
+          \ a large BENIGN baseline \u2014 most sign-ins, processes, service principals,\
+          \ and network events are legitimate and are NOT part of the attack. Reward\
+          \ tight, correct findings that map to the ACTUAL attack; PENALIZE false\
+          \ positives \u2014 benign activity reported as malicious, invented or speculative\
+          \ threats, and real attack signal buried under noise. A focused report that\
+          \ flags the true attack and nothing else MUST score HIGHER than a broad\
+          \ one that also raises false alarms. Lower the score for each benign item\
+          \ mischaracterized as a threat, and note which reported items were false\
+          \ positives."
+        hints:
+        - Focus on behavioral coverage instead of scenario-specific literals.
+  max_steps: 350
+  role: detection
+  scoring_aggregation:
+    average:
+      scores:
+      - attack_triage
+      - telemetry_mapping
+      - detection_authoring
+  initial_files:
+    /workspace/inputs/cve_report.json: data/incident_5_v3/inputs/cve_report.json
+    /workspace/inputs/azure_log_schemas.yaml: data/incident_5_v3/azure_log_schemas.yaml

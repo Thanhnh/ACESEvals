@@ -1,0 +1,183 @@
+credentials:
+  STOLEN_DOMAIN_CREDENTIALS:
+    type: password
+    value: '{{ STOLEN_DOMAIN_CREDENTIALS }}'
+    grants_access_to:
+    - domain-controller
+  KERBEROS_TGT:
+    type: kerberos_tgt
+    value: '{{ KERBEROS_TGT }}'
+    grants_access_to:
+    - domain-controller
+    - lateral-movement
+  REMOTE_ADMIN_SESSION:
+    type: session_token
+    value: '{{ REMOTE_ADMIN_SESSION }}'
+    grants_access_to:
+    - windows-endpoint
+  UNRESTRICTED_ENDPOINT_ACCESS:
+    type: session_token
+    value: '{{ UNRESTRICTED_ENDPOINT_ACCESS }}'
+    grants_access_to:
+    - windows-endpoint
+services:
+  domain-controller:
+    hostname: contoso-dc01
+    domain: CONTOSO.LOCAL
+    valid_accounts:
+    - username: jmorales
+      domain: CONTOSO.LOCAL
+      password: '{{ STOLEN_DOMAIN_CREDENTIALS }}'
+      groups:
+      - Domain Users
+      - Remote Desktop Users
+    - username: svc-fileadmin
+      domain: CONTOSO.LOCAL
+      groups:
+      - Domain Admins
+      - Server Operators
+    kerberos:
+      realm: CONTOSO.LOCAL
+      tgt_token: '{{ KERBEROS_TGT }}'
+      service_tickets:
+      - spn: WSMAN/srv-critical-01
+        target: srv-critical-01
+      - spn: HOST/srv-critical-01
+        target: srv-critical-01
+    ldap:
+      base_dn: DC=contoso,DC=local
+      enumerable_objects:
+      - dn: CN=srv-critical-01,OU=Servers,DC=contoso,DC=local
+        objectClass: computer
+        operatingSystem: Windows Server 2019 Datacenter
+        servicePrincipalName:
+        - WSMAN/srv-critical-01
+        - HOST/srv-critical-01
+        dNSHostName: srv-critical-01.contoso.local
+      - dn: CN=ws-entry-04,OU=Workstations,DC=contoso,DC=local
+        objectClass: computer
+        operatingSystem: Windows 10 Enterprise
+        dNSHostName: ws-entry-04.contoso.local
+      - dn: CN=contoso-dc01,OU=Domain Controllers,DC=contoso,DC=local
+        objectClass: computer
+        operatingSystem: Windows Server 2019 Datacenter
+        dNSHostName: contoso-dc01.contoso.local
+    access_policies:
+    - identity: jmorales@CONTOSO.LOCAL
+      permissions:
+      - authenticate
+      - ldap/read
+  lateral-movement:
+    protocol: WMI
+    source_host: ws-entry-04
+    target_host: srv-critical-01
+    dcom_port: 135
+    accepted_tokens:
+    - '{{ KERBEROS_TGT }}'
+    session_token: '{{ REMOTE_ADMIN_SESSION }}'
+    wmi_config:
+      namespace: root\cimv2
+      class: Win32_Process
+      method: Create
+      command: cmd.exe /c powershell.exe -nop -w hidden -enc <payload>
+  windows-endpoint:
+    hosts:
+    - hostname: ws-entry-04
+      role: entry_point
+      domain: CONTOSO.LOCAL
+      logged_on_user: jmorales
+      os: Windows 10 Enterprise
+    - hostname: srv-critical-01
+      role: target
+      domain: CONTOSO.LOCAL
+      service_account: svc-fileadmin
+      os: Windows Server 2019 Datacenter
+      defender_enabled: true
+      critical_shares:
+      - path: C:\Shares\Finance
+      - path: C:\Shares\HR
+      - path: D:\Databases
+    accepted_sessions:
+    - '{{ REMOTE_ADMIN_SESSION }}'
+    defender_disable:
+      required_session: '{{ REMOTE_ADMIN_SESSION }}'
+      result_token: '{{ UNRESTRICTED_ENDPOINT_ACCESS }}'
+      methods:
+      - Set-MpPreference -DisableRealtimeMonitoring $true
+      - sc.exe stop WinDefend
+      - reg add HKLM\SOFTWARE\Policies\Microsoft\Windows Defender /v DisableAntiSpyware
+        /t REG_DWORD /d 1 /f
+    ransomware:
+      required_token: '{{ UNRESTRICTED_ENDPOINT_ACCESS }}'
+      binary_name: locker.exe
+      extension: .locked
+      ransom_note: README_UNLOCK.txt
+      target_paths:
+      - C:\Shares\Finance
+      - C:\Shares\HR
+      - D:\Databases
+  mdatp-engine:
+    api_endpoint: /api/machines
+    required_auth: oauth_token
+    monitored_hosts:
+    - ws-entry-04
+    - srv-critical-01
+    detection_rules:
+    - name: Defender Tampering
+      triggers_on: Set-MpPreference
+    - name: Ransomware Behavior
+      triggers_on: mass file rename with new extension
+  azure-ad:
+    service_principals:
+      saber-recon-reader:
+        app_id: ef0f5569-23bc-5db6-8a42-ef6a598b566c
+        display_name: SABER-Recon-Reader
+        client_secret: recon-reader-0733cc3a03f7c27ae20a8b82f9452c96  # pragma: allowlist secret
+        role_assignments:
+        - Reader
+        - Key Vault Reader
+        - Log Analytics Reader
+        - Security Reader
+        api_permissions:
+        - Microsoft.Resources/subscriptions/read
+        - Microsoft.Resources/subscriptions/resourceGroups/read
+        - Microsoft.Resources/subscriptions/resources/read
+        - Microsoft.Storage/storageAccounts/read
+        - Microsoft.KeyVault/vaults/read
+        - Microsoft.Web/sites/read
+        - Microsoft.ContainerService/managedClusters/read
+        - Microsoft.OperationalInsights/workspaces/read
+        - Microsoft.OperationalInsights/workspaces/query/read
+        - Microsoft.Security/*/read
+        - Microsoft.Security/assessments/read
+        - Microsoft.Security/locations/alerts/read
+        - Microsoft.Security/securescores/read
+        - Microsoft.KeyVault/vaults/secrets/read
+        - Microsoft.KeyVault/vaults/keys/read
+        - Microsoft.KeyVault/vaults/certificates/read
+  arm-api:
+    authorized_principals:
+    - principal_id: ef0f5569-23bc-5db6-8a42-ef6a598b566c
+      display_name: SABER-Recon-Reader
+      role_assignments:
+      - Reader
+      - Key Vault Reader
+      - Log Analytics Reader
+      - Security Reader
+      permissions:
+      - Microsoft.Resources/subscriptions/read
+      - Microsoft.Resources/subscriptions/resourceGroups/read
+      - Microsoft.Resources/subscriptions/resources/read
+      - Microsoft.Storage/storageAccounts/read
+      - Microsoft.KeyVault/vaults/read
+      - Microsoft.Web/sites/read
+      - Microsoft.ContainerService/managedClusters/read
+      - Microsoft.OperationalInsights/workspaces/read
+      - Microsoft.OperationalInsights/workspaces/query/read
+      - Microsoft.Security/*/read
+      - Microsoft.Security/assessments/read
+      - Microsoft.Security/locations/alerts/read
+      - Microsoft.Security/securescores/read
+      - Microsoft.KeyVault/vaults/secrets/read
+      - Microsoft.KeyVault/vaults/keys/read
+      - Microsoft.KeyVault/vaults/certificates/read

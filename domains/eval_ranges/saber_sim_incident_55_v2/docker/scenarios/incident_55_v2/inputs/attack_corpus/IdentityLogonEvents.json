@@ -1,0 +1,41 @@
+[
+  {
+    "AccountDisplayName": "jsmith",
+    "AccountDomain": "",
+    "AccountName": "",
+    "AccountObjectId": "",
+    "AccountSid": "",
+    "AccountUpn": "jsmith@CONTOSO.LOCAL",
+    "ActionType": "LogonSuccess",
+    "AdditionalFields": {
+      "source": "domain_controller"
+    },
+    "Application": "Active Directory",
+    "DestinationDeviceName": "",
+    "DestinationIPAddress": "",
+    "DestinationPort": "",
+    "DeviceName": "",
+    "DeviceType": "",
+    "FailureReason": "",
+    "IPAddress": "172.30.10.1",
+    "ISP": "",
+    "LastSeenForUser": null,
+    "Location": "",
+    "LogonType": "Interactive",
+    "OSPlatform": "",
+    "Port": "",
+    "Protocol": "Kerberos",
+    "ReportId": "",
+    "SourceSystem": "",
+    "TargetAccountDisplayName": "",
+    "TargetDeviceName": "",
+    "TenantId": "",
+    "TimeGenerated": "",
+    "Timestamp": "2026-07-01T00:09:39.201Z",
+    "Type": "IdentityLogonEvents",
+    "UncommonForUser": null,
+    "source": "",
+    "collectedAt": "2026-07-01T00:09:47.202435Z",
+    "AttackTechnique": "T1078.002"
+  }
+]

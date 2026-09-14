@@ -1,0 +1,106 @@
+[
+  {
+    "TimeGenerated": "2026-06-30T09:25:47.8167790Z",
+    "OperationName": "Sign-in activity",
+    "Category": "SignInLogs",
+    "ResultType": "0",
+    "ResultDescription": "ROPC password grant authentication",
+    "CorrelationId": "f44bf1f9-3b3f-4c5d-a43b-2e66543fe228",
+    "Id": "4b74b5ec-c8d2-4067-b420-90dbeb2a0883",
+    "UserDisplayName": "s.chen",
+    "UserPrincipalName": "s.chen@contoso.com",
+    "UserId": "0af763fc-8162-5a1d-b879-97b61a1bb602",
+    "AppDisplayName": "ROPC Password Grant",
+    "AppId": "11111111-2222-3333-4444-555555555555",
+    "IPAddress": "172.30.30.1",
+    "Location": "US",
+    "LocationDetails": {
+      "city": "Seattle",
+      "countryOrRegion": "US",
+      "geoCoordinates": {
+        "latitude": 47.6062,
+        "longitude": -122.3321
+      },
+      "state": "Washington"
+    },
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "DeviceDetail": {
+      "browser": "Rich Client",
+      "deviceId": "",
+      "operatingSystem": "Windows 10"
+    },
+    "ConditionalAccessStatus": "notApplied",
+    "IsInteractive": true,
+    "RiskLevelAggregated": "medium",
+    "RiskLevelDuringSignIn": "medium",
+    "RiskState": "atRisk",
+    "Status": {
+      "errorCode": 0,
+      "failureReason": null
+    },
+    "AuthenticationMethodsUsed": [
+      "Password"
+    ],
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "TokenIssuerType": "AzureAD",
+    "ResourceDisplayName": "ROPC Password Grant",
+    "ResourceId": "11111111-2222-3333-4444-555555555555",
+    "HomeTenantId": "87654321-4321-4321-4321-cba987654321",
+    "UserType": "Member",
+    "source": "azure_ad",
+    "collectedAt": "2026-06-30T09:25:48.039540Z",
+    "AttackTechnique": "T1078.004"
+  },
+  {
+    "TimeGenerated": "2026-06-25T03:58:12.110165Z",
+    "OperationName": "Sign-in activity",
+    "Category": "SignInLogs",
+    "ResultType": "0",
+    "ResultDescription": "ROPC password grant authentication",
+    "CorrelationId": "d1b9214c-54de-42b1-851e-5b320600e30c",
+    "Id": "94d18569-1f21-4227-8f32-2e6beabee467",
+    "UserDisplayName": "s.chen",
+    "UserPrincipalName": "s.chen@contoso.com",
+    "UserId": "bb4d3544-519a-455c-b248-f28673fa0b58",
+    "AppDisplayName": "ROPC Password Grant",
+    "AppId": "11111111-2222-3333-4444-555555555555",
+    "IPAddress": "172.30.30.1",
+    "Location": "US",
+    "LocationDetails": {
+      "city": "Seattle",
+      "state": "Washington",
+      "countryOrRegion": "US",
+      "geoCoordinates": {
+        "latitude": 47.6062,
+        "longitude": -122.3321
+      }
+    },
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "DeviceDetail": {
+      "operatingSystem": "Windows 10",
+      "browser": "Rich Client",
+      "deviceId": ""
+    },
+    "ConditionalAccessStatus": "notApplied",
+    "IsInteractive": true,
+    "RiskLevelAggregated": "medium",
+    "RiskLevelDuringSignIn": "medium",
+    "RiskState": "atRisk",
+    "Status": {
+      "errorCode": 0,
+      "failureReason": null
+    },
+    "AuthenticationMethodsUsed": [
+      "Password"
+    ],
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "TokenIssuerType": "AzureAD",
+    "ResourceDisplayName": "ROPC Password Grant",
+    "ResourceId": "11111111-2222-3333-4444-555555555555",
+    "HomeTenantId": "87654321-4321-4321-4321-cba987654321",
+    "UserType": "Member",
+    "source": "azure_ad",
+    "collectedAt": "2026-06-25T03:57:41.168501Z",
+    "AttackTechnique": "T1078.004"
+  }
+]

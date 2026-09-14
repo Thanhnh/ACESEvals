@@ -1,0 +1,56 @@
+attack_chain:
+- step: 1
+  description: "Device code phishing \u2014 victim authenticates attacker's device\
+    \ code, yielding delegated OAuth token"
+  service: azure-ad
+  credential_used: none
+  credential_obtained: VICTIM_OAUTH_TOKEN
+  decoy:
+    service: imds
+    expected_result: 403 Forbidden
+    reason: IMDS endpoint only accessible from Azure compute instances; attacker is
+      external with no network path to 169.254.169.254
+- step: 2
+  description: "ARM organizational enumeration \u2014 list subscriptions, resource\
+    \ groups, and directory users to identify finance team wire transfer approvers"
+  service: arm-api
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-sentinel
+    expected_result: 403 Forbidden
+    reason: Attacker attempts to query Sentinel workspace for active alerts on their
+      sign-in; victim lacks SecurityReader role assignment
+- step: 3
+  description: "Exchange mailbox access \u2014 read CFO financial correspondence via\
+    \ Graph API to gather wire transfer context, vendor names, and invoice numbers"
+  service: exchange-online
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 404 Not Found
+    reason: Attacker queries ARM for Exchange resource configuration to find mailbox
+      endpoints; Exchange Online is SaaS and not represented as an ARM resource
+- step: 4
+  description: "Create inbox hiding rule \u2014 auto-move replies from finance targets\
+    \ to RSS Feeds folder to suppress victim awareness of BEC correspondence"
+  service: exchange-online
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-ad
+    expected_result: 403 Forbidden
+    reason: Attacker attempts to add credentials to app registration for persistence;
+      victim token lacks Application.ReadWrite.All admin-consent scope
+- step: 5
+  description: "Send BEC wire fraud email \u2014 impersonate compromised CFO to request\
+    \ fraudulent wire transfer to finance controller referencing real invoices"
+  service: exchange-online
+  credential_used: VICTIM_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: imds
+    expected_result: 403 Forbidden
+    reason: Attacker probes IMDS for managed identity to establish compute-side persistence
+      after completing email objective; IMDS unreachable from external network

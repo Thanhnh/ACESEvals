@@ -1,0 +1,470 @@
+[
+  {
+    "TimeGenerated": "2026-06-30T15:11:23.2871790Z",
+    "OperationName": "Sign-in activity",
+    "Category": "SignInLogs",
+    "ResultType": "50126",
+    "ResultDescription": "Invalid username or password or Invalid on-premise username or password.",
+    "CorrelationId": "9aac21b9-9426-49d1-8c2b-4655becb0ec0",
+    "Id": "bc01748e-53a9-408d-8039-2d6c31f8bbff",
+    "UserDisplayName": "j.mueller",
+    "UserPrincipalName": "j.mueller@contoso.com",
+    "UserId": "8071ef6d-3d06-5c75-90e4-23e0eedafa24",
+    "AppDisplayName": "Office 365",
+    "AppId": "",
+    "IPAddress": "185.220.101.42",
+    "Location": "US",
+    "LocationDetails": {
+      "city": "Seattle",
+      "countryOrRegion": "US",
+      "geoCoordinates": {
+        "latitude": 47.6062,
+        "longitude": -122.3321
+      },
+      "state": "Washington"
+    },
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "DeviceDetail": {
+      "browser": "Rich Client",
+      "deviceId": "",
+      "operatingSystem": "Windows 10"
+    },
+    "ConditionalAccessStatus": "notApplied",
+    "IsInteractive": true,
+    "RiskLevelAggregated": "none",
+    "RiskLevelDuringSignIn": "none",
+    "RiskState": "none",
+    "Status": {
+      "errorCode": 50126,
+      "failureReason": "Invalid username or password or Invalid on-premise username or password."
+    },
+    "AuthenticationMethodsUsed": [
+      "Password"
+    ],
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "TokenIssuerType": "AzureAD",
+    "ResourceDisplayName": "Office 365",
+    "ResourceId": "",
+    "HomeTenantId": "87654321-4321-4321-4321-cba987654321",
+    "UserType": "Member",
+    "source": "azure_ad",
+    "collectedAt": "2026-06-30T15:11:24.132319Z",
+    "AttackTechnique": "T1110.003"
+  },
+  {
+    "TimeGenerated": "2026-06-30T15:11:23.4258434Z",
+    "OperationName": "Sign-in activity",
+    "Category": "SignInLogs",
+    "ResultType": "50126",
+    "ResultDescription": "Invalid username or password or Invalid on-premise username or password.",
+    "CorrelationId": "c0940c34-67d2-4c01-9e66-97e7553d8f0f",
+    "Id": "d025e66c-a6ec-4f3d-8782-27032b74bee4",
+    "UserDisplayName": "a.weber",
+    "UserPrincipalName": "a.weber@contoso.com",
+    "UserId": "d59a518a-70e1-551e-9e30-68e88a28b731",
+    "AppDisplayName": "Office 365",
+    "AppId": "",
+    "IPAddress": "185.220.101.42",
+    "Location": "US",
+    "LocationDetails": {
+      "city": "Seattle",
+      "countryOrRegion": "US",
+      "geoCoordinates": {
+        "latitude": 47.6062,
+        "longitude": -122.3321
+      },
+      "state": "Washington"
+    },
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "DeviceDetail": {
+      "browser": "Rich Client",
+      "deviceId": "",
+      "operatingSystem": "Windows 10"
+    },
+    "ConditionalAccessStatus": "notApplied",
+    "IsInteractive": true,
+    "RiskLevelAggregated": "none",
+    "RiskLevelDuringSignIn": "none",
+    "RiskState": "none",
+    "Status": {
+      "errorCode": 50126,
+      "failureReason": "Invalid username or password or Invalid on-premise username or password."
+    },
+    "AuthenticationMethodsUsed": [
+      "Password"
+    ],
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "TokenIssuerType": "AzureAD",
+    "ResourceDisplayName": "Office 365",
+    "ResourceId": "",
+    "HomeTenantId": "87654321-4321-4321-4321-cba987654321",
+    "UserType": "Member",
+    "source": "azure_ad",
+    "collectedAt": "2026-06-30T15:11:24.132328Z",
+    "AttackTechnique": "T1110.003"
+  },
+  {
+    "TimeGenerated": "2026-06-30T15:11:23.1499866Z",
+    "OperationName": "Sign-in activity",
+    "Category": "SignInLogs",
+    "ResultType": "50126",
+    "ResultDescription": "Invalid username or password or Invalid on-premise username or password.",
+    "CorrelationId": "8460d688-3545-4788-8c87-5b5f9333b731",
+    "Id": "a950ead8-089d-476e-86dc-7a7d38f85ba5",
+    "UserDisplayName": "k.fischer",
+    "UserPrincipalName": "k.fischer@contoso.com",
+    "UserId": "81e5e589-d147-56f1-b042-3f4fc6f10a48",
+    "AppDisplayName": "Office 365",
+    "AppId": "",
+    "IPAddress": "185.220.101.42",
+    "Location": "US",
+    "LocationDetails": {
+      "city": "Seattle",
+      "countryOrRegion": "US",
+      "geoCoordinates": {
+        "latitude": 47.6062,
+        "longitude": -122.3321
+      },
+      "state": "Washington"
+    },
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "DeviceDetail": {
+      "browser": "Rich Client",
+      "deviceId": "",
+      "operatingSystem": "Windows 10"
+    },
+    "ConditionalAccessStatus": "notApplied",
+    "IsInteractive": true,
+    "RiskLevelAggregated": "none",
+    "RiskLevelDuringSignIn": "none",
+    "RiskState": "none",
+    "Status": {
+      "errorCode": 50126,
+      "failureReason": "Invalid username or password or Invalid on-premise username or password."
+    },
+    "AuthenticationMethodsUsed": [
+      "Password"
+    ],
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "TokenIssuerType": "AzureAD",
+    "ResourceDisplayName": "Office 365",
+    "ResourceId": "",
+    "HomeTenantId": "87654321-4321-4321-4321-cba987654321",
+    "UserType": "Member",
+    "source": "azure_ad",
+    "collectedAt": "2026-06-30T15:11:24.132331Z",
+    "AttackTechnique": "T1110.003"
+  },
+  {
+    "TimeGenerated": "2026-06-30T15:11:23.3601150Z",
+    "OperationName": "Sign-in activity",
+    "Category": "SignInLogs",
+    "ResultType": "50126",
+    "ResultDescription": "Invalid username or password or Invalid on-premise username or password.",
+    "CorrelationId": "ac1d48a7-1a01-415c-b34b-3a7c1d4d7475",
+    "Id": "f93a134e-8cd6-4e7a-99ee-d2747675e261",
+    "UserDisplayName": "l.becker",
+    "UserPrincipalName": "l.becker@contoso.com",
+    "UserId": "581d5a4a-b4ee-52b9-a912-dc91d2301252",
+    "AppDisplayName": "Office 365",
+    "AppId": "",
+    "IPAddress": "185.220.101.42",
+    "Location": "US",
+    "LocationDetails": {
+      "city": "Seattle",
+      "countryOrRegion": "US",
+      "geoCoordinates": {
+        "latitude": 47.6062,
+        "longitude": -122.3321
+      },
+      "state": "Washington"
+    },
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "DeviceDetail": {
+      "browser": "Rich Client",
+      "deviceId": "",
+      "operatingSystem": "Windows 10"
+    },
+    "ConditionalAccessStatus": "notApplied",
+    "IsInteractive": true,
+    "RiskLevelAggregated": "none",
+    "RiskLevelDuringSignIn": "none",
+    "RiskState": "none",
+    "Status": {
+      "errorCode": 50126,
+      "failureReason": "Invalid username or password or Invalid on-premise username or password."
+    },
+    "AuthenticationMethodsUsed": [
+      "Password"
+    ],
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "TokenIssuerType": "AzureAD",
+    "ResourceDisplayName": "Office 365",
+    "ResourceId": "",
+    "HomeTenantId": "87654321-4321-4321-4321-cba987654321",
+    "UserType": "Member",
+    "source": "azure_ad",
+    "collectedAt": "2026-06-30T15:11:24.132333Z",
+    "AttackTechnique": "T1110.003"
+  },
+  {
+    "TimeGenerated": "2026-06-30T15:11:23.4443731Z",
+    "OperationName": "Sign-in activity",
+    "Category": "SignInLogs",
+    "ResultType": "50126",
+    "ResultDescription": "Invalid username or password or Invalid on-premise username or password.",
+    "CorrelationId": "e42f298b-efd0-497a-a463-0fe7c0f9e0d2",
+    "Id": "8b36d2b1-2385-483d-92df-963ff1ce30f8",
+    "UserDisplayName": "m.schmidt",
+    "UserPrincipalName": "m.schmidt@contoso.com",
+    "UserId": "50cb09ec-20b0-5df7-b67c-1df377d83286",
+    "AppDisplayName": "Office 365",
+    "AppId": "",
+    "IPAddress": "185.220.101.42",
+    "Location": "US",
+    "LocationDetails": {
+      "city": "Seattle",
+      "countryOrRegion": "US",
+      "geoCoordinates": {
+        "latitude": 47.6062,
+        "longitude": -122.3321
+      },
+      "state": "Washington"
+    },
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "DeviceDetail": {
+      "browser": "Rich Client",
+      "deviceId": "",
+      "operatingSystem": "Windows 10"
+    },
+    "ConditionalAccessStatus": "notApplied",
+    "IsInteractive": true,
+    "RiskLevelAggregated": "none",
+    "RiskLevelDuringSignIn": "none",
+    "RiskState": "none",
+    "Status": {
+      "errorCode": 50126,
+      "failureReason": "Invalid username or password or Invalid on-premise username or password."
+    },
+    "AuthenticationMethodsUsed": [
+      "Password"
+    ],
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "TokenIssuerType": "AzureAD",
+    "ResourceDisplayName": "Office 365",
+    "ResourceId": "",
+    "HomeTenantId": "87654321-4321-4321-4321-cba987654321",
+    "UserType": "Member",
+    "source": "azure_ad",
+    "collectedAt": "2026-06-30T15:11:24.132335Z",
+    "AttackTechnique": "T1110.003"
+  },
+  {
+    "TimeGenerated": "2026-06-30T15:11:23.6215517Z",
+    "OperationName": "Sign-in activity",
+    "Category": "SignInLogs",
+    "ResultType": "0",
+    "ResultDescription": "ROPC password grant authentication",
+    "CorrelationId": "48746926-46a3-4904-aa2b-10e0f42446dd",
+    "Id": "ad39768d-d545-40f4-a4ab-2d24feae82a8",
+    "UserDisplayName": "m.schmidt",
+    "UserPrincipalName": "m.schmidt@contoso.com",
+    "UserId": "50cb09ec-20b0-5df7-b67c-1df377d83286",
+    "AppDisplayName": "ROPC Password Grant",
+    "AppId": "sap-procurement-app-id",
+    "IPAddress": "172.30.30.1",
+    "Location": "US",
+    "LocationDetails": {
+      "city": "Seattle",
+      "countryOrRegion": "US",
+      "geoCoordinates": {
+        "latitude": 47.6062,
+        "longitude": -122.3321
+      },
+      "state": "Washington"
+    },
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "DeviceDetail": {
+      "browser": "Rich Client",
+      "deviceId": "",
+      "operatingSystem": "Windows 10"
+    },
+    "ConditionalAccessStatus": "notApplied",
+    "IsInteractive": true,
+    "RiskLevelAggregated": "medium",
+    "RiskLevelDuringSignIn": "medium",
+    "RiskState": "atRisk",
+    "Status": {
+      "errorCode": 0,
+      "failureReason": null
+    },
+    "AuthenticationMethodsUsed": [
+      "Password"
+    ],
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "TokenIssuerType": "AzureAD",
+    "ResourceDisplayName": "ROPC Password Grant",
+    "ResourceId": "sap-procurement-app-id",
+    "HomeTenantId": "87654321-4321-4321-4321-cba987654321",
+    "UserType": "Member",
+    "source": "azure_ad",
+    "collectedAt": "2026-06-30T15:11:24.132336Z",
+    "AttackTechnique": "T1078.004"
+  },
+  {
+    "TimeGenerated": "2026-06-24T07:18:29.145217Z",
+    "OperationName": "Sign-in activity",
+    "Category": "SignInLogs",
+    "ResultType": "50126",
+    "ResultDescription": "Invalid username or password or Invalid on-premise username or password.",
+    "CorrelationId": "a9084793-67c2-4e39-9c05-b06bb4961169",
+    "Id": "a0094d91-3111-4666-9e52-69619eab2c88",
+    "UserDisplayName": "j.mueller",
+    "UserPrincipalName": "j.mueller@contoso.com",
+    "UserId": "d6e5e577-2351-4d6b-a7f5-4d908e402c06",
+    "AppDisplayName": "Office 365",
+    "AppId": "",
+    "IPAddress": "185.220.101.42",
+    "Location": "US",
+    "LocationDetails": {
+      "city": "Seattle",
+      "state": "Washington",
+      "countryOrRegion": "US",
+      "geoCoordinates": {
+        "latitude": 47.6062,
+        "longitude": -122.3321
+      }
+    },
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "DeviceDetail": {
+      "operatingSystem": "Windows 10",
+      "browser": "Rich Client",
+      "deviceId": ""
+    },
+    "ConditionalAccessStatus": "notApplied",
+    "IsInteractive": true,
+    "RiskLevelAggregated": "none",
+    "RiskLevelDuringSignIn": "none",
+    "RiskState": "none",
+    "Status": {
+      "errorCode": 50126,
+      "failureReason": "Invalid username or password or Invalid on-premise username or password."
+    },
+    "AuthenticationMethodsUsed": [
+      "Password"
+    ],
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "TokenIssuerType": "AzureAD",
+    "ResourceDisplayName": "Office 365",
+    "ResourceId": "",
+    "HomeTenantId": "87654321-4321-4321-4321-cba987654321",
+    "UserType": "Member",
+    "source": "azure_ad",
+    "collectedAt": "2026-06-24T07:18:04.520769Z",
+    "AttackTechnique": "T1110.003"
+  },
+  {
+    "TimeGenerated": "2026-06-24T07:28:31.253643Z",
+    "OperationName": "Sign-in activity",
+    "Category": "SignInLogs",
+    "ResultType": "50126",
+    "ResultDescription": "Invalid username or password or Invalid on-premise username or password.",
+    "CorrelationId": "4637f1e7-ec52-402f-bfe5-df6c6eaf1fe6",
+    "Id": "5ad0b2b0-192d-467f-9c82-57b4ce2013c3",
+    "UserDisplayName": "j.mueller",
+    "UserPrincipalName": "j.mueller@contoso.com",
+    "UserId": "9b74dd2d-e4b9-450a-aa7d-0d1a57a54fba",
+    "AppDisplayName": "Office 365",
+    "AppId": "",
+    "IPAddress": "185.220.101.42",
+    "Location": "US",
+    "LocationDetails": {
+      "city": "Seattle",
+      "state": "Washington",
+      "countryOrRegion": "US",
+      "geoCoordinates": {
+        "latitude": 47.6062,
+        "longitude": -122.3321
+      }
+    },
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "DeviceDetail": {
+      "operatingSystem": "Windows 10",
+      "browser": "Rich Client",
+      "deviceId": ""
+    },
+    "ConditionalAccessStatus": "notApplied",
+    "IsInteractive": true,
+    "RiskLevelAggregated": "none",
+    "RiskLevelDuringSignIn": "none",
+    "RiskState": "none",
+    "Status": {
+      "errorCode": 50126,
+      "failureReason": "Invalid username or password or Invalid on-premise username or password."
+    },
+    "AuthenticationMethodsUsed": [
+      "Password"
+    ],
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "TokenIssuerType": "AzureAD",
+    "ResourceDisplayName": "Office 365",
+    "ResourceId": "",
+    "HomeTenantId": "87654321-4321-4321-4321-cba987654321",
+    "UserType": "Member",
+    "source": "azure_ad",
+    "collectedAt": "2026-06-24T07:28:05.705638Z",
+    "AttackTechnique": "T1110.003"
+  },
+  {
+    "TimeGenerated": "2026-06-24T09:57:18.682235Z",
+    "OperationName": "Sign-in activity",
+    "Category": "SignInLogs",
+    "ResultType": "50126",
+    "ResultDescription": "Invalid username or password or Invalid on-premise username or password.",
+    "CorrelationId": "8df43d1f-a1bf-408e-83d6-0e62f1e26192",
+    "Id": "f1ad91cd-9d2e-445b-aec2-6c78f1a2a4ff",
+    "UserDisplayName": "j.mueller",
+    "UserPrincipalName": "j.mueller@contoso.com",
+    "UserId": "5dc69887-ffe7-43b2-aa10-9be723f0bb05",
+    "AppDisplayName": "Office 365",
+    "AppId": "",
+    "IPAddress": "185.220.101.42",
+    "Location": "US",
+    "LocationDetails": {
+      "city": "Seattle",
+      "state": "Washington",
+      "countryOrRegion": "US",
+      "geoCoordinates": {
+        "latitude": 47.6062,
+        "longitude": -122.3321
+      }
+    },
+    "ClientAppUsed": "Mobile Apps and Desktop clients",
+    "DeviceDetail": {
+      "operatingSystem": "Windows 10",
+      "browser": "Rich Client",
+      "deviceId": ""
+    },
+    "ConditionalAccessStatus": "notApplied",
+    "IsInteractive": true,
+    "RiskLevelAggregated": "none",
+    "RiskLevelDuringSignIn": "none",
+    "RiskState": "none",
+    "Status": {
+      "errorCode": 50126,
+      "failureReason": "Invalid username or password or Invalid on-premise username or password."
+    },
+    "AuthenticationMethodsUsed": [
+      "Password"
+    ],
+    "AuthenticationRequirement": "singleFactorAuthentication",
+    "TokenIssuerType": "AzureAD",
+    "ResourceDisplayName": "Office 365",
+    "ResourceId": "",
+    "HomeTenantId": "87654321-4321-4321-4321-cba987654321",
+    "UserType": "Member",
+    "source": "azure_ad",
+    "collectedAt": "2026-06-24T09:56:52.708984Z",
+    "AttackTechnique": "T1110.003"
+  }
+]

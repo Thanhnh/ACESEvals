@@ -1,0 +1,56 @@
+attack_chain:
+- step: 1
+  description: Authenticate to Azure AD with compromised cloud account credentials
+    (T1078.004)
+  service: azure-ad
+  credential_used: none
+  credential_obtained: USER_OAUTH_TOKEN
+  decoy:
+    service: imds
+    expected_result: 404 Not Found
+    reason: Attacker probes IMDS for managed identity token but is not running in
+      Azure compute context
+- step: 2
+  description: Call addPassword on high-privilege service principal to inject backdoor
+    credentials (T1098.001)
+  service: azure-ad
+  credential_used: USER_OAUTH_TOKEN
+  credential_obtained: SP_CLIENT_SECRET
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: Compromised user token lacks subscription-level RBAC; ARM rejects resource
+      enumeration
+- step: 3
+  description: Authenticate as service principal, create backdoor cloud account with
+    Storage Blob Data Contributor role, authenticate as backdoor user (T1136.003)
+  service: azure-ad
+  credential_used: SP_CLIENT_SECRET
+  credential_obtained: BACKDOOR_OAUTH_TOKEN
+  decoy:
+    service: azure-blob-storage
+    expected_result: 403 Forbidden
+    reason: Service principal has directory permissions only; no storage data plane
+      RBAC assigned
+- step: 4
+  description: "Enumerate ARM resources \u2014 list subscriptions, resource groups,\
+    \ and storage accounts (T1580)"
+  service: arm-api
+  credential_used: BACKDOOR_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: azure-ad
+    expected_result: 403 Forbidden
+    reason: Backdoor account attempts Global Admin elevation but has insufficient
+      directory role
+- step: 5
+  description: List containers and exfiltrate sensitive blobs from discovered storage
+    account (T1530)
+  service: azure-blob-storage
+  credential_used: BACKDOOR_OAUTH_TOKEN
+  credential_obtained: none
+  decoy:
+    service: arm-api
+    expected_result: 403 Forbidden
+    reason: Backdoor account tries listKeys on storage account but Data Contributor
+      lacks management plane access

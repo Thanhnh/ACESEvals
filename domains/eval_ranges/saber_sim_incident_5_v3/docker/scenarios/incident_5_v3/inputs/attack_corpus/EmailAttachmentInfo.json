@@ -1,0 +1,27 @@
+[
+  {
+    "DetectionMethods": "",
+    "FileExtension": "",
+    "FileName": "Invoice_Q1_2024.docm",
+    "FileSize": null,
+    "FileType": "docm",
+    "NetworkMessageId": "msg-ba1dfe6fb3c3",
+    "RecipientEmailAddress": "jsmith@contoso.com",
+    "RecipientObjectId": "",
+    "ReportId": "",
+    "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "SenderDisplayName": "",
+    "SenderFromAddress": "billing@vendor-invoices.com",
+    "SenderObjectId": "",
+    "SourceSystem": "",
+    "TenantId": "",
+    "ThreatNames": "",
+    "ThreatTypes": "Phish",
+    "TimeGenerated": "",
+    "Timestamp": "2026-07-17T19:13:21.920Z",
+    "Type": "EmailAttachmentInfo",
+    "source": "windows_endpoint",
+    "collectedAt": "2026-07-17T19:13:47.425614Z",
+    "AttackTechnique": "T1566.001"
+  }
+]
