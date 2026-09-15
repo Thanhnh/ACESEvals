@@ -4,7 +4,8 @@ name: "CTI Realm - Cyber Threat Intelligence"
 description: >
   Cyber threat intelligence analysis and detection rule development
   benchmark with Kusto/KQL querying, MITRE ATT&CK mapping, and
-  Sigma rule generation across 100 detection scenarios.
+  Sigma rule generation across 50 unique detection scenarios, with a
+  25-sample subset available.
 version: "1.0.0"
 tags:
   - cti

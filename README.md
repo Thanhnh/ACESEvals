@@ -226,20 +226,22 @@ uv run inspect eval domains/excytin --model openai/azure/gpt-4.1 \
 
 ### CTI Realm — Cyber Threat Intelligence
 
-Threat intelligence analysis and detection rule development with KQL, MITRE ATT&CK mapping, and Sigma rules — 100 detection scenarios.
+Threat intelligence analysis and detection rule development with KQL, MITRE ATT&CK mapping, and Sigma rules — 50 unique detection scenarios, available as two dataset variants.
 
-| Dataset | Count | Description |
+| Dataset | Samples | Description |
 |---------|-------|-------------|
 | `cti_realm_25` | 25 | Core detection scenarios — **default** |
-| `cti_realm_75` | 75 | Extended detection set |
+| `cti_realm_50` | 50 | Full detection set |
+
+The 25-sample dataset is a subset of the 50-sample dataset; their counts should not be added to obtain the number of unique scenarios.
 
 ```bash
 # Default dataset (cti_realm_25)
 uv run inspect eval domains/cti_realm --model openai/azure/gpt-4.1
 
-# Full 75-task set
+# Full 50-sample set
 uv run inspect eval domains/cti_realm --model openai/azure/gpt-4.1 \
-  -T dataset=cti_realm_75
+  -T dataset=cti_realm_50
 
 # Dataset + task filter
 uv run inspect eval domains/cti_realm --model openai/azure/gpt-4.1 \
