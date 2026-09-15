@@ -4,6 +4,8 @@ CTI-REALM (Cyber Threat Real World Evaluation and LLM Benchmarking) evaluates AI
 
 This is the SABER port of the [inspect_evals CTI-REALM benchmark](https://github.com/UKGovernmentBEIS/inspect_evals).
 
+See [SABER versus Inspect native](README_SABER_VS_OSS.md) for the main differences and the reasons behind this integration.
+
 ## Overview
 
 CTI-REALM tests an AI agent's capability across a 5-stage detection engineering workflow:
@@ -67,7 +69,7 @@ The evaluation environment is a containerized Docker system integrated with [SAB
 - **Telemetry Logs** — Multi-source security logs from attack simulations across Linux endpoints, AKS clusters, and Azure cloud
 - **MITRE ATT&CK Database** — Techniques and tactic mappings for threat contextualization
 - **Sigma Rules Database** — Reference collection of existing detection rules
-- **Tool API** — 8 specialized functions for CTI retrieval, data exploration, query execution, and threat context mapping
+- **Tool API** — 9 specialized functions for CTI retrieval, data exploration, query execution, threat context mapping, and output validation
 
 ### Domain Structure
 
@@ -104,14 +106,14 @@ cti_realm/
 
 ## Usage
 
-### Task Variants
+### Dataset Variants
 
-| Task | Samples | Description |
+| Dataset | Samples | Description |
 |---|---|---|
-| `cti_realm_25` | 25 | Balanced subset (12 Linux, 9 AKS, 4 Cloud) |
+| `cti_realm_25` | 25 | Stratified subset (15 Linux, 6 AKS, 4 Cloud) |
 | `cti_realm_50` | 50 | Full evaluation (25 Linux, 17 AKS, 8 Cloud) |
 
-CTI-REALM-25 is a subset of CTI-REALM-50. All variants use hard difficulty (minimal prompting, no workflow guidance).
+CTI-REALM-25 is a subset of CTI-REALM-50, so the two dataset variants contain 50 unique scenarios in total. All variants use hard difficulty (minimal prompting, no workflow guidance).
 
 ### Running Evaluations
 
@@ -132,7 +134,7 @@ uv run inspect eval domains/cti_realm --model openai/gpt-4o -T dataset=cti_realm
 ### Notes
 
 - Use `--max-samples 2` for stable performance when running multiple samples
-- Agents are permitted a maximum of 70 messages per task (configurable via `-T message_limit=N`)
+- The default task configuration sets a 70-tool-call budget, not 70 messages; see [execution differences](README_SABER_VS_OSS.md#execution-differences)
 - Docker Required: Ensure Docker is running as the benchmark uses containerized services
 - At least 4GB available RAM recommended for Docker containers
 
@@ -147,17 +149,13 @@ $$R_{\text{total}} = \sum_{i \in \{C0, C1, C2, C3, C4\}} w_i \cdot r_i \in [0, 1
 | Checkpoint | Weight | Method | Description |
 |---|---|---|---|
 | C0 — CTI Analysis | 0.125 | LLM-as-judge | Correct identification of relevant threat intelligence reports |
-| C1 — MITRE Mapping | 0.075 | Jaccard similarity | Accuracy of ATT&CK technique extraction |
+| C1 — MITRE Mapping | 0.075 | Expected-technique coverage | Coverage of expected ATT&CK technique IDs |
 | C2 — Data Exploration | 0.100 | Jaccard similarity | Identification of relevant telemetry sources |
-| C3 — Query Execution | 0.050 | Binary | Iterative query refinement (≥2 successful queries) |
+| C3 — Query Execution | 0.050 | Binary | At least 2 unique queries with nonempty successful results |
 | C4 — Detection Quality | 0.650 | F1-score + LLM-as-judge | KQL correctness via F1-score, Sigma rule quality via judge |
 
 Checkpoints C0–C3 comprise 35% of the total weight (trajectory reward), while C4 accounts for 65% (ground truth reward).
 
 ### Grader Model
 
-Checkpoints C0 and C4 use an LLM-as-judge. By default, the grader uses `openai/azure/gpt-5-mini`. To specify a different grader, use the `grader` [model role](https://inspect.aisi.org.uk/models.html#model-roles):
-
-```bash
-uv run inspect eval domains/cti_realm --model anthropic/claude-opus-4-6 --model grader=openai/azure/gpt-5-mini -T dataset=cti_realm_25
-```
+Checkpoints C0 and C4 use an LLM-as-judge, defaulting to `openai/azure/gpt-5-mini`. The current SABER custom scorers resolve their configured/default model directly rather than the upstream `grader` model role. Passing a `grader` role does not override these scorers.

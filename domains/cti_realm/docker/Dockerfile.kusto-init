@@ -2,7 +2,12 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# Built with docker/ as the context (see eval.yaml), so paths are relative to it.
 COPY kusto_init/requirements.txt /tmp/requirements.txt
-RUN pip install --no-cache-dir -r /tmp/requirements.txt && rm /tmp/requirements.txt
+COPY wheels/ /tmp/wheels/
+RUN pip install --no-cache-dir -r /tmp/requirements.txt \
+    || { echo "PyPI unreachable - falling back to docker/wheels/ (populate it on a host with PyPI access via docker/fetch_wheels.sh)"; \
+         pip install --no-cache-dir --no-index --find-links=/tmp/wheels -r /tmp/requirements.txt; } \
+    && rm -rf /tmp/requirements.txt /tmp/wheels
 
 CMD ["bash", "-c", "python init_kusto.py && python load_data.py"]
