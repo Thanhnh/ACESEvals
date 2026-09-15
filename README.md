@@ -261,6 +261,38 @@ uv run inspect eval domains/cybench --model openai/azure/gpt-4.1 \
   -T task_filter="labyrinth_*"
 ```
 
+### SABER-Sim — Simulated Azure Security Ranges
+
+Azure cloud security simulations backed by Dockerized mock services. Each range under
+[`domains/eval_ranges/`](domains/eval_ranges/) is a separate domain with six tasks:
+red-team attack, reconnaissance, detection, posture analysis, remediation, and threat intelligence.
+Point Inspect at an individual range directory, not the parent.
+
+> **First run:** Setup hooks automatically download and verify the range's telemetry from
+> HuggingFace. Use `-T build=true` to build missing Docker images. Each sample starts a
+> multi-container environment, so start with `--max-samples 1`.
+
+```bash
+# All six tasks in one range (default react harness)
+uv run inspect eval domains/eval_ranges/saber_sim_incident_34_v1 \
+  --model openai/azure/gpt-4.1 -T judge_llm=openai/azure/gpt-4.1 \
+  -T build=true --max-samples 1 --display plain
+
+# Run only the detection task with the Copilot harness
+uv run inspect eval domains/eval_ranges/saber_sim_incident_34_v1 \
+  --model openai/azure/gpt-4.1 -T judge_llm=openai/azure/gpt-4.1 \
+  -T task_filter="incident_34_v1_detection" -T agent=copilot \
+  -T build=true --max-samples 1 --display plain
+```
+
+Replace `incident_34_v1` in the path and task filter to select another range.
+`-T agent` selects the harness, not the task role. Set `-T judge_llm` to your scoring
+model; if omitted, it uses `JUDGE_MODEL`, falling back to `openai/azure/gpt-5.4`.
+
+For batch runs across ranges and harnesses, use the
+[matrix runner](scripts/run_saber_sim_matrix.sh). See the
+[range documentation](docs/DOMAIN_DEVELOPMENT.md#saber-sim-range-domains) for details and telemetry prefetching.
+
 ---
 
 ## Agents
